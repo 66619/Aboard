@@ -29,6 +29,14 @@
 
     <!-- Dynamic configuration area (appears above toolbar) -->
     <div id="config-area">
+        <!-- Close button for config panel -->
+        <button id="config-close-btn" class="config-close-btn" title="关闭">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        
         <!-- Pen configuration -->
         <div id="pen-config" class="config-panel active">
             <div class="config-group">
@@ -51,6 +59,31 @@
             <div class="config-group">
                 <label>橡皮擦大小 <span id="eraser-size-value">20</span>px</label>
                 <input type="range" id="eraser-size-slider" min="10" max="30" value="20" class="slider">
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>设置</h2>
+                <button id="settings-close-btn" class="modal-close-btn" title="关闭">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-group">
+                    <label>工具栏按钮大小</label>
+                    <div class="button-size-options">
+                        <button class="size-option-btn" data-size="small">小</button>
+                        <button class="size-option-btn active" data-size="medium">中</button>
+                        <button class="size-option-btn" data-size="large">大</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -79,6 +112,13 @@
                 <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
             </svg>
             <span>清空</span>
+        </button>
+        <button id="settings-btn" class="tool-btn" data-tool="settings" title="设置">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M12 1v6m0 6v6M5.6 5.6l4.2 4.2m4.2 4.2l4.2 4.2M1 12h6m6 0h6M5.6 18.4l4.2-4.2m4.2-4.2l4.2-4.2"></path>
+            </svg>
+            <span>设置</span>
         </button>
     </div>
 

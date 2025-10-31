@@ -17,6 +17,9 @@ class DrawingBoard {
         this.penSize = 5;
         this.eraserSize = 20;
         
+        // UI settings
+        this.buttonSize = localStorage.getItem('buttonSize') || 'medium';
+        
         // History management for undo/redo
         this.history = [];
         this.historyStep = -1;
@@ -29,6 +32,7 @@ class DrawingBoard {
         // Initialize
         this.resizeCanvas();
         this.setupEventListeners();
+        this.loadSettings();
         this.updateUI();
         this.saveState();
         
@@ -92,6 +96,10 @@ class DrawingBoard {
         document.getElementById('pen-btn').addEventListener('click', () => this.setTool('pen'));
         document.getElementById('eraser-btn').addEventListener('click', () => this.setTool('eraser'));
         document.getElementById('clear-btn').addEventListener('click', () => this.confirmClear());
+        document.getElementById('settings-btn').addEventListener('click', () => this.openSettings());
+        
+        // Config close button
+        document.getElementById('config-close-btn').addEventListener('click', () => this.closeConfigPanel());
         
         // Color picker
         document.querySelectorAll('.color-btn').forEach(btn => {
@@ -122,6 +130,22 @@ class DrawingBoard {
         document.getElementById('undo-btn').addEventListener('click', () => this.undo());
         document.getElementById('redo-btn').addEventListener('click', () => this.redo());
         
+        // Settings modal
+        document.getElementById('settings-close-btn').addEventListener('click', () => this.closeSettings());
+        document.querySelectorAll('.size-option-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const size = e.target.dataset.size;
+                this.setButtonSize(size);
+            });
+        });
+        
+        // Close modal when clicking outside
+        document.getElementById('settings-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'settings-modal') {
+                this.closeSettings();
+            }
+        });
+        
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey || e.metaKey) {
@@ -132,6 +156,11 @@ class DrawingBoard {
                     e.preventDefault();
                     this.redo();
                 }
+            }
+            // Escape key to close modals
+            if (e.key === 'Escape') {
+                this.closeSettings();
+                this.closeConfigPanel();
             }
         });
         
@@ -153,7 +182,18 @@ class DrawingBoard {
         this.points = [pos];
         this.lastPoint = pos;
         
+        // Setup drawing context
+        this.setupDrawingContext();
+        
         // Draw initial point
+        this.ctx.beginPath();
+        this.ctx.moveTo(pos.x, pos.y);
+        this.ctx.lineTo(pos.x, pos.y);
+        this.ctx.stroke();
+    }
+    
+    setupDrawingContext() {
+        // Always set line properties
         this.ctx.lineCap = 'round';
         this.ctx.lineJoin = 'round';
         
@@ -163,13 +203,9 @@ class DrawingBoard {
             this.ctx.lineWidth = this.penSize;
         } else if (this.currentTool === 'eraser') {
             this.ctx.globalCompositeOperation = 'destination-out';
+            this.ctx.strokeStyle = 'rgba(0,0,0,1)'; // Eraser needs a stroke style
             this.ctx.lineWidth = this.eraserSize;
         }
-        
-        this.ctx.beginPath();
-        this.ctx.moveTo(pos.x, pos.y);
-        this.ctx.lineTo(pos.x, pos.y);
-        this.ctx.stroke();
     }
     
     draw(e) {
@@ -190,6 +226,9 @@ class DrawingBoard {
     
     renderStroke() {
         if (this.points.length < 2) return;
+        
+        // Ensure drawing context is set up before rendering
+        this.setupDrawingContext();
         
         const points = this.points;
         
@@ -253,22 +292,64 @@ class DrawingBoard {
         this.updateUI();
     }
     
+    closeConfigPanel() {
+        document.getElementById('config-area').classList.remove('show');
+    }
+    
+    openSettings() {
+        document.getElementById('settings-modal').classList.add('show');
+    }
+    
+    closeSettings() {
+        document.getElementById('settings-modal').classList.remove('show');
+    }
+    
+    setButtonSize(size) {
+        this.buttonSize = size;
+        localStorage.setItem('buttonSize', size);
+        
+        // Update UI
+        const toolbar = document.getElementById('toolbar');
+        toolbar.className = `size-${size}`;
+        
+        // Update active button
+        document.querySelectorAll('.size-option-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.size === size) {
+                btn.classList.add('active');
+            }
+        });
+    }
+    
+    loadSettings() {
+        // Load button size setting
+        this.setButtonSize(this.buttonSize);
+    }
+    
     updateUI() {
         // Update toolbar buttons
         document.querySelectorAll('.tool-btn').forEach(btn => {
             btn.classList.remove('active');
         });
         
+        const configArea = document.getElementById('config-area');
+        
         if (this.currentTool === 'pen') {
             document.getElementById('pen-btn').classList.add('active');
             document.getElementById('pen-config').classList.add('active');
             document.getElementById('eraser-config').classList.remove('active');
+            configArea.classList.add('show');
             this.canvas.style.cursor = 'crosshair';
         } else if (this.currentTool === 'eraser') {
             document.getElementById('eraser-btn').classList.add('active');
             document.getElementById('pen-config').classList.remove('active');
             document.getElementById('eraser-config').classList.add('active');
+            configArea.classList.add('show');
             this.canvas.style.cursor = 'pointer';
+        } else {
+            // For other tools, hide config area
+            configArea.classList.remove('show');
+            this.canvas.style.cursor = 'default';
         }
         
         // Update history buttons
@@ -283,6 +364,8 @@ class DrawingBoard {
     }
     
     clearCanvas(saveToHistory = true) {
+        // Reset to default drawing mode before clearing
+        this.ctx.globalCompositeOperation = 'source-over';
         this.ctx.fillStyle = '#ffffff';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
