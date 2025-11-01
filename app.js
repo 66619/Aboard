@@ -35,10 +35,6 @@ class DrawingBoard {
         this.loadSettings();
         this.updateUI();
         this.saveState();
-        
-        // Performance optimization
-        this.rafId = null;
-        this.pendingDraw = false;
     }
     
     resizeCanvas() {
@@ -214,59 +210,13 @@ class DrawingBoard {
         const pos = this.getPosition(e);
         this.points.push(pos);
         
-        // Use requestAnimationFrame for smooth rendering
-        if (!this.pendingDraw) {
-            this.pendingDraw = true;
-            this.rafId = requestAnimationFrame(() => {
-                this.renderStroke();
-                this.pendingDraw = false;
-            });
-        }
-    }
-    
-    renderStroke() {
-        if (this.points.length < 2) return;
-        
-        // Ensure drawing context is set up before rendering
-        this.setupDrawingContext();
-        
-        const points = this.points;
-        
-        if (points.length >= 3) {
-            // Use single path for better performance
+        // Draw immediately for responsiveness
+        if (this.points.length >= 2) {
+            const lastIndex = this.points.length - 1;
             this.ctx.beginPath();
-            this.ctx.moveTo(points[0].x, points[0].y);
-            
-            // Draw smooth curve through points
-            for (let i = 1; i < points.length - 1; i++) {
-                const control = points[i];
-                const end = points[i + 1];
-                
-                // Calculate midpoint for smoother curves
-                const midX = (control.x + end.x) / 2;
-                const midY = (control.y + end.y) / 2;
-                
-                this.ctx.quadraticCurveTo(control.x, control.y, midX, midY);
-            }
-            
-            // Draw to the last point
-            const lastPoint = points[points.length - 1];
-            this.ctx.lineTo(lastPoint.x, lastPoint.y);
+            this.ctx.moveTo(this.points[lastIndex - 1].x, this.points[lastIndex - 1].y);
+            this.ctx.lineTo(this.points[lastIndex].x, this.points[lastIndex].y);
             this.ctx.stroke();
-        } else {
-            // Draw straight line for first segment
-            const start = points[points.length - 2];
-            const end = points[points.length - 1];
-            
-            this.ctx.beginPath();
-            this.ctx.moveTo(start.x, start.y);
-            this.ctx.lineTo(end.x, end.y);
-            this.ctx.stroke();
-        }
-        
-        // Keep only recent points for smoothing
-        if (this.points.length > 10) {
-            this.points = this.points.slice(-10);
         }
     }
     
@@ -275,12 +225,6 @@ class DrawingBoard {
             this.isDrawing = false;
             this.points = [];
             this.lastPoint = null;
-            
-            // Cancel any pending animation frame
-            if (this.rafId) {
-                cancelAnimationFrame(this.rafId);
-                this.rafId = null;
-            }
             
             // Save state after drawing
             this.saveState();
