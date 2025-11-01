@@ -67,6 +67,13 @@ body {
     bottom: 100px;
 }
 
+#history-controls.bottom-left {
+    top: auto;
+    bottom: 100px;
+    right: auto;
+    left: 20px;
+}
+
 #history-controls.dragging {
     cursor: grabbing;
 }
@@ -455,6 +462,12 @@ body {
     gap: 12px;
 }
 
+.button-size-options-4 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
 .button-size-options.pattern-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -566,7 +579,14 @@ body {
 
 #pagination-controls.bottom-right {
     top: auto;
-    bottom: 100px;
+    bottom: 170px;  /* Position above the history controls */
+}
+
+#pagination-controls.bottom-left {
+    top: auto;
+    bottom: 170px;  /* Position above the history controls */
+    right: auto;
+    left: 20px;
 }
 
 .page-nav-btn {
@@ -633,6 +653,52 @@ body {
     font-size: 14px;
     color: #333;
     font-weight: 500;
+}
+
+/* Confirm Modal */
+.confirm-modal-content {
+    max-width: 400px;
+}
+
+.confirm-message {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.confirm-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cancel-btn {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.cancel-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.ok-btn {
+    background-color: #FF3B30;
+    color: #ffffff;
+}
+
+.ok-btn:hover {
+    background-color: #E02020;
 }
 
 /* Responsive adjustments */

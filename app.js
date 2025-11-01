@@ -233,8 +233,13 @@ class DrawingBoard {
         
         // Zoom input
         const zoomInput = document.getElementById('zoom-input');
+        zoomInput.addEventListener('input', (e) => {
+            // Remove any non-digit characters except decimal point while typing
+            let value = e.target.value.replace(/[^0-9.]/g, '');
+            e.target.value = value;
+        });
         zoomInput.addEventListener('change', (e) => {
-            const value = e.target.value.replace('%', '');
+            const value = e.target.value.replace(/[^0-9.]/g, '');
             const scale = parseFloat(value) / 100;
             if (!isNaN(scale) && scale >= 0.5 && scale <= 3.0) {
                 this.canvasScale = scale;
@@ -244,11 +249,33 @@ class DrawingBoard {
             }
         });
         zoomInput.addEventListener('focus', (e) => {
+            // Remove % sign when focused for easier editing
+            e.target.value = e.target.value.replace('%', '');
             e.target.select();
+        });
+        zoomInput.addEventListener('blur', (e) => {
+            // Re-add % sign when focus is lost
+            this.updateZoomDisplay();
         });
         
         // Settings modal
         document.getElementById('settings-close-btn').addEventListener('click', () => this.closeSettings());
+        
+        // Confirm modal
+        document.getElementById('confirm-cancel-btn').addEventListener('click', () => {
+            document.getElementById('confirm-modal').classList.remove('show');
+        });
+        document.getElementById('confirm-ok-btn').addEventListener('click', () => {
+            document.getElementById('confirm-modal').classList.remove('show');
+            this.clearCanvas(true);
+        });
+        
+        // Close confirm modal when clicking outside
+        document.getElementById('confirm-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'confirm-modal') {
+                document.getElementById('confirm-modal').classList.remove('show');
+            }
+        });
         
         // Toolbar size slider
         const toolbarSizeSlider = document.getElementById('toolbar-size-slider');
@@ -617,9 +644,8 @@ class DrawingBoard {
     }
     
     confirmClear() {
-        if (confirm('确定要清空画布吗？')) {
-            this.clearCanvas(true);
-        }
+        // Show custom confirm modal
+        document.getElementById('confirm-modal').classList.add('show');
     }
     
     clearCanvas(saveToHistory = true) {

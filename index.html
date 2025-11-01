@@ -158,10 +158,11 @@
                 </div>
                 <div class="settings-group">
                     <label>控制按钮位置</label>
-                    <div class="button-size-options">
+                    <div class="button-size-options button-size-options-4">
                         <button class="position-option-btn active" data-position="top-right">右上角</button>
                         <button class="position-option-btn" data-position="top-left">左上角</button>
                         <button class="position-option-btn" data-position="bottom-right">右下角</button>
+                        <button class="position-option-btn" data-position="bottom-left">左下角</button>
                     </div>
                 </div>
                 <div class="settings-group">
@@ -176,6 +177,22 @@
                         <span>无限画布模式</span>
                     </label>
                     <p class="settings-hint">关闭后启用分页系统</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm modal for clear action -->
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content confirm-modal-content">
+            <div class="modal-header">
+                <h2>确认清空</h2>
+            </div>
+            <div class="modal-body">
+                <p class="confirm-message">确定要清空画布吗？此操作无法撤销。</p>
+                <div class="confirm-buttons">
+                    <button id="confirm-cancel-btn" class="confirm-btn cancel-btn">取消</button>
+                    <button id="confirm-ok-btn" class="confirm-btn ok-btn">确定</button>
                 </div>
             </div>
         </div>
