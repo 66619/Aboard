@@ -30,9 +30,12 @@ class DrawingEngine {
     
     getPosition(e) {
         const rect = this.canvas.getBoundingClientRect();
+        // Adjust for canvas scale (CSS transform)
+        const scaleX = this.canvas.offsetWidth / rect.width;
+        const scaleY = this.canvas.offsetHeight / rect.height;
         return {
-            x: (e.clientX - rect.left) / this.canvasScale - this.panOffset.x,
-            y: (e.clientY - rect.top) / this.canvasScale - this.panOffset.y
+            x: (e.clientX - rect.left) * scaleX,
+            y: (e.clientY - rect.top) * scaleY
         };
     }
     
