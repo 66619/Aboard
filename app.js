@@ -22,6 +22,7 @@ class DrawingBoard {
         this.controlPosition = localStorage.getItem('controlPosition') || 'top-right';
         this.edgeSnapEnabled = localStorage.getItem('edgeSnapEnabled') !== 'false';
         this.canvasScale = parseFloat(localStorage.getItem('canvasScale')) || 1.0;
+        this.edgeSnapDistance = 20; // Distance in pixels for edge snapping
         
         // Dragging state
         this.isDraggingPanel = false;
@@ -422,11 +423,12 @@ class DrawingBoard {
         const toolbar = document.getElementById('toolbar');
         const buttons = toolbar.querySelectorAll('.tool-btn');
         
-        // Constants for size calculations
-        const PADDING_VERTICAL_RATIO = 5;
-        const PADDING_HORIZONTAL_RATIO = 3;
-        const SVG_SIZE_RATIO = 2;
-        const FONT_SIZE_RATIO = 4.5;
+        // Size calculation ratios for responsive toolbar scaling
+        // These ratios ensure proper proportions at different toolbar sizes
+        const PADDING_VERTICAL_RATIO = 5;    // Vertical padding = toolbarSize / 5
+        const PADDING_HORIZONTAL_RATIO = 3;  // Horizontal padding = toolbarSize / 3
+        const SVG_SIZE_RATIO = 2;            // Icon size = toolbarSize / 2
+        const FONT_SIZE_RATIO = 4.5;         // Font size = toolbarSize / 4.5
         
         buttons.forEach(btn => {
             btn.style.padding = `${this.toolbarSize / PADDING_VERTICAL_RATIO}px ${this.toolbarSize / PADDING_HORIZONTAL_RATIO}px`;
@@ -502,20 +504,19 @@ class DrawingBoard {
             
             // Apply edge snapping if enabled
             if (this.edgeSnapEnabled) {
-                const snapDistance = 20;
                 const windowWidth = window.innerWidth;
                 const windowHeight = window.innerHeight;
                 
                 // Snap to left
-                if (x < snapDistance) x = 0;
+                if (x < this.edgeSnapDistance) x = 0;
                 // Snap to right
-                if (x + this.draggedElementWidth > windowWidth - snapDistance) {
+                if (x + this.draggedElementWidth > windowWidth - this.edgeSnapDistance) {
                     x = windowWidth - this.draggedElementWidth;
                 }
                 // Snap to top
-                if (y < snapDistance) y = 0;
+                if (y < this.edgeSnapDistance) y = 0;
                 // Snap to bottom
-                if (y + this.draggedElementHeight > windowHeight - snapDistance) {
+                if (y + this.draggedElementHeight > windowHeight - this.edgeSnapDistance) {
                     y = windowHeight - this.draggedElementHeight;
                 }
             }
