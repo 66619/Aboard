@@ -6,8 +6,13 @@ class DrawingBoard {
         // Canvas setup
         this.canvas = document.getElementById('canvas');
         this.ctx = this.canvas.getContext('2d', { 
-            desynchronized: true // Better performance
+            desynchronized: true, // Better performance
+            alpha: true // Enable transparency
         });
+        
+        // Background canvas setup
+        this.bgCanvas = document.getElementById('background-canvas');
+        this.bgCtx = this.bgCanvas.getContext('2d');
         
         // Eraser cursor element
         this.eraserCursor = document.getElementById('eraser-cursor');
@@ -78,21 +83,28 @@ class DrawingBoard {
         const imageData = this.historyStep >= 0 ? 
             this.ctx.getImageData(0, 0, oldWidth, oldHeight) : null;
         
-        // Set canvas size
+        // Set canvas size for both layers
         this.canvas.width = rect.width * dpr;
         this.canvas.height = rect.height * dpr;
         this.canvas.style.width = rect.width + 'px';
         this.canvas.style.height = rect.height + 'px';
         
+        this.bgCanvas.width = rect.width * dpr;
+        this.bgCanvas.height = rect.height * dpr;
+        this.bgCanvas.style.width = rect.width + 'px';
+        this.bgCanvas.style.height = rect.height + 'px';
+        
         // Scale context for high DPI displays
         this.ctx.scale(dpr, dpr);
+        this.bgCtx.scale(dpr, dpr);
         
         // Restore canvas state after resize
         if (imageData) {
             this.ctx.putImageData(imageData, 0, 0);
-        } else {
-            this.clearCanvas(false); // Clear without saving to history
         }
+        
+        // Always redraw background
+        this.drawBackground();
     }
     
     setupEventListeners() {
@@ -611,13 +623,8 @@ class DrawingBoard {
     }
     
     clearCanvas(saveToHistory = true) {
-        // Reset to default drawing mode before clearing
-        this.ctx.globalCompositeOperation = 'source-over';
-        this.ctx.fillStyle = this.backgroundColor;
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Apply background pattern
-        this.drawBackgroundPattern();
+        // Clear drawing layer only (not the background)
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         
         if (saveToHistory) {
             this.saveState();
@@ -824,19 +831,18 @@ class DrawingBoard {
     
     // Background functions
     applyBackground() {
-        this.ctx.globalCompositeOperation = 'source-over';
-        this.ctx.fillStyle = this.backgroundColor;
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        this.drawBackgroundPattern();
+        this.drawBackground();
         
         localStorage.setItem('backgroundColor', this.backgroundColor);
         localStorage.setItem('backgroundPattern', this.backgroundPattern);
+    }
+    
+    drawBackground() {
+        // Draw background on the background canvas
+        this.bgCtx.fillStyle = this.backgroundColor;
+        this.bgCtx.fillRect(0, 0, this.bgCanvas.width, this.bgCanvas.height);
         
-        // Save to history if we have history
-        if (this.historyStep >= 0) {
-            this.saveState();
-        }
+        this.drawBackgroundPattern();
     }
     
     drawBackgroundPattern() {
@@ -844,8 +850,8 @@ class DrawingBoard {
             return; // No pattern needed
         }
         
-        this.ctx.save();
-        this.ctx.globalCompositeOperation = 'source-over';
+        this.bgCtx.save();
+        this.bgCtx.globalCompositeOperation = 'source-over';
         
         const dpr = window.devicePixelRatio || 1;
         const patternColor = this.getPatternColor();
@@ -853,191 +859,191 @@ class DrawingBoard {
         if (this.backgroundPattern === 'dots') {
             // Draw dot grid pattern
             const spacing = 20 * dpr;
-            this.ctx.fillStyle = patternColor;
+            this.bgCtx.fillStyle = patternColor;
             
-            for (let x = spacing; x < this.canvas.width; x += spacing) {
-                for (let y = spacing; y < this.canvas.height; y += spacing) {
-                    this.ctx.beginPath();
-                    this.ctx.arc(x, y, 1 * dpr, 0, Math.PI * 2);
-                    this.ctx.fill();
+            for (let x = spacing; x < this.bgCanvas.width; x += spacing) {
+                for (let y = spacing; y < this.bgCanvas.height; y += spacing) {
+                    this.bgCtx.beginPath();
+                    this.bgCtx.arc(x, y, 1 * dpr, 0, Math.PI * 2);
+                    this.bgCtx.fill();
                 }
             }
         } else if (this.backgroundPattern === 'grid') {
             // Draw square grid pattern
             const spacing = 20 * dpr;
-            this.ctx.strokeStyle = patternColor;
-            this.ctx.lineWidth = 0.5 * dpr;
+            this.bgCtx.strokeStyle = patternColor;
+            this.bgCtx.lineWidth = 0.5 * dpr;
             
             // Vertical lines
-            for (let x = spacing; x < this.canvas.width; x += spacing) {
-                this.ctx.beginPath();
-                this.ctx.moveTo(x, 0);
-                this.ctx.lineTo(x, this.canvas.height);
-                this.ctx.stroke();
+            for (let x = spacing; x < this.bgCanvas.width; x += spacing) {
+                this.bgCtx.beginPath();
+                this.bgCtx.moveTo(x, 0);
+                this.bgCtx.lineTo(x, this.bgCanvas.height);
+                this.bgCtx.stroke();
             }
             
             // Horizontal lines
-            for (let y = spacing; y < this.canvas.height; y += spacing) {
-                this.ctx.beginPath();
-                this.ctx.moveTo(0, y);
-                this.ctx.lineTo(this.canvas.width, y);
-                this.ctx.stroke();
+            for (let y = spacing; y < this.bgCanvas.height; y += spacing) {
+                this.bgCtx.beginPath();
+                this.bgCtx.moveTo(0, y);
+                this.bgCtx.lineTo(this.bgCanvas.width, y);
+                this.bgCtx.stroke();
             }
         } else if (this.backgroundPattern === 'tianzige') {
             // Draw Tian Zi Ge (田字格) pattern - Chinese character practice grid
             const cellSize = 60 * dpr;
-            this.ctx.strokeStyle = patternColor;
+            this.bgCtx.strokeStyle = patternColor;
             
-            for (let x = 0; x < this.canvas.width; x += cellSize) {
-                for (let y = 0; y < this.canvas.height; y += cellSize) {
+            for (let x = 0; x < this.bgCanvas.width; x += cellSize) {
+                for (let y = 0; y < this.bgCanvas.height; y += cellSize) {
                     // Outer square (bold)
-                    this.ctx.lineWidth = 2 * dpr;
-                    this.ctx.strokeRect(x, y, cellSize, cellSize);
+                    this.bgCtx.lineWidth = 2 * dpr;
+                    this.bgCtx.strokeRect(x, y, cellSize, cellSize);
                     
                     // Inner cross lines (lighter)
-                    this.ctx.lineWidth = 0.5 * dpr;
+                    this.bgCtx.lineWidth = 0.5 * dpr;
                     // Vertical middle line
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(x + cellSize / 2, y);
-                    this.ctx.lineTo(x + cellSize / 2, y + cellSize);
-                    this.ctx.stroke();
+                    this.bgCtx.beginPath();
+                    this.bgCtx.moveTo(x + cellSize / 2, y);
+                    this.bgCtx.lineTo(x + cellSize / 2, y + cellSize);
+                    this.bgCtx.stroke();
                     
                     // Horizontal middle line
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(x, y + cellSize / 2);
-                    this.ctx.lineTo(x + cellSize, y + cellSize / 2);
-                    this.ctx.stroke();
+                    this.bgCtx.beginPath();
+                    this.bgCtx.moveTo(x, y + cellSize / 2);
+                    this.bgCtx.lineTo(x + cellSize, y + cellSize / 2);
+                    this.bgCtx.stroke();
                     
                     // Diagonal lines
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(x, y);
-                    this.ctx.lineTo(x + cellSize, y + cellSize);
-                    this.ctx.stroke();
+                    this.bgCtx.beginPath();
+                    this.bgCtx.moveTo(x, y);
+                    this.bgCtx.lineTo(x + cellSize, y + cellSize);
+                    this.bgCtx.stroke();
                     
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(x + cellSize, y);
-                    this.ctx.lineTo(x, y + cellSize);
-                    this.ctx.stroke();
+                    this.bgCtx.beginPath();
+                    this.bgCtx.moveTo(x + cellSize, y);
+                    this.bgCtx.lineTo(x, y + cellSize);
+                    this.bgCtx.stroke();
                 }
             }
         } else if (this.backgroundPattern === 'english-lines') {
             // Draw 4-line English writing paper
             const lineHeight = 60 * dpr;
-            this.ctx.strokeStyle = patternColor;
+            this.bgCtx.strokeStyle = patternColor;
             
-            for (let y = lineHeight; y < this.canvas.height; y += lineHeight) {
+            for (let y = lineHeight; y < this.bgCanvas.height; y += lineHeight) {
                 // Top line (solid)
-                this.ctx.lineWidth = 1 * dpr;
-                this.ctx.beginPath();
-                this.ctx.moveTo(0, y);
-                this.ctx.lineTo(this.canvas.width, y);
-                this.ctx.stroke();
+                this.bgCtx.lineWidth = 1 * dpr;
+                this.bgCtx.beginPath();
+                this.bgCtx.moveTo(0, y);
+                this.bgCtx.lineTo(this.bgCanvas.width, y);
+                this.bgCtx.stroke();
                 
                 // Upper middle line (dashed)
-                this.ctx.lineWidth = 0.5 * dpr;
-                this.ctx.setLineDash([5 * dpr, 5 * dpr]);
-                this.ctx.beginPath();
-                this.ctx.moveTo(0, y + lineHeight / 4);
-                this.ctx.lineTo(this.canvas.width, y + lineHeight / 4);
-                this.ctx.stroke();
+                this.bgCtx.lineWidth = 0.5 * dpr;
+                this.bgCtx.setLineDash([5 * dpr, 5 * dpr]);
+                this.bgCtx.beginPath();
+                this.bgCtx.moveTo(0, y + lineHeight / 4);
+                this.bgCtx.lineTo(this.bgCanvas.width, y + lineHeight / 4);
+                this.bgCtx.stroke();
                 
                 // Middle line (solid, red for baseline)
-                this.ctx.setLineDash([]);
-                this.ctx.strokeStyle = this.isLightBackground() ? 'rgba(255, 0, 0, 0.3)' : 'rgba(255, 100, 100, 0.5)';
-                this.ctx.lineWidth = 1 * dpr;
-                this.ctx.beginPath();
-                this.ctx.moveTo(0, y + lineHeight / 2);
-                this.ctx.lineTo(this.canvas.width, y + lineHeight / 2);
-                this.ctx.stroke();
-                this.ctx.strokeStyle = patternColor;
+                this.bgCtx.setLineDash([]);
+                this.bgCtx.strokeStyle = this.isLightBackground() ? 'rgba(255, 0, 0, 0.3)' : 'rgba(255, 100, 100, 0.5)';
+                this.bgCtx.lineWidth = 1 * dpr;
+                this.bgCtx.beginPath();
+                this.bgCtx.moveTo(0, y + lineHeight / 2);
+                this.bgCtx.lineTo(this.bgCanvas.width, y + lineHeight / 2);
+                this.bgCtx.stroke();
+                this.bgCtx.strokeStyle = patternColor;
                 
                 // Lower middle line (dashed)
-                this.ctx.lineWidth = 0.5 * dpr;
-                this.ctx.setLineDash([5 * dpr, 5 * dpr]);
-                this.ctx.beginPath();
-                this.ctx.moveTo(0, y + 3 * lineHeight / 4);
-                this.ctx.lineTo(this.canvas.width, y + 3 * lineHeight / 4);
-                this.ctx.stroke();
-                this.ctx.setLineDash([]);
+                this.bgCtx.lineWidth = 0.5 * dpr;
+                this.bgCtx.setLineDash([5 * dpr, 5 * dpr]);
+                this.bgCtx.beginPath();
+                this.bgCtx.moveTo(0, y + 3 * lineHeight / 4);
+                this.bgCtx.lineTo(this.bgCanvas.width, y + 3 * lineHeight / 4);
+                this.bgCtx.stroke();
+                this.bgCtx.setLineDash([]);
             }
         } else if (this.backgroundPattern === 'music-staff') {
             // Draw 5-line music staff
             const staffHeight = 80 * dpr;
             const lineSpacing = staffHeight / 4;
-            this.ctx.strokeStyle = patternColor;
-            this.ctx.lineWidth = 1 * dpr;
+            this.bgCtx.strokeStyle = patternColor;
+            this.bgCtx.lineWidth = 1 * dpr;
             
-            for (let startY = staffHeight; startY < this.canvas.height; startY += staffHeight * 2) {
+            for (let startY = staffHeight; startY < this.bgCanvas.height; startY += staffHeight * 2) {
                 // Draw 5 horizontal lines
                 for (let i = 0; i < 5; i++) {
                     const y = startY + i * lineSpacing;
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(0, y);
-                    this.ctx.lineTo(this.canvas.width, y);
-                    this.ctx.stroke();
+                    this.bgCtx.beginPath();
+                    this.bgCtx.moveTo(0, y);
+                    this.bgCtx.lineTo(this.bgCanvas.width, y);
+                    this.bgCtx.stroke();
                 }
             }
         } else if (this.backgroundPattern === 'coordinate') {
             // Draw coordinate system (平面直角坐标系)
-            const centerX = this.canvas.width / 2;
-            const centerY = this.canvas.height / 2;
+            const centerX = this.bgCanvas.width / 2;
+            const centerY = this.bgCanvas.height / 2;
             const gridSize = 20 * dpr;
             
             // Draw grid lines
-            this.ctx.strokeStyle = this.isLightBackground() ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
-            this.ctx.lineWidth = 0.5 * dpr;
+            this.bgCtx.strokeStyle = this.isLightBackground() ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
+            this.bgCtx.lineWidth = 0.5 * dpr;
             
             // Vertical grid lines
-            for (let x = 0; x < this.canvas.width; x += gridSize) {
-                this.ctx.beginPath();
-                this.ctx.moveTo(x, 0);
-                this.ctx.lineTo(x, this.canvas.height);
-                this.ctx.stroke();
+            for (let x = 0; x < this.bgCanvas.width; x += gridSize) {
+                this.bgCtx.beginPath();
+                this.bgCtx.moveTo(x, 0);
+                this.bgCtx.lineTo(x, this.bgCanvas.height);
+                this.bgCtx.stroke();
             }
             
             // Horizontal grid lines
-            for (let y = 0; y < this.canvas.height; y += gridSize) {
-                this.ctx.beginPath();
-                this.ctx.moveTo(0, y);
-                this.ctx.lineTo(this.canvas.width, y);
-                this.ctx.stroke();
+            for (let y = 0; y < this.bgCanvas.height; y += gridSize) {
+                this.bgCtx.beginPath();
+                this.bgCtx.moveTo(0, y);
+                this.bgCtx.lineTo(this.bgCanvas.width, y);
+                this.bgCtx.stroke();
             }
             
             // Draw main axes (thicker)
-            this.ctx.strokeStyle = patternColor;
-            this.ctx.lineWidth = 2 * dpr;
+            this.bgCtx.strokeStyle = patternColor;
+            this.bgCtx.lineWidth = 2 * dpr;
             
             // X-axis
-            this.ctx.beginPath();
-            this.ctx.moveTo(0, centerY);
-            this.ctx.lineTo(this.canvas.width, centerY);
-            this.ctx.stroke();
+            this.bgCtx.beginPath();
+            this.bgCtx.moveTo(0, centerY);
+            this.bgCtx.lineTo(this.bgCanvas.width, centerY);
+            this.bgCtx.stroke();
             
             // Y-axis
-            this.ctx.beginPath();
-            this.ctx.moveTo(centerX, 0);
-            this.ctx.lineTo(centerX, this.canvas.height);
-            this.ctx.stroke();
+            this.bgCtx.beginPath();
+            this.bgCtx.moveTo(centerX, 0);
+            this.bgCtx.lineTo(centerX, this.bgCanvas.height);
+            this.bgCtx.stroke();
             
             // Draw arrows on axes
             const arrowSize = 10 * dpr;
             
             // X-axis arrow (right)
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.canvas.width - arrowSize, centerY - arrowSize / 2);
-            this.ctx.lineTo(this.canvas.width, centerY);
-            this.ctx.lineTo(this.canvas.width - arrowSize, centerY + arrowSize / 2);
-            this.ctx.stroke();
+            this.bgCtx.beginPath();
+            this.bgCtx.moveTo(this.bgCanvas.width - arrowSize, centerY - arrowSize / 2);
+            this.bgCtx.lineTo(this.bgCanvas.width, centerY);
+            this.bgCtx.lineTo(this.bgCanvas.width - arrowSize, centerY + arrowSize / 2);
+            this.bgCtx.stroke();
             
             // Y-axis arrow (up)
-            this.ctx.beginPath();
-            this.ctx.moveTo(centerX - arrowSize / 2, arrowSize);
-            this.ctx.lineTo(centerX, 0);
-            this.ctx.lineTo(centerX + arrowSize / 2, arrowSize);
-            this.ctx.stroke();
+            this.bgCtx.beginPath();
+            this.bgCtx.moveTo(centerX - arrowSize / 2, arrowSize);
+            this.bgCtx.lineTo(centerX, 0);
+            this.bgCtx.lineTo(centerX + arrowSize / 2, arrowSize);
+            this.bgCtx.stroke();
         }
         
-        this.ctx.restore();
+        this.bgCtx.restore();
     }
     
     isLightBackground() {
