@@ -88,6 +88,33 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Zoom input */
+.zoom-input {
+    width: 70px;
+    height: 48px;
+    border: none;
+    border-radius: 12px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    padding: 0 8px;
+    transition: all 0.2s ease;
+}
+
+.zoom-input:hover {
+    background-color: #f0f0f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.zoom-input:focus {
+    outline: none;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 2px #007AFF;
+}
+
 /* Configuration area */
 #config-area {
     position: fixed;
@@ -434,6 +461,78 @@ body {
     background-color: #007AFF;
     color: #ffffff;
     border-color: #007AFF;
+}
+
+.pattern-option-btn {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.pattern-option-btn:hover {
+    background-color: #f0f0f0;
+    border-color: #ccc;
+}
+
+.pattern-option-btn.active {
+    background-color: #007AFF;
+    color: #ffffff;
+    border-color: #007AFF;
+}
+
+.settings-hint {
+    margin: 4px 0 0 0;
+    font-size: 12px;
+    color: #999;
+}
+
+/* Pagination controls */
+#pagination-controls {
+    display: none;
+    align-items: center;
+    gap: 12px;
+}
+
+#pagination-controls.show {
+    display: flex;
+}
+
+.page-nav-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    color: #333;
+}
+
+.page-nav-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.page-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+#page-indicator {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    min-width: 60px;
+    text-align: center;
 }
 
 .checkbox-label {

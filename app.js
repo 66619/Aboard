@@ -16,6 +16,15 @@ class DrawingBoard {
         this.penSize = 5;
         this.eraserSize = 20;
         
+        // Background settings
+        this.backgroundColor = localStorage.getItem('backgroundColor') || '#ffffff';
+        this.backgroundPattern = localStorage.getItem('backgroundPattern') || 'blank';
+        
+        // Canvas mode settings
+        this.infiniteCanvas = localStorage.getItem('infiniteCanvas') !== 'false';
+        this.currentPage = 1;
+        this.pages = []; // Store pages when in pagination mode
+        
         // UI settings
         this.toolbarSize = parseInt(localStorage.getItem('toolbarSize')) || 50;
         this.controlPosition = localStorage.getItem('controlPosition') || 'top-right';
@@ -101,6 +110,7 @@ class DrawingBoard {
         // Toolbar buttons
         document.getElementById('pen-btn').addEventListener('click', () => this.setTool('pen'));
         document.getElementById('eraser-btn').addEventListener('click', () => this.setTool('eraser'));
+        document.getElementById('background-btn').addEventListener('click', () => this.setTool('background'));
         document.getElementById('clear-btn').addEventListener('click', () => this.confirmClear());
         document.getElementById('settings-btn').addEventListener('click', () => this.openSettings());
         
@@ -108,11 +118,31 @@ class DrawingBoard {
         document.getElementById('config-close-btn').addEventListener('click', () => this.closeConfigPanel());
         
         // Color picker
-        document.querySelectorAll('.color-btn').forEach(btn => {
+        document.querySelectorAll('.color-btn[data-color]').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 this.currentColor = e.target.dataset.color;
-                document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.color-btn[data-color]').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
+            });
+        });
+        
+        // Background color picker
+        document.querySelectorAll('.color-btn[data-bg-color]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.backgroundColor = e.target.dataset.bgColor;
+                document.querySelectorAll('.color-btn[data-bg-color]').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                this.applyBackground();
+            });
+        });
+        
+        // Background pattern buttons
+        document.querySelectorAll('.pattern-option-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.backgroundPattern = e.target.dataset.pattern;
+                document.querySelectorAll('.pattern-option-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                this.applyBackground();
             });
         });
         
@@ -137,7 +167,22 @@ class DrawingBoard {
         document.getElementById('redo-btn').addEventListener('click', () => this.redo());
         document.getElementById('zoom-in-btn').addEventListener('click', () => this.zoomIn());
         document.getElementById('zoom-out-btn').addEventListener('click', () => this.zoomOut());
-        document.getElementById('zoom-reset-btn').addEventListener('click', () => this.zoomReset());
+        
+        // Zoom input
+        const zoomInput = document.getElementById('zoom-input');
+        zoomInput.addEventListener('change', (e) => {
+            const value = e.target.value.replace('%', '');
+            const scale = parseFloat(value) / 100;
+            if (!isNaN(scale) && scale >= 0.5 && scale <= 3.0) {
+                this.canvasScale = scale;
+                this.applyZoom();
+            } else {
+                this.updateZoomDisplay();
+            }
+        });
+        zoomInput.addEventListener('focus', (e) => {
+            e.target.select();
+        });
         
         // Settings modal
         document.getElementById('settings-close-btn').addEventListener('click', () => this.closeSettings());
@@ -164,6 +209,17 @@ class DrawingBoard {
             this.edgeSnapEnabled = e.target.checked;
             localStorage.setItem('edgeSnapEnabled', this.edgeSnapEnabled);
         });
+        
+        // Infinite canvas checkbox
+        document.getElementById('infinite-canvas-checkbox').addEventListener('change', (e) => {
+            this.infiniteCanvas = e.target.checked;
+            localStorage.setItem('infiniteCanvas', this.infiniteCanvas);
+            this.updateCanvasMode();
+        });
+        
+        // Pagination controls
+        document.getElementById('prev-page-btn').addEventListener('click', () => this.prevPage());
+        document.getElementById('next-page-btn').addEventListener('click', () => this.nextPage());
         
         // Close modal when clicking outside
         document.getElementById('settings-modal').addEventListener('click', (e) => {
@@ -305,8 +361,17 @@ class DrawingBoard {
         // Load edge snap setting
         document.getElementById('edge-snap-checkbox').checked = this.edgeSnapEnabled;
         
-        // Load canvas scale
+        // Load infinite canvas setting
+        document.getElementById('infinite-canvas-checkbox').checked = this.infiniteCanvas;
+        
+        // Load background settings
+        this.applyBackground();
+        
+        // Load canvas scale and update zoom display
         this.applyZoom();
+        
+        // Initialize canvas mode
+        this.updateCanvasMode();
     }
     
     updateUI() {
@@ -317,27 +382,47 @@ class DrawingBoard {
         
         const configArea = document.getElementById('config-area');
         
+        // Hide all config panels first
+        document.querySelectorAll('.config-panel').forEach(panel => {
+            panel.classList.remove('active');
+        });
+        
         if (this.currentTool === 'pen') {
             document.getElementById('pen-btn').classList.add('active');
             document.getElementById('pen-config').classList.add('active');
-            document.getElementById('eraser-config').classList.remove('active');
             configArea.classList.add('show');
             this.canvas.style.cursor = 'crosshair';
         } else if (this.currentTool === 'eraser') {
             document.getElementById('eraser-btn').classList.add('active');
-            document.getElementById('pen-config').classList.remove('active');
             document.getElementById('eraser-config').classList.add('active');
             configArea.classList.add('show');
             this.canvas.style.cursor = 'pointer';
+        } else if (this.currentTool === 'background') {
+            document.getElementById('background-btn').classList.add('active');
+            document.getElementById('background-config').classList.add('active');
+            configArea.classList.add('show');
+            this.canvas.style.cursor = 'default';
         } else {
             // For other tools, hide config area
             configArea.classList.remove('show');
             this.canvas.style.cursor = 'default';
         }
         
+        // Check for collision and adjust position if needed
+        this.checkCollision();
+        
         // Update history buttons
         document.getElementById('undo-btn').disabled = this.historyStep <= 0;
         document.getElementById('redo-btn').disabled = this.historyStep >= this.history.length - 1;
+        
+        // Update pagination controls visibility
+        const paginationControls = document.getElementById('pagination-controls');
+        if (!this.infiniteCanvas) {
+            paginationControls.classList.add('show');
+            this.updatePaginationUI();
+        } else {
+            paginationControls.classList.remove('show');
+        }
     }
     
     confirmClear() {
@@ -349,8 +434,11 @@ class DrawingBoard {
     clearCanvas(saveToHistory = true) {
         // Reset to default drawing mode before clearing
         this.ctx.globalCompositeOperation = 'source-over';
-        this.ctx.fillStyle = '#ffffff';
+        this.ctx.fillStyle = this.backgroundColor;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Apply background pattern
+        this.drawBackgroundPattern();
         
         if (saveToHistory) {
             this.saveState();
@@ -417,6 +505,12 @@ class DrawingBoard {
         this.canvas.style.transform = `scale(${this.canvasScale})`;
         this.canvas.style.transformOrigin = 'center center';
         localStorage.setItem('canvasScale', this.canvasScale);
+        this.updateZoomDisplay();
+    }
+    
+    updateZoomDisplay() {
+        const zoomInput = document.getElementById('zoom-input');
+        zoomInput.value = Math.round(this.canvasScale * 100) + '%';
     }
     
     // Toolbar size update
@@ -537,6 +631,177 @@ class DrawingBoard {
                 this.draggedElement = null;
             }
         });
+    }
+    
+    // Background functions
+    applyBackground() {
+        this.ctx.globalCompositeOperation = 'source-over';
+        this.ctx.fillStyle = this.backgroundColor;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        this.drawBackgroundPattern();
+        
+        localStorage.setItem('backgroundColor', this.backgroundColor);
+        localStorage.setItem('backgroundPattern', this.backgroundPattern);
+        
+        // Save to history if we have history
+        if (this.historyStep >= 0) {
+            this.saveState();
+        }
+    }
+    
+    drawBackgroundPattern() {
+        if (this.backgroundPattern === 'blank') {
+            return; // No pattern needed
+        }
+        
+        this.ctx.save();
+        this.ctx.globalCompositeOperation = 'source-over';
+        
+        const dpr = window.devicePixelRatio || 1;
+        const rect = this.canvas.getBoundingClientRect();
+        
+        if (this.backgroundPattern === 'dots') {
+            // Draw dot grid pattern
+            const spacing = 20;
+            this.ctx.fillStyle = this.getPatternColor();
+            
+            for (let x = spacing; x < rect.width; x += spacing) {
+                for (let y = spacing; y < rect.height; y += spacing) {
+                    this.ctx.beginPath();
+                    this.ctx.arc(x, y, 1, 0, Math.PI * 2);
+                    this.ctx.fill();
+                }
+            }
+        } else if (this.backgroundPattern === 'grid') {
+            // Draw line grid pattern
+            const spacing = 20;
+            this.ctx.strokeStyle = this.getPatternColor();
+            this.ctx.lineWidth = 0.5;
+            
+            // Vertical lines
+            for (let x = spacing; x < rect.width; x += spacing) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(x, 0);
+                this.ctx.lineTo(x, rect.height);
+                this.ctx.stroke();
+            }
+            
+            // Horizontal lines
+            for (let y = spacing; y < rect.height; y += spacing) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(0, y);
+                this.ctx.lineTo(rect.width, y);
+                this.ctx.stroke();
+            }
+        }
+        
+        this.ctx.restore();
+    }
+    
+    getPatternColor() {
+        // Choose pattern color based on background brightness
+        const r = parseInt(this.backgroundColor.slice(1, 3), 16);
+        const g = parseInt(this.backgroundColor.slice(3, 5), 16);
+        const b = parseInt(this.backgroundColor.slice(5, 7), 16);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        
+        return brightness > 128 ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
+    }
+    
+    // Canvas mode functions
+    updateCanvasMode() {
+        const paginationControls = document.getElementById('pagination-controls');
+        
+        if (this.infiniteCanvas) {
+            paginationControls.classList.remove('show');
+            // For infinite canvas, just ensure we have the current state
+        } else {
+            paginationControls.classList.add('show');
+            this.initializePagination();
+        }
+        
+        this.updateUI();
+    }
+    
+    initializePagination() {
+        // Initialize pagination system if not already done
+        if (this.pages.length === 0) {
+            // Save current canvas as first page
+            const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+            this.pages.push(imageData);
+            this.currentPage = 1;
+        }
+        this.updatePaginationUI();
+    }
+    
+    updatePaginationUI() {
+        document.getElementById('page-indicator').textContent = `第 ${this.currentPage} 页`;
+        document.getElementById('prev-page-btn').disabled = this.currentPage <= 1;
+        // Next button is never disabled - can always create new page
+    }
+    
+    prevPage() {
+        if (this.currentPage > 1) {
+            // Save current page
+            const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+            this.pages[this.currentPage - 1] = imageData;
+            
+            // Load previous page
+            this.currentPage--;
+            this.ctx.putImageData(this.pages[this.currentPage - 1], 0, 0);
+            this.updatePaginationUI();
+        }
+    }
+    
+    nextPage() {
+        // Save current page
+        const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+        this.pages[this.currentPage - 1] = imageData;
+        
+        // Move to next page
+        this.currentPage++;
+        
+        if (this.currentPage > this.pages.length) {
+            // Create new blank page
+            this.clearCanvas(false);
+            this.pages.push(this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height));
+        } else {
+            // Load existing page
+            this.ctx.putImageData(this.pages[this.currentPage - 1], 0, 0);
+        }
+        
+        this.updatePaginationUI();
+    }
+    
+    // Collision detection
+    checkCollision() {
+        const toolbar = document.getElementById('toolbar');
+        const configArea = document.getElementById('config-area');
+        
+        if (!configArea.classList.contains('show')) {
+            return; // No collision check needed if config area is hidden
+        }
+        
+        const toolbarRect = toolbar.getBoundingClientRect();
+        const configRect = configArea.getBoundingClientRect();
+        
+        // Check if rectangles overlap
+        const overlap = !(
+            toolbarRect.right < configRect.left ||
+            toolbarRect.left > configRect.right ||
+            toolbarRect.bottom < configRect.top ||
+            toolbarRect.top > configRect.bottom
+        );
+        
+        if (overlap) {
+            // Move config area above toolbar
+            const newBottom = window.innerHeight - toolbarRect.top + 20;
+            configArea.style.bottom = `${newBottom}px`;
+            configArea.style.top = 'auto';
+            configArea.style.left = '50%';
+            configArea.style.transform = 'translateX(-50%)';
+        }
     }
 }
 
