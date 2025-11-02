@@ -39,7 +39,7 @@ body {
 #eraser-cursor {
     position: fixed;
     pointer-events: none;
-    border: 2px solid #333;
+    border: 2px dashed #bbb;
     border-radius: 50%;
     background-color: rgba(255, 255, 255, 0.3);
     z-index: 9999;
@@ -166,6 +166,44 @@ body {
     cursor: grabbing;
 }
 
+/* Vertical config area layout (when snapped to left or right) */
+#config-area.vertical {
+    min-width: auto;
+    max-width: 250px;
+    max-height: 80vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#config-area.vertical .config-panel {
+    flex-direction: column;
+}
+
+#config-area.vertical .config-group {
+    max-width: 100%;
+}
+
+#config-area.vertical .color-picker {
+    max-width: 100%;
+}
+
+#config-area.vertical .color-picker-row {
+    max-width: 100%;
+}
+
+#config-area.vertical .slider,
+#config-area.vertical .slider-compact {
+    max-width: 180px;
+}
+
+#config-area.vertical .pattern-grid-compact {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+#config-area.vertical .pen-type-grid {
+    grid-template-columns: repeat(2, 1fr);
+}
+
 .config-close-btn {
     position: absolute;
     top: 8px;
@@ -194,14 +232,15 @@ body {
 
 .config-panel.active {
     display: flex;
-    gap: 24px;
-    align-items: center;
+    gap: 16px;
+    align-items: flex-start;
 }
 
 .config-group {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    min-width: 0;
 }
 
 .config-group label {
@@ -219,6 +258,19 @@ body {
 
 .color-picker-custom {
     margin-top: 8px;
+}
+
+.pen-size-compact {
+    margin-top: 12px;
+    width: 100%;
+}
+
+.pen-size-compact label {
+    font-size: 11px;
+    color: #666;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 6px;
 }
 
 .color-picker-icon-btn {
@@ -330,6 +382,24 @@ body {
     background-color: #ffffff;
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    cursor: move;
+}
+
+#toolbar.dragging {
+    cursor: grabbing;
+}
+
+/* Vertical toolbar layout (when snapped to left or right) */
+#toolbar.vertical {
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px 12px;
+}
+
+#toolbar.vertical .tool-btn {
+    min-width: auto;
+    width: 60px;
+    padding: 10px 8px;
 }
 
 .tool-btn {
@@ -555,6 +625,64 @@ body {
     gap: 20px;
 }
 
+/* About page styles */
+.about-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.about-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.about-section h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.about-section p {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.about-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.about-section ul li {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.8;
+    padding-left: 20px;
+    position: relative;
+}
+
+.about-section ul li::before {
+    content: "•";
+    position: absolute;
+    left: 8px;
+    color: #007AFF;
+}
+
+.about-section a {
+    color: #007AFF;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.about-section a:hover {
+    text-decoration: underline;
+}
+
 .modal-body {
     display: flex;
     flex-direction: column;
@@ -576,6 +704,35 @@ body {
 .button-size-options {
     display: flex;
     gap: 12px;
+}
+
+.eraser-shape-options {
+    display: flex;
+    gap: 8px;
+}
+
+.eraser-shape-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #666;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.eraser-shape-btn:hover {
+    background-color: #f0f0f0;
+    border-color: #ccc;
+}
+
+.eraser-shape-btn.active {
+    background-color: #007AFF;
+    color: #ffffff;
+    border-color: #007AFF;
 }
 
 .button-size-options-4 {
@@ -1144,4 +1301,292 @@ body {
 
 .image-done-btn:hover {
     background-color: #0066CC;
+}
+
+/* Canvas mode buttons */
+.button-size-options-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.canvas-mode-btn {
+    padding: 12px 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.canvas-mode-btn:hover {
+    background-color: #f0f0f0;
+    border-color: #ccc;
+}
+
+.canvas-mode-btn.active {
+    background-color: #007AFF;
+    color: #ffffff;
+    border-color: #007AFF;
+}
+
+/* Canvas presets */
+.canvas-presets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.canvas-preset-btn {
+    padding: 10px 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #666;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.canvas-preset-btn:hover {
+    background-color: #f0f0f0;
+    border-color: #ccc;
+}
+
+.canvas-preset-btn.active {
+    background-color: #007AFF;
+    color: #ffffff;
+    border-color: #007AFF;
+}
+
+/* Canvas custom size */
+.canvas-custom-size {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+}
+
+.custom-size-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.custom-size-row label {
+    min-width: 50px;
+    font-size: 13px;
+    color: #666;
+}
+
+.custom-size-row input[type="number"],
+.custom-size-row select {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    background-color: #ffffff;
+}
+
+.custom-size-row span {
+    font-size: 13px;
+    color: #666;
+}
+
+/* Compact pen and background config layouts */
+.color-picker-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.color-picker-main {
+    display: flex;
+    gap: 6px;
+}
+
+.color-and-size-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.pen-size-inline {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.pen-size-inline label {
+    font-size: 11px;
+    color: #666;
+    font-weight: 500;
+}
+
+.slider-compact {
+    width: 150px;
+}
+
+.config-group-compact {
+    gap: 6px;
+}
+
+.pattern-grid-compact {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+}
+
+.pattern-grid-compact .pattern-option-btn {
+    padding: 6px 8px;
+    font-size: 10px;
+}
+
+.compact-sliders {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.compact-slider-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.compact-slider-item label {
+    font-size: 11px;
+    color: #666;
+    font-weight: 500;
+}
+
+/* Responsive sizing for controls based on screen size */
+@media (max-width: 1024px) {
+    .color-btn {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .color-picker-icon-btn {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .slider-compact {
+        width: 120px;
+    }
+    
+    #history-controls {
+        gap: 8px;
+    }
+    
+    .history-btn {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .zoom-input {
+        width: 65px;
+        height: 44px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 768px) {
+    .color-btn {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .color-picker-icon-btn {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .slider-compact {
+        width: 100px;
+    }
+    
+    .pattern-grid-compact {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    #history-controls {
+        gap: 6px;
+    }
+    
+    .history-btn {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .zoom-input {
+        width: 60px;
+        height: 40px;
+        font-size: 12px;
+    }
+    
+    #config-area {
+        min-width: 280px;
+        padding: 12px 18px;
+    }
+    
+    .tool-btn {
+        padding: 10px 14px;
+        min-width: 60px;
+    }
+    
+    .tool-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .tool-btn span {
+        font-size: 11px;
+    }
+}
+
+@media (min-width: 1920px) {
+    /* Larger screens - scale up controls */
+    .color-btn {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .color-picker-icon-btn {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .history-btn {
+        width: 52px;
+        height: 52px;
+    }
+    
+    .zoom-input {
+        width: 75px;
+        height: 52px;
+        font-size: 15px;
+    }
+    
+    #config-area {
+        min-width: 350px;
+        padding: 18px 28px;
+    }
+    
+    .tool-btn {
+        padding: 14px 18px;
+        min-width: 75px;
+    }
 }

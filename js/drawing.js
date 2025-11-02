@@ -12,6 +12,7 @@ class DrawingEngine {
         this.penSize = 5;
         this.penType = localStorage.getItem('penType') || 'normal';
         this.eraserSize = 20;
+        this.eraserShape = localStorage.getItem('eraserShape') || 'circle';
         this.currentTool = 'pen';
         
         // Drawing buffer
@@ -46,10 +47,9 @@ class DrawingEngine {
     }
     
     setupDrawingContext() {
-        this.ctx.lineCap = 'round';
-        this.ctx.lineJoin = 'round';
-        
         if (this.currentTool === 'pen') {
+            this.ctx.lineCap = 'round';
+            this.ctx.lineJoin = 'round';
             this.ctx.globalCompositeOperation = 'source-over';
             this.ctx.strokeStyle = this.currentColor;
             this.ctx.lineWidth = this.penSize;
@@ -78,6 +78,15 @@ class DrawingEngine {
             this.ctx.strokeStyle = 'rgba(0,0,0,1)';
             this.ctx.lineWidth = this.eraserSize;
             this.ctx.globalAlpha = 1.0;
+            
+            // Set line cap/join based on eraser shape
+            if (this.eraserShape === 'rectangle') {
+                this.ctx.lineCap = 'butt';
+                this.ctx.lineJoin = 'miter';
+            } else {
+                this.ctx.lineCap = 'round';
+                this.ctx.lineJoin = 'round';
+            }
         }
     }
     
@@ -137,7 +146,7 @@ class DrawingEngine {
     startPanning(e) {
         this.isPanning = true;
         this.lastPanPoint = { x: e.clientX, y: e.clientY };
-        this.canvas.style.cursor = 'grab';
+        this.canvas.style.cursor = 'grabbing';
     }
     
     pan(e) {
@@ -159,6 +168,10 @@ class DrawingEngine {
         if (this.isPanning) {
             this.isPanning = false;
             this.lastPanPoint = null;
+            // Restore cursor based on current tool
+            if (this.currentTool === 'pan') {
+                this.canvas.style.cursor = 'grab';
+            }
             return true;
         }
         return false;
@@ -187,5 +200,10 @@ class DrawingEngine {
     
     setEraserSize(size) {
         this.eraserSize = size;
+    }
+    
+    setEraserShape(shape) {
+        this.eraserShape = shape;
+        localStorage.setItem('eraserShape', shape);
     }
 }

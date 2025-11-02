@@ -146,7 +146,7 @@ class ImageControls {
         this.overlay.style.display = 'block';
         
         // Initialize with image data
-        const canvas = this.backgroundManager.canvas;
+        const canvas = this.backgroundManager.bgCanvas;
         const rect = canvas.getBoundingClientRect();
         
         // Center the image initially
@@ -166,7 +166,7 @@ class ImageControls {
     }
     
     updateControlBox() {
-        const canvas = this.backgroundManager.canvas;
+        const canvas = this.backgroundManager.bgCanvas;
         const rect = canvas.getBoundingClientRect();
         
         // Apply transformations to control box
@@ -313,7 +313,7 @@ class ImageControls {
     resetImage() {
         this.imageRotation = 0;
         this.imageScale = 1.0;
-        const canvas = this.backgroundManager.canvas;
+        const canvas = this.backgroundManager.bgCanvas;
         const rect = canvas.getBoundingClientRect();
         this.imagePosition.x = (rect.width - this.imageSize.width) / 2;
         this.imagePosition.y = (rect.height - this.imageSize.height) / 2;
@@ -321,7 +321,7 @@ class ImageControls {
     }
     
     fitToCanvas() {
-        const canvas = this.backgroundManager.canvas;
+        const canvas = this.backgroundManager.bgCanvas;
         const rect = canvas.getBoundingClientRect();
         
         // Fit image to canvas while maintaining aspect ratio
