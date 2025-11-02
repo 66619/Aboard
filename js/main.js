@@ -25,6 +25,10 @@ class DrawingBoard {
         this.currentPage = 1;
         this.pages = [];
         
+        // Pinch zoom state
+        this.isPinching = false;
+        this.lastPinchDistance = 0;
+        
         // Dragging state
         this.isDraggingPanel = false;
         this.draggedElement = null;
@@ -112,17 +116,32 @@ class DrawingBoard {
         // Touch events
         this.canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            this.drawingEngine.startDrawing(e.touches[0]);
+            if (e.touches.length === 2) {
+                // Two-finger pinch to zoom
+                this.handlePinchStart(e);
+            } else if (e.touches.length === 1) {
+                this.drawingEngine.startDrawing(e.touches[0]);
+            }
         }, { passive: false });
         
         this.canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
-            this.drawingEngine.draw(e.touches[0]);
+            if (e.touches.length === 2) {
+                // Two-finger pinch to zoom
+                this.handlePinchMove(e);
+            } else if (e.touches.length === 1) {
+                this.drawingEngine.draw(e.touches[0]);
+            }
         }, { passive: false });
         
         this.canvas.addEventListener('touchend', (e) => {
             e.preventDefault();
-            this.handleDrawingComplete();
+            if (e.touches.length < 2) {
+                this.handlePinchEnd();
+            }
+            if (e.touches.length === 0) {
+                this.handleDrawingComplete();
+            }
         }, { passive: false });
         
         // Toolbar buttons
@@ -157,9 +176,13 @@ class DrawingBoard {
             }
         });
         
+        // Close controls button
+        document.getElementById('close-controls-btn').addEventListener('click', () => this.hideHistoryControls());
+        
         // Pagination controls
         document.getElementById('prev-page-btn').addEventListener('click', () => this.prevPage());
         document.getElementById('next-page-btn').addEventListener('click', () => this.nextPage());
+        document.getElementById('add-page-btn').addEventListener('click', () => this.addPage());
         document.getElementById('page-input').addEventListener('change', (e) => this.goToPage(parseInt(e.target.value)));
         document.getElementById('page-input').addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
@@ -243,28 +266,15 @@ class DrawingBoard {
                 this.eraserCursor.style.height = e.target.value + 'px';
             }
         });
-        
-        const bgOpacitySlider = document.getElementById('bg-opacity-slider');
-        const bgOpacityValue = document.getElementById('bg-opacity-value');
-        bgOpacitySlider.addEventListener('input', (e) => {
-            this.backgroundManager.setOpacity(parseInt(e.target.value) / 100);
-            bgOpacityValue.textContent = e.target.value;
-        });
-        
-        const patternIntensitySlider = document.getElementById('pattern-intensity-slider');
-        const patternIntensityValue = document.getElementById('pattern-intensity-value');
-        patternIntensitySlider.addEventListener('input', (e) => {
-            this.backgroundManager.setPatternIntensity(parseInt(e.target.value) / 100);
-            patternIntensityValue.textContent = e.target.value;
-        });
     }
     
     setupSettingsListeners() {
         document.getElementById('settings-close-btn').addEventListener('click', () => this.closeSettings());
         
-        document.querySelectorAll('.settings-tab').forEach(tab => {
+        document.querySelectorAll('.settings-tab-icon').forEach(tab => {
             tab.addEventListener('click', (e) => {
-                this.settingsManager.switchTab(e.target.dataset.tab);
+                const tabName = e.currentTarget.dataset.tab;
+                this.settingsManager.switchTab(tabName);
             });
         });
         
@@ -282,6 +292,21 @@ class DrawingBoard {
             this.settingsManager.configScale = parseInt(e.target.value) / 100;
             configScaleValue.textContent = Math.round(this.settingsManager.configScale * 100);
             this.settingsManager.updateConfigScale();
+        });
+        
+        // Background opacity and pattern intensity from settings
+        const bgOpacitySlider = document.getElementById('bg-opacity-slider');
+        const bgOpacityValue = document.getElementById('bg-opacity-value');
+        bgOpacitySlider.addEventListener('input', (e) => {
+            this.backgroundManager.setOpacity(parseInt(e.target.value) / 100);
+            bgOpacityValue.textContent = e.target.value;
+        });
+        
+        const patternIntensitySlider = document.getElementById('pattern-intensity-slider');
+        const patternIntensityValue = document.getElementById('pattern-intensity-value');
+        patternIntensitySlider.addEventListener('input', (e) => {
+            this.backgroundManager.setPatternIntensity(parseInt(e.target.value) / 100);
+            patternIntensityValue.textContent = e.target.value;
         });
         
         document.querySelectorAll('.position-option-btn').forEach(btn => {
@@ -554,7 +579,28 @@ class DrawingBoard {
         document.getElementById('zoom-input').value = percent + '%';
     }
     
+    hideHistoryControls() {
+        const historyControls = document.getElementById('history-controls');
+        historyControls.style.display = 'none';
+    }
+    
     // Pagination methods
+    addPage() {
+        if (this.settingsManager.infiniteCanvas) return;
+        
+        // Save current page
+        this.pages[this.currentPage - 1] = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Create new blank page
+        this.pages.push(null);
+        this.currentPage = this.pages.length;
+        
+        // Clear canvas for new page
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.pages[this.currentPage - 1] = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+        this.historyManager.saveState();
+        this.updatePaginationUI();
+    }
     prevPage() {
         if (this.settingsManager.infiniteCanvas || this.currentPage <= 1) return;
         
@@ -645,6 +691,47 @@ class DrawingBoard {
     
     hideEraserCursor() {
         this.eraserCursor.style.display = 'none';
+    }
+    
+    // Pinch zoom gesture handlers
+    handlePinchStart(e) {
+        if (e.touches.length !== 2) return;
+        
+        this.isPinching = true;
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        this.lastPinchDistance = this.getPinchDistance(touch1, touch2);
+    }
+    
+    handlePinchMove(e) {
+        if (!this.isPinching || e.touches.length !== 2) return;
+        
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        const currentDistance = this.getPinchDistance(touch1, touch2);
+        
+        if (this.lastPinchDistance > 0) {
+            const scale = currentDistance / this.lastPinchDistance;
+            const newScale = Math.max(0.5, Math.min(3.0, this.drawingEngine.canvasScale * scale));
+            
+            this.drawingEngine.canvasScale = newScale;
+            this.applyZoom();
+            this.updateZoomUI();
+            localStorage.setItem('canvasScale', newScale);
+        }
+        
+        this.lastPinchDistance = currentDistance;
+    }
+    
+    handlePinchEnd() {
+        this.isPinching = false;
+        this.lastPinchDistance = 0;
+    }
+    
+    getPinchDistance(touch1, touch2) {
+        const dx = touch2.clientX - touch1.clientX;
+        const dy = touch2.clientY - touch1.clientY;
+        return Math.sqrt(dx * dx + dy * dy);
     }
     
     redrawCanvas() {

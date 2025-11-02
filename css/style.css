@@ -428,8 +428,12 @@ body {
 }
 
 .settings-modal-content {
-    min-width: 480px;
-    max-width: 600px;
+    min-width: 600px;
+    max-width: 700px;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .modal-header {
@@ -464,35 +468,78 @@ body {
     color: #333;
 }
 
-/* Settings tabs */
-.settings-tabs {
+/* Settings layout with sidebar */
+.settings-layout {
     display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #f0f0f0;
+    gap: 0;
+    height: 100%;
+    overflow: hidden;
 }
 
-.settings-tab {
-    padding: 12px 20px;
+.settings-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 120px;
+    border-right: 2px solid #f0f0f0;
+    padding-right: 16px;
+}
+
+.settings-tab-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 8px;
     border: none;
     background-color: transparent;
     color: #666;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -2px;
+    border-radius: 8px;
 }
 
-.settings-tab:hover {
-    color: #333;
+.settings-tab-icon:hover {
     background-color: #f8f8f8;
+    color: #333;
 }
 
-.settings-tab.active {
-    color: #007AFF;
-    border-bottom-color: #007AFF;
+.settings-tab-icon.active {
+    background-color: #007AFF;
+    color: #ffffff;
+}
+
+.settings-tab-icon.active svg {
+    stroke: #ffffff;
+}
+
+.settings-tab-icon svg {
+    stroke: currentColor;
+}
+
+.settings-content {
+    flex: 1;
+    padding-left: 24px;
+    overflow-y: auto;
+    max-height: 60vh;
+}
+
+.settings-content h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 16px;
+}
+
+/* Settings tabs - deprecated but keeping for compatibility */
+.settings-tabs {
+    display: none;
+}
+
+.settings-tab {
+    display: none;
 }
 
 .settings-tab-content {

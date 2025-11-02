@@ -26,6 +26,12 @@
                 <line x1="8" y1="11" x2="14" y2="11"></line>
             </svg>
         </button>
+        <button id="close-controls-btn" class="history-btn" title="关闭">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
     </div>
 
     <!-- Background canvas layer -->
@@ -120,10 +126,6 @@
                 </div>
             </div>
             <div class="config-group">
-                <label>背景透明度 <span id="bg-opacity-value">100</span>%</label>
-                <input type="range" id="bg-opacity-slider" min="0" max="100" value="100" class="slider">
-            </div>
-            <div class="config-group">
                 <label>背景图案</label>
                 <div class="button-size-options pattern-grid">
                     <button class="pattern-option-btn active" data-pattern="blank">空白</button>
@@ -134,10 +136,6 @@
                     <button class="pattern-option-btn" data-pattern="music-staff">五线谱</button>
                     <button class="pattern-option-btn" data-pattern="coordinate">坐标系</button>
                 </div>
-            </div>
-            <div class="config-group">
-                <label>图案深浅 <span id="pattern-intensity-value">50</span>%</label>
-                <input type="range" id="pattern-intensity-slider" min="10" max="100" value="50" class="slider">
             </div>
         </div>
     </div>
@@ -156,6 +154,12 @@
                 <polyline points="9 18 15 12 9 6"></polyline>
             </svg>
         </button>
+        <button id="add-page-btn" class="page-nav-btn" title="新建页面">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        </button>
     </div>
 
     <!-- Settings modal -->
@@ -171,54 +175,101 @@
                 </button>
             </div>
             
-            <!-- Settings tabs -->
-            <div class="settings-tabs">
-                <button class="settings-tab active" data-tab="general">通用</button>
-                <button class="settings-tab" data-tab="display">显示</button>
-                <button class="settings-tab" data-tab="canvas">画布</button>
-            </div>
-            
-            <div class="modal-body">
-                <!-- General settings -->
-                <div id="general-settings" class="settings-tab-content active">
-                    <div class="settings-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="edge-snap-checkbox" checked>
-                            <span>启用边缘吸附</span>
-                        </label>
-                        <p class="settings-hint">拖动控制面板时自动吸附到屏幕边缘</p>
-                    </div>
-                    <div class="settings-group">
-                        <label>控制按钮位置</label>
-                        <div class="button-size-options button-size-options-4">
-                            <button class="position-option-btn active" data-position="top-right">右上角</button>
-                            <button class="position-option-btn" data-position="top-left">左上角</button>
-                            <button class="position-option-btn" data-position="bottom-right">右下角</button>
-                            <button class="position-option-btn" data-position="bottom-left">左下角</button>
+            <!-- Settings layout with sidebar and content -->
+            <div class="settings-layout">
+                <!-- Settings sidebar with icons -->
+                <div class="settings-sidebar">
+                    <button class="settings-tab-icon active" data-tab="general" title="通用">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M12 1v6m0 6v6M5.6 5.6l4.2 4.2m4.2 4.2l4.2 4.2M1 12h6m6 0h6M5.6 18.4l4.2-4.2m4.2-4.2l4.2-4.2"></path>
+                        </svg>
+                        <span>通用</span>
+                    </button>
+                    <button class="settings-tab-icon" data-tab="display" title="显示">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                        <span>显示</span>
+                    </button>
+                    <button class="settings-tab-icon" data-tab="canvas" title="画布">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <path d="M3 9h18M9 21V9"></path>
+                        </svg>
+                        <span>画布</span>
+                    </button>
+                    <button class="settings-tab-icon" data-tab="background" title="背景">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <span>背景</span>
+                    </button>
+                </div>
+                
+                <!-- Settings content area -->
+                <div class="settings-content">
+                    <!-- General settings -->
+                    <div id="general-settings" class="settings-tab-content active">
+                        <h3>通用设置</h3>
+                        <div class="settings-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="edge-snap-checkbox" checked>
+                                <span>启用边缘吸附</span>
+                            </label>
+                            <p class="settings-hint">拖动控制面板时自动吸附到屏幕边缘</p>
+                        </div>
+                        <div class="settings-group">
+                            <label>控制按钮位置</label>
+                            <div class="button-size-options button-size-options-4">
+                                <button class="position-option-btn active" data-position="top-right">右上角</button>
+                                <button class="position-option-btn" data-position="top-left">左上角</button>
+                                <button class="position-option-btn" data-position="bottom-right">右下角</button>
+                                <button class="position-option-btn" data-position="bottom-left">左下角</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Display settings -->
-                <div id="display-settings" class="settings-tab-content">
-                    <div class="settings-group">
-                        <label>工具栏按钮大小 <span id="toolbar-size-value">50</span>px</label>
-                        <input type="range" id="toolbar-size-slider" min="40" max="80" value="50" class="slider" step="5">
+                    
+                    <!-- Display settings -->
+                    <div id="display-settings" class="settings-tab-content">
+                        <h3>显示设置</h3>
+                        <div class="settings-group">
+                            <label>工具栏按钮大小 <span id="toolbar-size-value">40</span>px</label>
+                            <input type="range" id="toolbar-size-slider" min="40" max="80" value="40" class="slider" step="5">
+                        </div>
+                        <div class="settings-group">
+                            <label>属性栏缩放 <span id="config-scale-value">100</span>%</label>
+                            <input type="range" id="config-scale-slider" min="80" max="120" value="100" class="slider" step="10">
+                        </div>
                     </div>
-                    <div class="settings-group">
-                        <label>属性栏缩放 <span id="config-scale-value">100</span>%</label>
-                        <input type="range" id="config-scale-slider" min="80" max="120" value="100" class="slider" step="10">
+                    
+                    <!-- Canvas settings -->
+                    <div id="canvas-settings" class="settings-tab-content">
+                        <h3>画布设置</h3>
+                        <div class="settings-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="infinite-canvas-checkbox" checked>
+                                <span>无限画布模式</span>
+                            </label>
+                            <p class="settings-hint">关闭后启用分页系统</p>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- Canvas settings -->
-                <div id="canvas-settings" class="settings-tab-content">
-                    <div class="settings-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="infinite-canvas-checkbox" checked>
-                            <span>无限画布模式</span>
-                        </label>
-                        <p class="settings-hint">关闭后启用分页系统</p>
+                    
+                    <!-- Background settings -->
+                    <div id="background-settings" class="settings-tab-content">
+                        <h3>背景设置</h3>
+                        <div class="settings-group">
+                            <label>背景透明度 <span id="bg-opacity-value">100</span>%</label>
+                            <input type="range" id="bg-opacity-slider" min="0" max="100" value="100" class="slider">
+                        </div>
+                        <div class="settings-group">
+                            <label>图案深浅 <span id="pattern-intensity-value">50</span>%</label>
+                            <input type="range" id="pattern-intensity-slider" min="10" max="100" value="50" class="slider">
+                        </div>
                     </div>
                 </div>
             </div>

@@ -3,7 +3,7 @@
 
 class SettingsManager {
     constructor() {
-        this.toolbarSize = parseInt(localStorage.getItem('toolbarSize')) || 50;
+        this.toolbarSize = parseInt(localStorage.getItem('toolbarSize')) || 40;
         this.configScale = parseFloat(localStorage.getItem('configScale')) || 1.0;
         this.controlPosition = localStorage.getItem('controlPosition') || 'top-right';
         this.edgeSnapEnabled = localStorage.getItem('edgeSnapEnabled') !== 'false';
@@ -11,7 +11,7 @@ class SettingsManager {
     }
     
     switchTab(tabName) {
-        document.querySelectorAll('.settings-tab').forEach(tab => {
+        document.querySelectorAll('.settings-tab-icon').forEach(tab => {
             tab.classList.remove('active');
         });
         
@@ -19,7 +19,7 @@ class SettingsManager {
             content.classList.remove('active');
         });
         
-        document.querySelector(`.settings-tab[data-tab="${tabName}"]`).classList.add('active');
+        document.querySelector(`.settings-tab-icon[data-tab="${tabName}"]`).classList.add('active');
         document.getElementById(`${tabName}-settings`).classList.add('active');
     }
     
