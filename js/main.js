@@ -138,7 +138,7 @@ class DrawingBoard {
                 this.hasTwoFingers = true;
                 if (this.drawingEngine.isDrawing) {
                     // Stop any ongoing drawing
-                    this.drawingEngine.stopDrawing();
+                    this.drawingEngine.isDrawing = false;
                 }
                 this.handlePinchStart(e);
             } else if (e.touches.length === 1 && !this.hasTwoFingers) {
@@ -643,8 +643,9 @@ class DrawingBoard {
     
     applyZoom() {
         // Apply zoom using CSS transform for better performance
-        this.canvas.style.transform = `scale(${this.drawingEngine.canvasScale})`;
-        this.bgCanvas.style.transform = `scale(${this.drawingEngine.canvasScale})`;
+        const transform = `scale(${this.drawingEngine.canvasScale})`;
+        this.canvas.style.transform = transform;
+        this.bgCanvas.style.transform = transform;
         this.canvas.style.transformOrigin = 'center center';
         this.bgCanvas.style.transformOrigin = 'center center';
     }
@@ -889,9 +890,10 @@ class DrawingBoard {
             localStorage.setItem('panOffsetX', this.drawingEngine.panOffset.x);
             localStorage.setItem('panOffsetY', this.drawingEngine.panOffset.y);
             
-            // Apply visual pan effect
-            this.canvas.style.transform = `scale(${this.drawingEngine.canvasScale}) translate(${this.drawingEngine.panOffset.x}px, ${this.drawingEngine.panOffset.y}px)`;
-            this.bgCanvas.style.transform = `scale(${this.drawingEngine.canvasScale}) translate(${this.drawingEngine.panOffset.x}px, ${this.drawingEngine.panOffset.y}px)`;
+            // Apply visual pan and zoom effect
+            const transform = `scale(${this.drawingEngine.canvasScale}) translate(${this.drawingEngine.panOffset.x}px, ${this.drawingEngine.panOffset.y}px)`;
+            this.canvas.style.transform = transform;
+            this.bgCanvas.style.transform = transform;
         }
         
         this.lastPinchDistance = currentDistance;

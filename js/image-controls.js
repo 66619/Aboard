@@ -9,6 +9,9 @@ class ImageControls {
         this.isResizing = false;
         this.isRotating = false;
         
+        // Constants
+        this.MIN_IMAGE_SIZE = 50;
+        
         // Image state
         this.imagePosition = { x: 0, y: 0 };
         this.imageSize = { width: 0, height: 0 };
@@ -231,38 +234,38 @@ class ImageControls {
         
         switch (this.resizeHandle) {
             case 'top-left':
-                this.imageSize.width = Math.max(50, this.resizeStartSize.width - deltaX);
-                this.imageSize.height = Math.max(50, this.resizeStartSize.height - deltaY);
+                this.imageSize.width = Math.max(this.MIN_IMAGE_SIZE, this.resizeStartSize.width - deltaX);
+                this.imageSize.height = Math.max(this.MIN_IMAGE_SIZE, this.resizeStartSize.height - deltaY);
                 this.imagePosition.x = this.dragStartImagePos.x + deltaX;
                 this.imagePosition.y = this.dragStartImagePos.y + deltaY;
                 break;
             case 'top-right':
-                this.imageSize.width = Math.max(50, this.resizeStartSize.width + deltaX);
-                this.imageSize.height = Math.max(50, this.resizeStartSize.height - deltaY);
+                this.imageSize.width = Math.max(this.MIN_IMAGE_SIZE, this.resizeStartSize.width + deltaX);
+                this.imageSize.height = Math.max(this.MIN_IMAGE_SIZE, this.resizeStartSize.height - deltaY);
                 this.imagePosition.y = this.dragStartImagePos.y + deltaY;
                 break;
             case 'bottom-left':
-                this.imageSize.width = Math.max(50, this.resizeStartSize.width - deltaX);
-                this.imageSize.height = Math.max(50, this.resizeStartSize.height + deltaY);
+                this.imageSize.width = Math.max(this.MIN_IMAGE_SIZE, this.resizeStartSize.width - deltaX);
+                this.imageSize.height = Math.max(this.MIN_IMAGE_SIZE, this.resizeStartSize.height + deltaY);
                 this.imagePosition.x = this.dragStartImagePos.x + deltaX;
                 break;
             case 'bottom-right':
-                this.imageSize.width = Math.max(50, this.resizeStartSize.width + deltaX);
-                this.imageSize.height = Math.max(50, this.resizeStartSize.height + deltaY);
+                this.imageSize.width = Math.max(this.MIN_IMAGE_SIZE, this.resizeStartSize.width + deltaX);
+                this.imageSize.height = Math.max(this.MIN_IMAGE_SIZE, this.resizeStartSize.height + deltaY);
                 break;
             case 'top':
-                this.imageSize.height = Math.max(50, this.resizeStartSize.height - deltaY);
+                this.imageSize.height = Math.max(this.MIN_IMAGE_SIZE, this.resizeStartSize.height - deltaY);
                 this.imagePosition.y = this.dragStartImagePos.y + deltaY;
                 break;
             case 'bottom':
-                this.imageSize.height = Math.max(50, this.resizeStartSize.height + deltaY);
+                this.imageSize.height = Math.max(this.MIN_IMAGE_SIZE, this.resizeStartSize.height + deltaY);
                 break;
             case 'left':
-                this.imageSize.width = Math.max(50, this.resizeStartSize.width - deltaX);
+                this.imageSize.width = Math.max(this.MIN_IMAGE_SIZE, this.resizeStartSize.width - deltaX);
                 this.imagePosition.x = this.dragStartImagePos.x + deltaX;
                 break;
             case 'right':
-                this.imageSize.width = Math.max(50, this.resizeStartSize.width + deltaX);
+                this.imageSize.width = Math.max(this.MIN_IMAGE_SIZE, this.resizeStartSize.width + deltaX);
                 break;
         }
         
