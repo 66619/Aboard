@@ -199,8 +199,13 @@ class CanvasImageManager {
         
         const image = this.images.find(img => img.id === this.selectedImageId);
         if (image) {
-            const deltaX = e.clientX - this.dragStartPos.x;
-            const deltaY = e.clientY - this.dragStartPos.y;
+            // Get canvas scale to convert screen coordinates to canvas coordinates
+            const computedStyle = window.getComputedStyle(this.canvas);
+            const matrix = new DOMMatrix(computedStyle.transform);
+            const canvasScale = matrix.a || 1;
+            
+            const deltaX = (e.clientX - this.dragStartPos.x) / canvasScale;
+            const deltaY = (e.clientY - this.dragStartPos.y) / canvasScale;
             
             image.x = this.dragStartImagePos.x + deltaX;
             image.y = this.dragStartImagePos.y + deltaY;
@@ -232,8 +237,13 @@ class CanvasImageManager {
         const image = this.images.find(img => img.id === this.selectedImageId);
         if (!image) return;
         
-        const deltaX = e.clientX - this.resizeStartPos.x;
-        const deltaY = e.clientY - this.resizeStartPos.y;
+        // Get canvas scale to convert screen coordinates to canvas coordinates
+        const computedStyle = window.getComputedStyle(this.canvas);
+        const matrix = new DOMMatrix(computedStyle.transform);
+        const canvasScale = matrix.a || 1;
+        
+        const deltaX = (e.clientX - this.resizeStartPos.x) / canvasScale;
+        const deltaY = (e.clientY - this.resizeStartPos.y) / canvasScale;
         
         const aspectRatio = this.resizeStartSize.width / this.resizeStartSize.height;
         
@@ -339,11 +349,8 @@ class CanvasImageManager {
     }
     
     redrawCanvas() {
-        // This will be called by the main app to redraw all images
-        // Save current state and redraw
-        const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.putImageData(imageData, 0, 0);
+        // Redraw all images on canvas
+        // This is called after any image manipulation
         this.drawImages();
     }
     
