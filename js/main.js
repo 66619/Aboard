@@ -93,6 +93,11 @@ class DrawingBoard {
                 return;
             }
             
+            // Auto-switch to pen mode if currently in background mode
+            if (this.drawingEngine.currentTool === 'background') {
+                this.setTool('pen', false); // Don't show config panel
+            }
+            
             if (e.button === 1 || (e.button === 0 && e.shiftKey)) {
                 this.drawingEngine.startPanning(e);
             } else if (this.drawingEngine.currentTool === 'pen' || this.drawingEngine.currentTool === 'eraser') {
@@ -275,6 +280,14 @@ class DrawingBoard {
                     document.querySelectorAll('.pattern-option-btn').forEach(b => b.classList.remove('active'));
                     e.target.classList.add('active');
                     document.getElementById('image-size-group').style.display = 'none';
+                    
+                    // Show/hide pattern density slider based on pattern
+                    const patternDensityGroup = document.getElementById('pattern-density-group');
+                    if (pattern !== 'blank' && pattern !== 'image') {
+                        patternDensityGroup.style.display = 'flex';
+                    } else {
+                        patternDensityGroup.style.display = 'none';
+                    }
                 }
             });
         });
@@ -308,12 +321,31 @@ class DrawingBoard {
             bgImageSizeValue.textContent = e.target.value;
         });
         
+        // Pattern density slider
+        const patternDensitySlider = document.getElementById('pattern-density-slider');
+        const patternDensityValue = document.getElementById('pattern-density-value');
+        patternDensitySlider.addEventListener('input', (e) => {
+            this.backgroundManager.setPatternDensity(parseInt(e.target.value) / 100);
+            patternDensityValue.textContent = e.target.value;
+        });
+        
         // Sliders
         const penSizeSlider = document.getElementById('pen-size-slider');
         const penSizeValue = document.getElementById('pen-size-value');
         penSizeSlider.addEventListener('input', (e) => {
             this.drawingEngine.setPenSize(parseInt(e.target.value));
             penSizeValue.textContent = e.target.value;
+        });
+        
+        // Eraser shape buttons
+        document.querySelectorAll('.eraser-shape-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.drawingEngine.setEraserShape(e.target.dataset.eraserShape);
+                document.querySelectorAll('.eraser-shape-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                // Update cursor shape
+                this.updateEraserCursorShape();
+            });
         });
         
         const eraserSizeSlider = document.getElementById('eraser-size-slider');
@@ -459,8 +491,9 @@ class DrawingBoard {
     setupDraggablePanels() {
         const historyControls = document.getElementById('history-controls');
         const configArea = document.getElementById('config-area');
+        const toolbar = document.getElementById('toolbar');
         
-        [historyControls, configArea].forEach(element => {
+        [historyControls, configArea, toolbar].forEach(element => {
             element.addEventListener('mousedown', (e) => {
                 if (e.target.closest('button') || e.target.closest('input')) return;
                 
@@ -487,19 +520,45 @@ class DrawingBoard {
             let x = e.clientX - this.dragOffset.x;
             let y = e.clientY - this.dragOffset.y;
             
+            const edgeSnapDistance = 30;
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            const isToolbar = this.draggedElement.id === 'toolbar';
+            const isConfigArea = this.draggedElement.id === 'config-area';
+            
+            let snappedToEdge = false;
+            let isVertical = false;
+            
             if (this.settingsManager.edgeSnapEnabled) {
-                const edgeSnapDistance = 20;
-                const windowWidth = window.innerWidth;
-                const windowHeight = window.innerHeight;
-                
-                if (x < edgeSnapDistance) x = 0;
+                // Snap to left edge
+                if (x < edgeSnapDistance) {
+                    x = 10;
+                    snappedToEdge = true;
+                    isVertical = true;
+                }
+                // Snap to right edge
                 if (x + this.draggedElementWidth > windowWidth - edgeSnapDistance) {
-                    x = windowWidth - this.draggedElementWidth;
+                    x = windowWidth - this.draggedElementWidth - 10;
+                    snappedToEdge = true;
+                    isVertical = true;
                 }
-                if (y < edgeSnapDistance) y = 0;
+                // Snap to top
+                if (y < edgeSnapDistance) {
+                    y = 10;
+                    snappedToEdge = true;
+                }
+                // Snap to bottom
                 if (y + this.draggedElementHeight > windowHeight - edgeSnapDistance) {
-                    y = windowHeight - this.draggedElementHeight;
+                    y = windowHeight - this.draggedElementHeight - 10;
+                    snappedToEdge = true;
                 }
+            }
+            
+            // Apply vertical layout for toolbar and config area when snapped to left/right
+            if ((isToolbar || isConfigArea) && snappedToEdge && isVertical) {
+                this.draggedElement.classList.add('vertical');
+            } else {
+                this.draggedElement.classList.remove('vertical');
             }
             
             this.draggedElement.style.left = `${x}px`;
@@ -519,7 +578,7 @@ class DrawingBoard {
         });
     }
     
-    setTool(tool) {
+    setTool(tool, showConfig = true) {
         this.drawingEngine.setTool(tool);
         if (tool === 'eraser') {
             this.showEraserCursor();
@@ -528,7 +587,7 @@ class DrawingBoard {
         }
         this.updateUI();
         
-        if (tool === 'pen' || tool === 'eraser' || tool === 'background') {
+        if (showConfig && (tool === 'pen' || tool === 'eraser' || tool === 'background')) {
             document.getElementById('config-area').classList.add('show');
         }
     }
@@ -841,8 +900,17 @@ class DrawingBoard {
         }
     }
     
+    updateEraserCursorShape() {
+        if (this.drawingEngine.eraserShape === 'rectangle') {
+            this.eraserCursor.style.borderRadius = '0';
+        } else {
+            this.eraserCursor.style.borderRadius = '50%';
+        }
+    }
+    
     showEraserCursor() {
         if (this.drawingEngine.currentTool === 'eraser') {
+            this.updateEraserCursorShape();
             this.eraserCursor.style.display = 'block';
         }
     }

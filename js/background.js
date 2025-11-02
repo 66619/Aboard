@@ -10,6 +10,7 @@ class BackgroundManager {
         this.backgroundPattern = localStorage.getItem('backgroundPattern') || 'blank';
         this.bgOpacity = parseFloat(localStorage.getItem('bgOpacity')) || 1.0;
         this.patternIntensity = parseFloat(localStorage.getItem('patternIntensity')) || 0.5;
+        this.patternDensity = parseFloat(localStorage.getItem('patternDensity')) || 1.0;
         this.backgroundImage = null;
         this.backgroundImageData = localStorage.getItem('backgroundImageData') || null;
         this.imageSize = parseFloat(localStorage.getItem('imageSize')) || 1.0;
@@ -137,7 +138,8 @@ class BackgroundManager {
     }
     
     drawDotsPattern(dpr, patternColor) {
-        const spacing = 20 * dpr;
+        const baseSpacing = 20 * dpr;
+        const spacing = baseSpacing / this.patternDensity;
         this.bgCtx.fillStyle = patternColor;
         
         for (let x = spacing; x < this.bgCanvas.width; x += spacing) {
@@ -150,7 +152,8 @@ class BackgroundManager {
     }
     
     drawGridPattern(dpr, patternColor) {
-        const spacing = 20 * dpr;
+        const baseSpacing = 20 * dpr;
+        const spacing = baseSpacing / this.patternDensity;
         this.bgCtx.strokeStyle = patternColor;
         this.bgCtx.lineWidth = 0.5 * dpr;
         
@@ -170,7 +173,8 @@ class BackgroundManager {
     }
     
     drawTianzigePattern(dpr, patternColor) {
-        const cellSize = 60 * dpr;
+        const baseCellSize = 60 * dpr;
+        const cellSize = baseCellSize / this.patternDensity;
         this.bgCtx.strokeStyle = patternColor;
         
         for (let x = 0; x < this.bgCanvas.width; x += cellSize) {
@@ -203,7 +207,8 @@ class BackgroundManager {
     }
     
     drawEnglishLinesPattern(dpr, patternColor) {
-        const lineHeight = 60 * dpr;
+        const baseLineHeight = 60 * dpr;
+        const lineHeight = baseLineHeight / this.patternDensity;
         
         for (let y = lineHeight; y < this.bgCanvas.height; y += lineHeight) {
             this.bgCtx.strokeStyle = patternColor;
@@ -240,7 +245,8 @@ class BackgroundManager {
     }
     
     drawMusicStaffPattern(dpr, patternColor) {
-        const staffHeight = 80 * dpr;
+        const baseStaffHeight = 80 * dpr;
+        const staffHeight = baseStaffHeight / this.patternDensity;
         const lineSpacing = staffHeight / 4;
         this.bgCtx.strokeStyle = patternColor;
         this.bgCtx.lineWidth = 1 * dpr;
@@ -259,7 +265,8 @@ class BackgroundManager {
     drawCoordinatePattern(dpr, patternColor) {
         const centerX = this.bgCanvas.width / 2;
         const centerY = this.bgCanvas.height / 2;
-        const gridSize = 20 * dpr;
+        const baseGridSize = 20 * dpr;
+        const gridSize = baseGridSize / this.patternDensity;
         
         this.bgCtx.strokeStyle = this.isLightBackground() ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
         this.bgCtx.lineWidth = 0.5 * dpr;
@@ -338,6 +345,12 @@ class BackgroundManager {
     
     setPatternIntensity(intensity) {
         this.patternIntensity = intensity;
+        this.drawBackground();
+    }
+    
+    setPatternDensity(density) {
+        this.patternDensity = density;
+        localStorage.setItem('patternDensity', density);
         this.drawBackground();
     }
     

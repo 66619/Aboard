@@ -80,18 +80,25 @@
                         <input type="color" id="custom-color-picker" class="custom-color-picker-input" value="#000000">
                     </label>
                 </div>
-            </div>
-            <div class="config-group">
-                <label>粗细 <span id="pen-size-value">5</span>px</label>
-                <input type="range" id="pen-size-slider" min="1" max="50" value="5" class="slider">
+                <div class="pen-size-compact">
+                    <label>粗细 <span id="pen-size-value">5</span>px</label>
+                    <input type="range" id="pen-size-slider" min="1" max="50" value="5" class="slider">
+                </div>
             </div>
         </div>
 
         <!-- Eraser configuration -->
         <div id="eraser-config" class="config-panel">
             <div class="config-group">
+                <label>形状</label>
+                <div class="button-size-options eraser-shape-options">
+                    <button class="eraser-shape-btn active" data-eraser-shape="circle">圆形</button>
+                    <button class="eraser-shape-btn" data-eraser-shape="rectangle">方形</button>
+                </div>
+            </div>
+            <div class="config-group">
                 <label>橡皮擦大小 <span id="eraser-size-value">20</span>px</label>
-                <input type="range" id="eraser-size-slider" min="10" max="30" value="20" class="slider">
+                <input type="range" id="eraser-size-slider" min="10" max="50" value="20" class="slider">
             </div>
         </div>
 
@@ -139,6 +146,10 @@
                     </button>
                     <input type="file" id="bg-image-upload" accept="image/*" style="display: none;">
                 </div>
+            </div>
+            <div class="config-group" id="pattern-density-group" style="display: none;">
+                <label>图案密度 <span id="pattern-density-value">100</span>%</label>
+                <input type="range" id="pattern-density-slider" min="50" max="200" value="100" class="slider">
             </div>
             <div class="config-group" id="image-size-group" style="display: none;">
                 <label>图片大小 <span id="bg-image-size-value">100</span>%</label>
@@ -209,6 +220,14 @@
                             <polyline points="21 15 16 10 5 21"></polyline>
                         </svg>
                         <span>背景</span>
+                    </button>
+                    <button class="settings-tab-icon" data-tab="about" title="关于">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        <span>关于</span>
                     </button>
                 </div>
                 
@@ -319,6 +338,56 @@
                                     <input type="checkbox" class="pattern-pref-checkbox" data-pattern="image" checked>
                                     <span>上传图片</span>
                                 </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- About settings -->
+                    <div id="about-settings" class="settings-tab-content">
+                        <h3>关于 Aboard</h3>
+                        <div class="about-info">
+                            <div class="about-section">
+                                <h4>项目简介</h4>
+                                <p>Aboard 是一个简约的网页白板应用，专为教学和演示设计。</p>
+                                <p>它提供了流畅的绘图体验和丰富的背景选项，让您的创意自由展现。</p>
+                            </div>
+                            
+                            <div class="about-section">
+                                <h4>主要功能</h4>
+                                <ul>
+                                    <li>多种笔触类型（普通笔、铅笔、圆珠笔、钢笔、毛笔）</li>
+                                    <li>智能橡皮擦（支持圆形和方形）</li>
+                                    <li>丰富的背景图案（点阵、方格、田字格、英语四线格等）</li>
+                                    <li>可调节的图案密度和透明度</li>
+                                    <li>无限画布模式和分页系统</li>
+                                    <li>可拖动的工具栏和属性面板</li>
+                                    <li>撤销/重做功能（支持最多50步）</li>
+                                    <li>画布缩放和平移</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="about-section">
+                                <h4>技术栈</h4>
+                                <p>HTML5 Canvas • Vanilla JavaScript • CSS3</p>
+                            </div>
+                            
+                            <div class="about-section">
+                                <h4>开源协议</h4>
+                                <p>MIT License</p>
+                            </div>
+                            
+                            <div class="about-section">
+                                <h4>GitHub</h4>
+                                <p>
+                                    <a href="https://github.com/lifeafter619/Aboard" target="_blank" rel="noopener noreferrer">
+                                        github.com/lifeafter619/Aboard
+                                    </a>
+                                </p>
+                            </div>
+                            
+                            <div class="about-section">
+                                <h4>版本</h4>
+                                <p>v2.0.0</p>
                             </div>
                         </div>
                     </div>
