@@ -495,7 +495,7 @@ class DrawingBoard {
         
         [historyControls, configArea, toolbar].forEach(element => {
             element.addEventListener('mousedown', (e) => {
-                if (e.target.closest('button') || e.target.closest('input') || e.target.closest('.slider')) return;
+                if (e.target.closest('button') || e.target.closest('input')) return;
                 
                 this.isDraggingPanel = true;
                 this.draggedElement = element;
