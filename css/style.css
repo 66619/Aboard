@@ -169,15 +169,39 @@ body {
 /* Vertical config area layout (when snapped to left or right) */
 #config-area.vertical {
     min-width: auto;
-    max-width: 200px;
+    max-width: 250px;
+    max-height: 80vh;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 #config-area.vertical .config-panel {
     flex-direction: column;
 }
 
+#config-area.vertical .config-group {
+    max-width: 100%;
+}
+
 #config-area.vertical .color-picker {
-    max-width: 150px;
+    max-width: 100%;
+}
+
+#config-area.vertical .color-picker-row {
+    max-width: 100%;
+}
+
+#config-area.vertical .slider,
+#config-area.vertical .slider-compact {
+    max-width: 180px;
+}
+
+#config-area.vertical .pattern-grid-compact {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+#config-area.vertical .pen-type-grid {
+    grid-template-columns: repeat(2, 1fr);
 }
 
 .config-close-btn {
@@ -1277,4 +1301,209 @@ body {
 
 .image-done-btn:hover {
     background-color: #0066CC;
+}
+
+/* Canvas mode buttons */
+.button-size-options-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.canvas-mode-btn {
+    padding: 12px 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.canvas-mode-btn:hover {
+    background-color: #f0f0f0;
+    border-color: #ccc;
+}
+
+.canvas-mode-btn.active {
+    background-color: #007AFF;
+    color: #ffffff;
+    border-color: #007AFF;
+}
+
+/* Canvas presets */
+.canvas-presets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.canvas-preset-btn {
+    padding: 10px 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #666;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.canvas-preset-btn:hover {
+    background-color: #f0f0f0;
+    border-color: #ccc;
+}
+
+.canvas-preset-btn.active {
+    background-color: #007AFF;
+    color: #ffffff;
+    border-color: #007AFF;
+}
+
+/* Canvas custom size */
+.canvas-custom-size {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+}
+
+.custom-size-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.custom-size-row label {
+    min-width: 50px;
+    font-size: 13px;
+    color: #666;
+}
+
+.custom-size-row input[type="number"],
+.custom-size-row select {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    background-color: #ffffff;
+}
+
+.custom-size-row span {
+    font-size: 13px;
+    color: #666;
+}
+
+/* Compact pen and background config layouts */
+.color-picker-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.color-picker-main {
+    display: flex;
+    gap: 6px;
+}
+
+.color-and-size-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.pen-size-inline {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.pen-size-inline label {
+    font-size: 11px;
+    color: #666;
+    font-weight: 500;
+}
+
+.slider-compact {
+    width: 150px;
+}
+
+.config-group-compact {
+    gap: 6px;
+}
+
+.pattern-grid-compact {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+}
+
+.pattern-grid-compact .pattern-option-btn {
+    padding: 6px 8px;
+    font-size: 10px;
+}
+
+.compact-sliders {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.compact-slider-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.compact-slider-item label {
+    font-size: 11px;
+    color: #666;
+    font-weight: 500;
+}
+
+/* Responsive sizing for controls based on screen size */
+@media (max-width: 1024px) {
+    .color-btn {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .color-picker-icon-btn {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .slider-compact {
+        width: 120px;
+    }
+}
+
+@media (max-width: 768px) {
+    .color-btn {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .color-picker-icon-btn {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .slider-compact {
+        width: 100px;
+    }
+    
+    .pattern-grid-compact {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }

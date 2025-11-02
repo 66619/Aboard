@@ -301,7 +301,9 @@ class DrawingBoard {
                     this.backgroundManager.setBackgroundImage(event.target.result);
                     document.querySelectorAll('.pattern-option-btn').forEach(b => b.classList.remove('active'));
                     document.querySelector('.pattern-option-btn[data-pattern="image"]').classList.add('active');
-                    document.getElementById('image-size-group').style.display = 'block';
+                    document.getElementById('image-size-group').style.display = 'flex';
+                    // Hide pattern density when image is uploaded
+                    document.getElementById('pattern-density-group').style.display = 'none';
                     
                     // Show image controls for manipulation
                     const imageData = this.backgroundManager.getImageData();
@@ -412,10 +414,74 @@ class DrawingBoard {
             localStorage.setItem('edgeSnapEnabled', e.target.checked);
         });
         
-        document.getElementById('infinite-canvas-checkbox').addEventListener('change', (e) => {
-            this.settingsManager.infiniteCanvas = e.target.checked;
-            localStorage.setItem('infiniteCanvas', e.target.checked);
-            this.updateCanvasMode();
+        // Canvas mode buttons
+        document.querySelectorAll('.canvas-mode-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const mode = e.target.dataset.mode;
+                this.settingsManager.setCanvasMode(mode);
+                document.querySelectorAll('.canvas-mode-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                this.updateCanvasMode();
+            });
+        });
+        
+        // Canvas preset buttons
+        document.querySelectorAll('.canvas-preset-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const preset = e.target.dataset.preset;
+                this.settingsManager.setCanvasPreset(preset);
+                document.querySelectorAll('.canvas-preset-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+            });
+        });
+        
+        // Canvas size inputs
+        document.getElementById('canvas-width-input').addEventListener('change', (e) => {
+            const width = parseInt(e.target.value);
+            const height = parseInt(document.getElementById('canvas-height-input').value);
+            this.settingsManager.setCanvasSize(width, height);
+            // Set to custom when manually changing size
+            document.querySelectorAll('.canvas-preset-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('.canvas-preset-btn[data-preset="custom"]').classList.add('active');
+        });
+        
+        document.getElementById('canvas-height-input').addEventListener('change', (e) => {
+            const height = parseInt(e.target.value);
+            const width = parseInt(document.getElementById('canvas-width-input').value);
+            this.settingsManager.setCanvasSize(width, height);
+            // Set to custom when manually changing size
+            document.querySelectorAll('.canvas-preset-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('.canvas-preset-btn[data-preset="custom"]').classList.add('active');
+        });
+        
+        // Canvas ratio selector
+        document.getElementById('canvas-ratio-select').addEventListener('change', (e) => {
+            const ratio = e.target.value;
+            if (ratio !== 'custom') {
+                const width = parseInt(document.getElementById('canvas-width-input').value);
+                let height;
+                
+                switch(ratio) {
+                    case '16:9':
+                        height = Math.round(width * 9 / 16);
+                        break;
+                    case '4:3':
+                        height = Math.round(width * 3 / 4);
+                        break;
+                    case '1:1':
+                        height = width;
+                        break;
+                    case '3:4':
+                        height = Math.round(width * 4 / 3);
+                        break;
+                    case '9:16':
+                        height = Math.round(width * 16 / 9);
+                        break;
+                }
+                
+                document.getElementById('canvas-height-input').value = height;
+                this.settingsManager.setCanvasSize(width, height);
+            }
         });
         
         // Show/hide zoom controls
@@ -528,19 +594,32 @@ class DrawingBoard {
             
             let snappedToEdge = false;
             let isVertical = false;
+            let snappedLeft = false;
+            let snappedRight = false;
             
             if (this.settingsManager.edgeSnapEnabled) {
-                // Snap to left edge
+                // Check for left edge snap first
                 if (x < edgeSnapDistance) {
                     x = 10;
                     snappedToEdge = true;
                     isVertical = true;
+                    snappedLeft = true;
                 }
-                // Snap to right edge
-                if (x + this.draggedElementWidth > windowWidth - edgeSnapDistance) {
-                    x = windowWidth - this.draggedElementWidth - 10;
+                // Check for right edge snap
+                else if (x + this.draggedElementWidth > windowWidth - edgeSnapDistance) {
+                    // When vertical, need to recalculate width
+                    if (isToolbar || isConfigArea) {
+                        // Temporarily add vertical class to get correct dimensions
+                        this.draggedElement.classList.add('vertical');
+                        const tempWidth = this.draggedElement.getBoundingClientRect().width;
+                        this.draggedElement.classList.remove('vertical');
+                        x = windowWidth - tempWidth - 10;
+                    } else {
+                        x = windowWidth - this.draggedElementWidth - 10;
+                    }
                     snappedToEdge = true;
                     isVertical = true;
+                    snappedRight = true;
                 }
                 // Snap to top
                 if (y < edgeSnapDistance) {
@@ -557,6 +636,11 @@ class DrawingBoard {
             // Apply vertical layout for toolbar and config area when snapped to left/right
             if ((isToolbar || isConfigArea) && snappedToEdge && isVertical) {
                 this.draggedElement.classList.add('vertical');
+                // Recalculate position after adding vertical class to account for dimension changes
+                if (snappedRight) {
+                    const newWidth = this.draggedElement.getBoundingClientRect().width;
+                    x = windowWidth - newWidth - 10;
+                }
             } else {
                 this.draggedElement.classList.remove('vertical');
             }
@@ -739,17 +823,52 @@ class DrawingBoard {
     }
     
     setupCanvasZoom() {
-        // Ctrl+scroll to zoom canvas
+        // Ctrl+scroll to zoom canvas towards mouse pointer
         document.addEventListener('wheel', (e) => {
             if (e.ctrlKey || e.metaKey) {
                 e.preventDefault();
                 
+                // Get mouse position relative to canvas
+                const rect = this.canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                // Get current scale
+                const oldScale = this.drawingEngine.canvasScale;
+                
+                // Calculate new scale
                 const delta = e.deltaY;
+                let newScale;
                 if (delta < 0) {
-                    this.zoomIn();
+                    newScale = Math.min(oldScale + 0.1, 3.0);
                 } else {
-                    this.zoomOut();
+                    newScale = Math.max(oldScale - 0.1, 0.5);
                 }
+                
+                // Calculate the zoom factor
+                const scaleFactor = newScale / oldScale;
+                
+                // Calculate the position of the mouse relative to the center of the canvas
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const offsetX = mouseX - centerX;
+                const offsetY = mouseY - centerY;
+                
+                // Adjust transform origin to mouse position for smooth zoom
+                this.canvas.style.transformOrigin = `${mouseX}px ${mouseY}px`;
+                this.bgCanvas.style.transformOrigin = `${mouseX}px ${mouseY}px`;
+                
+                // Update scale
+                this.drawingEngine.canvasScale = newScale;
+                this.updateZoomUI();
+                this.applyZoom();
+                localStorage.setItem('canvasScale', newScale);
+                
+                // Reset transform origin after a short delay to allow for smooth zooming
+                setTimeout(() => {
+                    this.canvas.style.transformOrigin = 'center center';
+                    this.bgCanvas.style.transformOrigin = 'center center';
+                }, 100);
             }
         }, { passive: false });
     }
