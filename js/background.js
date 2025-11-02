@@ -10,6 +10,21 @@ class BackgroundManager {
         this.backgroundPattern = localStorage.getItem('backgroundPattern') || 'blank';
         this.bgOpacity = parseFloat(localStorage.getItem('bgOpacity')) || 1.0;
         this.patternIntensity = parseFloat(localStorage.getItem('patternIntensity')) || 0.5;
+        this.backgroundImage = null;
+        this.backgroundImageData = localStorage.getItem('backgroundImageData') || null;
+        this.imageSize = parseFloat(localStorage.getItem('imageSize')) || 1.0;
+        
+        // Load saved image if exists
+        if (this.backgroundImageData) {
+            const img = new Image();
+            img.onload = () => {
+                this.backgroundImage = img;
+                if (this.backgroundPattern === 'image') {
+                    this.drawBackground();
+                }
+            };
+            img.src = this.backgroundImageData;
+        }
     }
     
     drawBackground() {
@@ -30,6 +45,11 @@ class BackgroundManager {
     
     drawBackgroundPattern() {
         if (this.backgroundPattern === 'blank') return;
+        
+        if (this.backgroundPattern === 'image' && this.backgroundImage) {
+            this.drawImagePattern();
+            return;
+        }
         
         this.bgCtx.save();
         this.bgCtx.globalCompositeOperation = 'source-over';
@@ -57,6 +77,29 @@ class BackgroundManager {
                 this.drawCoordinatePattern(dpr, patternColor);
                 break;
         }
+        
+        this.bgCtx.restore();
+    }
+    
+    drawImagePattern() {
+        if (!this.backgroundImage) return;
+        
+        this.bgCtx.save();
+        this.bgCtx.globalAlpha = this.patternIntensity;
+        
+        const dpr = window.devicePixelRatio || 1;
+        const canvasWidth = this.bgCanvas.width / dpr;
+        const canvasHeight = this.bgCanvas.height / dpr;
+        
+        // Calculate scaled dimensions
+        const scaledWidth = this.backgroundImage.width * this.imageSize;
+        const scaledHeight = this.backgroundImage.height * this.imageSize;
+        
+        // Center the image
+        const x = (canvasWidth - scaledWidth) / 2;
+        const y = (canvasHeight - scaledHeight) / 2;
+        
+        this.bgCtx.drawImage(this.backgroundImage, x, y, scaledWidth, scaledHeight);
         
         this.bgCtx.restore();
     }
@@ -240,10 +283,10 @@ class BackgroundManager {
     }
     
     getPatternColor() {
-        const baseOpacity = this.patternIntensity;
+        const baseOpacity = Math.min(this.patternIntensity, 1.0);
         return this.isLightBackground() ? 
-            `rgba(0, 0, 0, ${baseOpacity * 0.2})` : 
-            `rgba(255, 255, 255, ${baseOpacity * 0.2})`;
+            `rgba(0, 0, 0, ${baseOpacity})` : 
+            `rgba(255, 255, 255, ${baseOpacity})`;
     }
     
     setBackgroundColor(color) {
@@ -264,5 +307,26 @@ class BackgroundManager {
     setPatternIntensity(intensity) {
         this.patternIntensity = intensity;
         this.drawBackground();
+    }
+    
+    setBackgroundImage(imageData) {
+        this.backgroundImageData = imageData;
+        localStorage.setItem('backgroundImageData', imageData);
+        
+        const img = new Image();
+        img.onload = () => {
+            this.backgroundImage = img;
+            this.backgroundPattern = 'image';
+            this.drawBackground();
+        };
+        img.src = imageData;
+    }
+    
+    setImageSize(size) {
+        this.imageSize = size;
+        localStorage.setItem('imageSize', size);
+        if (this.backgroundPattern === 'image') {
+            this.drawBackground();
+        }
     }
 }

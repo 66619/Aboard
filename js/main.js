@@ -45,6 +45,8 @@ class DrawingBoard {
         this.historyManager.saveState();
         this.updateZoomUI();
         this.applyZoom();
+        this.updateZoomControlsVisibility();
+        this.updatePatternGrid();
     }
     
     resizeCanvas() {
@@ -77,39 +79,51 @@ class DrawingBoard {
     }
     
     setupEventListeners() {
-        // Canvas drawing events
-        this.canvas.addEventListener('mousedown', (e) => {
+        // Canvas drawing events - use document-level listeners for continuous drawing
+        document.addEventListener('mousedown', (e) => {
+            // Skip if clicking on UI elements (except canvas)
+            if (e.target.closest('#toolbar') || 
+                e.target.closest('#config-area') || 
+                e.target.closest('#history-controls') || 
+                e.target.closest('#pagination-controls') ||
+                e.target.closest('.modal')) {
+                return;
+            }
+            
             if (e.button === 1 || (e.button === 0 && e.shiftKey)) {
                 this.drawingEngine.startPanning(e);
-            } else {
+            } else if (this.drawingEngine.currentTool === 'pen' || this.drawingEngine.currentTool === 'eraser') {
                 this.drawingEngine.startDrawing(e);
             }
         });
         
-        this.canvas.addEventListener('mousemove', (e) => {
+        document.addEventListener('mousemove', (e) => {
             if (this.drawingEngine.isPanning) {
                 this.drawingEngine.pan(e);
                 this.redrawCanvas();
-            } else {
+            } else if (this.drawingEngine.isDrawing) {
                 this.drawingEngine.draw(e);
+                this.updateEraserCursor(e);
+            } else {
                 this.updateEraserCursor(e);
             }
         });
         
-        this.canvas.addEventListener('mouseup', () => {
+        document.addEventListener('mouseup', () => {
             this.handleDrawingComplete();
             this.drawingEngine.stopPanning();
-        });
-        
-        this.canvas.addEventListener('mouseout', () => {
-            this.handleDrawingComplete();
-            this.drawingEngine.stopPanning();
-            this.hideEraserCursor();
         });
         
         this.canvas.addEventListener('mouseenter', (e) => {
             if (this.drawingEngine.currentTool === 'eraser') {
                 this.showEraserCursor();
+            }
+        });
+        
+        this.canvas.addEventListener('mouseleave', () => {
+            // Don't hide eraser cursor if we're still drawing
+            if (!this.drawingEngine.isDrawing) {
+                this.hideEraserCursor();
             }
         });
         
@@ -176,13 +190,9 @@ class DrawingBoard {
             }
         });
         
-        // Close controls button
-        document.getElementById('close-controls-btn').addEventListener('click', () => this.hideHistoryControls());
-        
-        // Pagination controls
+        // Pagination controls - merged next and add button
         document.getElementById('prev-page-btn').addEventListener('click', () => this.prevPage());
-        document.getElementById('next-page-btn').addEventListener('click', () => this.nextPage());
-        document.getElementById('add-page-btn').addEventListener('click', () => this.addPage());
+        document.getElementById('next-or-add-page-btn').addEventListener('click', () => this.nextOrAddPage());
         document.getElementById('page-input').addEventListener('change', (e) => this.goToPage(parseInt(e.target.value)));
         document.getElementById('page-input').addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
@@ -197,6 +207,9 @@ class DrawingBoard {
         this.setupDraggablePanels();
         
         window.addEventListener('resize', () => this.resizeCanvas());
+        
+        // Ctrl+scroll to zoom canvas
+        this.setupCanvasZoom();
     }
     
     setupToolConfigListeners() {
@@ -242,10 +255,39 @@ class DrawingBoard {
         // Background pattern buttons
         document.querySelectorAll('.pattern-option-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                this.backgroundManager.setBackgroundPattern(e.target.dataset.pattern);
-                document.querySelectorAll('.pattern-option-btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
+                const pattern = e.target.dataset.pattern;
+                if (pattern === 'image') {
+                    document.getElementById('bg-image-upload').click();
+                } else {
+                    this.backgroundManager.setBackgroundPattern(pattern);
+                    document.querySelectorAll('.pattern-option-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    document.getElementById('image-size-group').style.display = 'none';
+                }
             });
+        });
+        
+        // Background image upload
+        document.getElementById('bg-image-upload').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    this.backgroundManager.setBackgroundImage(event.target.result);
+                    document.querySelectorAll('.pattern-option-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelector('.pattern-option-btn[data-pattern="image"]').classList.add('active');
+                    document.getElementById('image-size-group').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Background image size slider
+        const bgImageSizeSlider = document.getElementById('bg-image-size-slider');
+        const bgImageSizeValue = document.getElementById('bg-image-size-value');
+        bgImageSizeSlider.addEventListener('input', (e) => {
+            this.backgroundManager.setImageSize(parseInt(e.target.value) / 100);
+            bgImageSizeValue.textContent = e.target.value;
         });
         
         // Sliders
@@ -324,6 +366,21 @@ class DrawingBoard {
             this.settingsManager.infiniteCanvas = e.target.checked;
             localStorage.setItem('infiniteCanvas', e.target.checked);
             this.updateCanvasMode();
+        });
+        
+        // Show/hide zoom controls
+        document.getElementById('show-zoom-controls-checkbox').addEventListener('change', (e) => {
+            this.settingsManager.showZoomControls = e.target.checked;
+            localStorage.setItem('showZoomControls', e.target.checked);
+            this.updateZoomControlsVisibility();
+        });
+        
+        // Pattern preferences
+        document.querySelectorAll('.pattern-pref-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', (e) => {
+                this.settingsManager.updatePatternPreferences();
+                this.updatePatternGrid();
+            });
         });
         
         document.getElementById('settings-modal').addEventListener('click', (e) => {
@@ -579,6 +636,46 @@ class DrawingBoard {
         document.getElementById('zoom-input').value = percent + '%';
     }
     
+    updateZoomControlsVisibility() {
+        const historyControls = document.getElementById('history-controls');
+        if (this.settingsManager.showZoomControls) {
+            historyControls.style.display = 'flex';
+        } else {
+            historyControls.style.display = 'none';
+        }
+    }
+    
+    updatePatternGrid() {
+        const patternGrid = document.getElementById('pattern-grid');
+        const patterns = this.settingsManager.getPatternPreferences();
+        
+        // Hide all pattern buttons first
+        patternGrid.querySelectorAll('.pattern-option-btn').forEach(btn => {
+            const pattern = btn.dataset.pattern;
+            if (patterns[pattern]) {
+                btn.style.display = 'block';
+            } else {
+                btn.style.display = 'none';
+            }
+        });
+    }
+    
+    setupCanvasZoom() {
+        // Ctrl+scroll to zoom canvas
+        document.addEventListener('wheel', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                
+                const delta = e.deltaY;
+                if (delta < 0) {
+                    this.zoomIn();
+                } else {
+                    this.zoomOut();
+                }
+            }
+        }, { passive: false });
+    }
+    
     hideHistoryControls() {
         const historyControls = document.getElementById('history-controls');
         historyControls.style.display = 'none';
@@ -631,6 +728,28 @@ class DrawingBoard {
         this.updatePaginationUI();
     }
     
+    nextOrAddPage() {
+        if (this.settingsManager.infiniteCanvas) return;
+        
+        // Save current page
+        this.pages[this.currentPage - 1] = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Check if we're on the last page
+        if (this.currentPage >= this.pages.length) {
+            // Add new page
+            this.pages.push(null);
+            this.currentPage = this.pages.length;
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.pages[this.currentPage - 1] = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+            this.historyManager.saveState();
+        } else {
+            // Go to next page
+            this.currentPage++;
+            this.loadPage(this.currentPage);
+        }
+        this.updatePaginationUI();
+    }
+    
     goToPage(pageNumber) {
         if (this.settingsManager.infiniteCanvas || pageNumber < 1 || pageNumber === this.currentPage) {
             this.updatePaginationUI();
@@ -668,10 +787,30 @@ class DrawingBoard {
         document.getElementById('page-total').textContent = `/ ${this.pages.length}`;
         
         const prevBtn = document.getElementById('prev-page-btn');
-        const nextBtn = document.getElementById('next-page-btn');
+        const nextOrAddBtn = document.getElementById('next-or-add-page-btn');
         
         prevBtn.disabled = this.currentPage <= 1;
-        nextBtn.disabled = false;
+        nextOrAddBtn.disabled = false;
+        
+        // Update button icon and title based on whether we're on the last page
+        if (this.currentPage >= this.pages.length) {
+            // Show add icon
+            nextOrAddBtn.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            `;
+            nextOrAddBtn.title = '新建页面';
+        } else {
+            // Show next icon
+            nextOrAddBtn.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            `;
+            nextOrAddBtn.title = '下一页';
+        }
     }
     
     updateEraserCursor(e) {

@@ -8,6 +8,39 @@ class SettingsManager {
         this.controlPosition = localStorage.getItem('controlPosition') || 'top-right';
         this.edgeSnapEnabled = localStorage.getItem('edgeSnapEnabled') !== 'false';
         this.infiniteCanvas = localStorage.getItem('infiniteCanvas') !== 'false';
+        this.showZoomControls = localStorage.getItem('showZoomControls') !== 'false';
+        this.patternPreferences = this.loadPatternPreferences();
+    }
+    
+    loadPatternPreferences() {
+        const saved = localStorage.getItem('patternPreferences');
+        if (saved) {
+            return JSON.parse(saved);
+        }
+        // Default: all patterns enabled
+        return {
+            'blank': true,
+            'dots': true,
+            'grid': true,
+            'tianzige': true,
+            'english-lines': true,
+            'music-staff': true,
+            'coordinate': true,
+            'image': true
+        };
+    }
+    
+    getPatternPreferences() {
+        return this.patternPreferences;
+    }
+    
+    updatePatternPreferences() {
+        const prefs = {};
+        document.querySelectorAll('.pattern-pref-checkbox').forEach(checkbox => {
+            prefs[checkbox.dataset.pattern] = checkbox.checked;
+        });
+        this.patternPreferences = prefs;
+        localStorage.setItem('patternPreferences', JSON.stringify(prefs));
     }
     
     switchTab(tabName) {
@@ -96,5 +129,11 @@ class SettingsManager {
         
         document.getElementById('edge-snap-checkbox').checked = this.edgeSnapEnabled;
         document.getElementById('infinite-canvas-checkbox').checked = this.infiniteCanvas;
+        document.getElementById('show-zoom-controls-checkbox').checked = this.showZoomControls;
+        
+        // Load pattern preferences
+        document.querySelectorAll('.pattern-pref-checkbox').forEach(checkbox => {
+            checkbox.checked = this.patternPreferences[checkbox.dataset.pattern] !== false;
+        });
     }
 }

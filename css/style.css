@@ -942,3 +942,46 @@ body {
 .color-btn {
     -webkit-tap-highlight-color: transparent;
 }
+
+/* Pattern preferences styles */
+.pattern-preferences {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.pattern-preferences .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.pattern-preferences .checkbox-label:hover {
+    background-color: #e8e8e8;
+}
+
+.pattern-preferences input[type="checkbox"] {
+    cursor: pointer;
+}
+
+/* Image pattern button styling */
+#image-pattern-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+#image-pattern-btn svg {
+    flex-shrink: 0;
+}
+
+#image-size-group {
+    margin-top: 15px;
+}

@@ -33,10 +33,16 @@ class DrawingEngine {
         // Adjust for canvas scale (CSS transform)
         const scaleX = this.canvas.offsetWidth / rect.width;
         const scaleY = this.canvas.offsetHeight / rect.height;
-        return {
-            x: (e.clientX - rect.left) * scaleX,
-            y: (e.clientY - rect.top) * scaleY
-        };
+        
+        // Calculate position relative to canvas
+        let x = (e.clientX - rect.left) * scaleX;
+        let y = (e.clientY - rect.top) * scaleY;
+        
+        // Clamp to canvas bounds to prevent drawing outside
+        x = Math.max(0, Math.min(x, this.canvas.offsetWidth));
+        y = Math.max(0, Math.min(y, this.canvas.offsetHeight));
+        
+        return { x, y };
     }
     
     setupDrawingContext() {

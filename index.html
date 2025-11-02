@@ -26,12 +26,6 @@
                 <line x1="8" y1="11" x2="14" y2="11"></line>
             </svg>
         </button>
-        <button id="close-controls-btn" class="history-btn" title="关闭">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-        </button>
     </div>
 
     <!-- Background canvas layer -->
@@ -89,7 +83,7 @@
             </div>
             <div class="config-group">
                 <label>粗细 <span id="pen-size-value">5</span>px</label>
-                <input type="range" id="pen-size-slider" min="3" max="15" value="5" class="slider">
+                <input type="range" id="pen-size-slider" min="1" max="50" value="5" class="slider">
             </div>
         </div>
 
@@ -127,7 +121,7 @@
             </div>
             <div class="config-group">
                 <label>背景图案</label>
-                <div class="button-size-options pattern-grid">
+                <div class="button-size-options pattern-grid" id="pattern-grid">
                     <button class="pattern-option-btn active" data-pattern="blank">空白</button>
                     <button class="pattern-option-btn" data-pattern="dots">点阵</button>
                     <button class="pattern-option-btn" data-pattern="grid">方格</button>
@@ -135,7 +129,20 @@
                     <button class="pattern-option-btn" data-pattern="english-lines">英语四线</button>
                     <button class="pattern-option-btn" data-pattern="music-staff">五线谱</button>
                     <button class="pattern-option-btn" data-pattern="coordinate">坐标系</button>
+                    <button class="pattern-option-btn" data-pattern="image" id="image-pattern-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        上传图片
+                    </button>
+                    <input type="file" id="bg-image-upload" accept="image/*" style="display: none;">
                 </div>
+            </div>
+            <div class="config-group" id="image-size-group" style="display: none;">
+                <label>图片大小 <span id="bg-image-size-value">100</span>%</label>
+                <input type="range" id="bg-image-size-slider" min="10" max="200" value="100" class="slider">
             </div>
         </div>
     </div>
@@ -149,15 +156,9 @@
         </button>
         <input type="number" id="page-input" class="page-input" value="1" min="1" title="输入页码跳转">
         <span id="page-total">/ 1</span>
-        <button id="next-page-btn" class="page-nav-btn" title="下一页">
+        <button id="next-or-add-page-btn" class="page-nav-btn" title="下一页">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-        </button>
-        <button id="add-page-btn" class="page-nav-btn" title="新建页面">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
         </button>
     </div>
@@ -238,6 +239,13 @@
                     <div id="display-settings" class="settings-tab-content">
                         <h3>显示设置</h3>
                         <div class="settings-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="show-zoom-controls-checkbox" checked>
+                                <span>显示缩放控制</span>
+                            </label>
+                            <p class="settings-hint">在画布上方显示缩放控件</p>
+                        </div>
+                        <div class="settings-group">
                             <label>工具栏按钮大小 <span id="toolbar-size-value">40</span>px</label>
                             <input type="range" id="toolbar-size-slider" min="40" max="80" value="40" class="slider" step="5">
                         </div>
@@ -268,7 +276,45 @@
                         </div>
                         <div class="settings-group">
                             <label>图案深浅 <span id="pattern-intensity-value">50</span>%</label>
-                            <input type="range" id="pattern-intensity-slider" min="10" max="100" value="50" class="slider">
+                            <input type="range" id="pattern-intensity-slider" min="10" max="200" value="50" class="slider">
+                        </div>
+                        <div class="settings-group">
+                            <label>背景图案偏好</label>
+                            <p class="settings-hint">选择在属性栏中显示的图案</p>
+                            <div class="pattern-preferences">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="pattern-pref-checkbox" data-pattern="blank" checked>
+                                    <span>空白</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="pattern-pref-checkbox" data-pattern="dots" checked>
+                                    <span>点阵</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="pattern-pref-checkbox" data-pattern="grid" checked>
+                                    <span>方格</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="pattern-pref-checkbox" data-pattern="tianzige" checked>
+                                    <span>田字格</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="pattern-pref-checkbox" data-pattern="english-lines" checked>
+                                    <span>英语四线</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="pattern-pref-checkbox" data-pattern="music-staff" checked>
+                                    <span>五线谱</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="pattern-pref-checkbox" data-pattern="coordinate" checked>
+                                    <span>坐标系</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" class="pattern-pref-checkbox" data-pattern="image" checked>
+                                    <span>上传图片</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
