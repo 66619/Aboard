@@ -9,6 +9,7 @@ class SettingsManager {
         this.edgeSnapEnabled = localStorage.getItem('edgeSnapEnabled') !== 'false';
         this.infiniteCanvas = localStorage.getItem('canvasMode') !== 'paginated';
         this.showZoomControls = localStorage.getItem('showZoomControls') !== 'false';
+        this.showFullscreenBtn = localStorage.getItem('showFullscreenBtn') !== 'false';
         this.patternPreferences = this.loadPatternPreferences();
         this.canvasWidth = parseInt(localStorage.getItem('canvasWidth')) || 1920;
         this.canvasHeight = parseInt(localStorage.getItem('canvasHeight')) || 1080;

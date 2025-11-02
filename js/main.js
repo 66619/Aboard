@@ -25,6 +25,17 @@ class DrawingBoard {
         // Pagination
         this.currentPage = 1;
         this.pages = [];
+        this.pageBackgrounds = {}; // Store background settings per page
+        
+        // Load saved page backgrounds
+        const savedPageBackgrounds = localStorage.getItem('pageBackgrounds');
+        if (savedPageBackgrounds) {
+            try {
+                this.pageBackgrounds = JSON.parse(savedPageBackgrounds);
+            } catch (e) {
+                console.warn('Failed to load page backgrounds:', e);
+            }
+        }
         
         // Pinch zoom and pan state
         this.isPinching = false;
@@ -52,8 +63,12 @@ class DrawingBoard {
         this.updateZoomUI();
         this.applyZoom();
         this.updateZoomControlsVisibility();
+        this.updateFullscreenBtnVisibility();
         this.updatePatternGrid();
         this.updateUploadedImagesButtons();
+        
+        // Listen for fullscreen changes
+        document.addEventListener('fullscreenchange', () => this.handleFullscreenChange());
     }
     
     resizeCanvas() {
@@ -212,6 +227,9 @@ class DrawingBoard {
             }
         });
         
+        // Fullscreen button
+        document.getElementById('fullscreen-btn').addEventListener('click', () => this.toggleFullscreen());
+        
         // Pagination controls - merged next and add button
         document.getElementById('prev-page-btn').addEventListener('click', () => this.prevPage());
         document.getElementById('next-or-add-page-btn').addEventListener('click', () => this.nextOrAddPage());
@@ -265,6 +283,10 @@ class DrawingBoard {
                 this.backgroundManager.setBackgroundColor(e.target.dataset.bgColor);
                 document.querySelectorAll('.color-btn[data-bg-color]').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
+                // Save page background in paginated mode
+                if (!this.settingsManager.infiniteCanvas) {
+                    this.savePageBackground(this.currentPage);
+                }
             });
         });
         
@@ -272,6 +294,10 @@ class DrawingBoard {
         customBgColorPicker.addEventListener('input', (e) => {
             this.backgroundManager.setBackgroundColor(e.target.value);
             document.querySelectorAll('.color-btn[data-bg-color]').forEach(b => b.classList.remove('active'));
+            // Save page background in paginated mode
+            if (!this.settingsManager.infiniteCanvas) {
+                this.savePageBackground(this.currentPage);
+            }
         });
         
         // Background pattern buttons
@@ -292,6 +318,11 @@ class DrawingBoard {
                         patternDensityGroup.style.display = 'flex';
                     } else {
                         patternDensityGroup.style.display = 'none';
+                    }
+                    
+                    // Save page background in paginated mode
+                    if (!this.settingsManager.infiniteCanvas) {
+                        this.savePageBackground(this.currentPage);
                     }
                 }
             });
@@ -501,6 +532,13 @@ class DrawingBoard {
             this.settingsManager.showZoomControls = e.target.checked;
             localStorage.setItem('showZoomControls', e.target.checked);
             this.updateZoomControlsVisibility();
+        });
+        
+        // Show/hide fullscreen button
+        document.getElementById('show-fullscreen-btn-checkbox').addEventListener('change', (e) => {
+            this.settingsManager.showFullscreenBtn = e.target.checked;
+            localStorage.setItem('showFullscreenBtn', e.target.checked);
+            this.updateFullscreenBtnVisibility();
         });
         
         // Pattern preferences
@@ -900,6 +938,43 @@ class DrawingBoard {
         }
     }
     
+    updateFullscreenBtnVisibility() {
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        if (this.settingsManager.showFullscreenBtn) {
+            fullscreenBtn.style.display = 'flex';
+        } else {
+            fullscreenBtn.style.display = 'none';
+        }
+    }
+    
+    toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            // Enter fullscreen
+            document.documentElement.requestFullscreen().catch(err => {
+                console.error(`Error attempting to enable fullscreen: ${err.message}`);
+            });
+            // Update button icon to exit fullscreen
+            const btn = document.getElementById('fullscreen-btn');
+            btn.innerHTML = `
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>
+                </svg>
+            `;
+            btn.title = '退出全屏 (F11)';
+        } else {
+            // Exit fullscreen
+            document.exitFullscreen();
+            // Update button icon to enter fullscreen
+            const btn = document.getElementById('fullscreen-btn');
+            btn.innerHTML = `
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                </svg>
+            `;
+            btn.title = '全屏 (F11)';
+        }
+    }
+    
     updatePatternGrid() {
         const patternGrid = document.getElementById('pattern-grid');
         const patterns = this.settingsManager.getPatternPreferences();
@@ -913,6 +988,27 @@ class DrawingBoard {
                 btn.style.display = 'none';
             }
         });
+    }
+    
+    handleFullscreenChange() {
+        const btn = document.getElementById('fullscreen-btn');
+        if (!document.fullscreenElement) {
+            // Exited fullscreen
+            btn.innerHTML = `
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                </svg>
+            `;
+            btn.title = '全屏 (F11)';
+        } else {
+            // Entered fullscreen
+            btn.innerHTML = `
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>
+                </svg>
+            `;
+            btn.title = '退出全屏 (F11)';
+        }
     }
     
     setupCanvasZoom() {
@@ -991,8 +1087,11 @@ class DrawingBoard {
     prevPage() {
         if (this.settingsManager.infiniteCanvas || this.currentPage <= 1) return;
         
-        // Save current page
+        // Save current page and background
         this.pages[this.currentPage - 1] = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+        if (!this.settingsManager.infiniteCanvas) {
+            this.savePageBackground(this.currentPage);
+        }
         
         // Go to previous page
         this.currentPage--;
@@ -1003,8 +1102,11 @@ class DrawingBoard {
     nextPage() {
         if (this.settingsManager.infiniteCanvas) return;
         
-        // Save current page
+        // Save current page and background
         this.pages[this.currentPage - 1] = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+        if (!this.settingsManager.infiniteCanvas) {
+            this.savePageBackground(this.currentPage);
+        }
         
         // Go to next page (create new if needed)
         this.currentPage++;
@@ -1021,8 +1123,11 @@ class DrawingBoard {
     nextOrAddPage() {
         if (this.settingsManager.infiniteCanvas) return;
         
-        // Save current page
+        // Save current page and background
         this.pages[this.currentPage - 1] = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+        if (!this.settingsManager.infiniteCanvas) {
+            this.savePageBackground(this.currentPage);
+        }
         
         // Check if we're on the last page
         if (this.currentPage >= this.pages.length) {
@@ -1046,8 +1151,11 @@ class DrawingBoard {
             return;
         }
         
-        // Save current page
+        // Save current page and background
         this.pages[this.currentPage - 1] = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+        if (!this.settingsManager.infiniteCanvas) {
+            this.savePageBackground(this.currentPage);
+        }
         
         // Create new pages if needed
         while (pageNumber > this.pages.length) {
@@ -1070,6 +1178,78 @@ class DrawingBoard {
             }
         }
         this.historyManager.saveState();
+        
+        // Restore page-specific background if exists
+        this.restorePageBackground(pageNumber);
+    }
+    
+    savePageBackground(pageNumber) {
+        // Save current background settings for this page
+        this.pageBackgrounds[pageNumber] = {
+            backgroundColor: this.backgroundManager.backgroundColor,
+            backgroundPattern: this.backgroundManager.backgroundPattern,
+            bgOpacity: this.backgroundManager.bgOpacity,
+            patternIntensity: this.backgroundManager.patternIntensity,
+            patternDensity: this.backgroundManager.patternDensity,
+            backgroundImageData: this.backgroundManager.backgroundImageData,
+            imageSize: this.backgroundManager.imageSize
+        };
+        localStorage.setItem('pageBackgrounds', JSON.stringify(this.pageBackgrounds));
+    }
+    
+    restorePageBackground(pageNumber) {
+        // Restore background settings for this page
+        if (this.pageBackgrounds[pageNumber]) {
+            const bg = this.pageBackgrounds[pageNumber];
+            this.backgroundManager.backgroundColor = bg.backgroundColor;
+            this.backgroundManager.backgroundPattern = bg.backgroundPattern;
+            this.backgroundManager.bgOpacity = bg.bgOpacity;
+            this.backgroundManager.patternIntensity = bg.patternIntensity;
+            this.backgroundManager.patternDensity = bg.patternDensity;
+            this.backgroundManager.backgroundImageData = bg.backgroundImageData;
+            this.backgroundManager.imageSize = bg.imageSize;
+            
+            // Load image if exists
+            if (bg.backgroundImageData && bg.backgroundPattern === 'image') {
+                const img = new Image();
+                img.onload = () => {
+                    this.backgroundManager.backgroundImage = img;
+                    this.backgroundManager.drawBackground();
+                };
+                img.src = bg.backgroundImageData;
+            } else {
+                this.backgroundManager.drawBackground();
+            }
+            
+            // Update UI to reflect current page background
+            this.updateBackgroundUI();
+        } else {
+            // Use default/global background settings
+            this.backgroundManager.drawBackground();
+        }
+    }
+    
+    updateBackgroundUI() {
+        // Update background color buttons
+        document.querySelectorAll('.color-btn[data-bg-color]').forEach(btn => {
+            if (btn.dataset.bgColor === this.backgroundManager.backgroundColor) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        
+        // Update pattern buttons
+        document.querySelectorAll('.pattern-option-btn').forEach(btn => {
+            if (btn.dataset.pattern === this.backgroundManager.backgroundPattern) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        
+        // Update custom color picker
+        document.getElementById('custom-bg-color-picker').value = this.backgroundManager.backgroundColor;
     }
     
     updatePaginationUI() {
@@ -1207,7 +1387,14 @@ class DrawingBoard {
         const tempCtx = tempCanvas.getContext('2d');
         tempCtx.drawImage(this.canvas, 0, 0);
         
-        // Clear and restore with pan transformations
+        // Save current background content
+        const tempBgCanvas = document.createElement('canvas');
+        tempBgCanvas.width = this.bgCanvas.width;
+        tempBgCanvas.height = this.bgCanvas.height;
+        const tempBgCtx = tempBgCanvas.getContext('2d');
+        tempBgCtx.drawImage(this.bgCanvas, 0, 0);
+        
+        // Clear and restore with pan transformations for drawing canvas
         const dpr = window.devicePixelRatio || 1;
         this.ctx.save();
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -1216,6 +1403,15 @@ class DrawingBoard {
         this.ctx.translate(this.drawingEngine.panOffset.x, this.drawingEngine.panOffset.y);
         this.ctx.drawImage(tempCanvas, 0, 0, this.canvas.width / dpr, this.canvas.height / dpr);
         this.ctx.restore();
+        
+        // Clear and restore with pan transformations for background canvas
+        this.bgCtx.save();
+        this.bgCtx.setTransform(1, 0, 0, 1, 0, 0);
+        this.bgCtx.clearRect(0, 0, this.bgCanvas.width, this.bgCanvas.height);
+        this.bgCtx.scale(dpr, dpr);
+        this.bgCtx.translate(this.drawingEngine.panOffset.x, this.drawingEngine.panOffset.y);
+        this.bgCtx.drawImage(tempBgCanvas, 0, 0, this.bgCanvas.width / dpr, this.bgCanvas.height / dpr);
+        this.bgCtx.restore();
     }
     
     loadUploadedImages() {
