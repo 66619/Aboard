@@ -21,6 +21,7 @@ class DrawingBoard {
         this.backgroundManager = new BackgroundManager(this.bgCanvas, this.bgCtx);
         this.imageControls = new ImageControls(this.backgroundManager);
         this.canvasImageManager = new CanvasImageManager(this.canvas, this.ctx);
+        this.canvasImageControls = new CanvasImageControls(this.canvasImageManager, this.canvas, this.historyManager);
         this.selectionManager = new SelectionManager(this.canvas, this.ctx, this.canvasImageManager);
         this.settingsManager = new SettingsManager();
         this.exportManager = new ExportManager(this.canvas, this.bgCanvas);
@@ -168,7 +169,18 @@ class DrawingBoard {
             
             // Handle selection tool
             if (this.drawingEngine.currentTool === 'select') {
-                this.selectionManager.startSelection(e);
+                const rect = this.canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const imageId = this.canvasImageManager.getImageAtPoint(x, y);
+                if (imageId) {
+                    this.canvasImageManager.selectImage(imageId);
+                    this.selectionManager.selectedImage = imageId;
+                } else {
+                    this.canvasImageManager.deselectImage();
+                    this.selectionManager.selectedImage = null;
+                }
+                this.updateUI();
                 return;
             }
             
@@ -446,6 +458,18 @@ class DrawingBoard {
             bgImageSizeValue.textContent = e.target.value;
         });
         
+        // Adjust background image button
+        document.getElementById('adjust-bg-image-btn').addEventListener('click', () => {
+            // Reset confirmation state to allow re-adjustment
+            this.imageControls.resetConfirmation();
+            
+            // Show image controls for the current background image
+            const imgData = this.backgroundManager.getImageData();
+            if (imgData) {
+                this.imageControls.showControls(imgData);
+            }
+        });
+        
         // Pattern density slider
         const patternDensitySlider = document.getElementById('pattern-density-slider');
         const patternDensityValue = document.getElementById('pattern-density-value');
@@ -499,8 +523,13 @@ class DrawingBoard {
                     const rect = this.canvas.getBoundingClientRect();
                     const centerX = rect.width / 2 - 100;
                     const centerY = rect.height / 2 - 100;
-                    this.canvasImageManager.addImage(imageData, centerX, centerY);
-                    this.historyManager.saveState();
+                    
+                    // Use callback to get the imageId once image is loaded
+                    this.canvasImageManager.addImage(imageData, centerX, centerY, (imageId) => {
+                        // Show the new image controls for the newly added image
+                        this.canvasImageControls.showControls(imageId);
+                    });
+                    
                     this.updateUI();
                 };
                 reader.readAsDataURL(file);
