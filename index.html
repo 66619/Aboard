@@ -345,6 +345,31 @@
                             <p class="settings-hint">调整弹出具体属性面板的大小</p>
                             <input type="range" id="config-scale-slider" min="80" max="120" value="100" class="slider" step="10">
                         </div>
+                        <div class="settings-group">
+                            <label>主题色</label>
+                            <p class="settings-hint">工具栏被选中时的颜色</p>
+                            <div class="color-picker-row">
+                                <div class="color-picker-main">
+                                    <button class="color-btn active" data-theme-color="#007AFF" style="background-color: #007AFF;" title="蓝色（默认）"></button>
+                                    <button class="color-btn" data-theme-color="#34C759" style="background-color: #34C759;" title="绿色"></button>
+                                    <button class="color-btn" data-theme-color="#FF3B30" style="background-color: #FF3B30;" title="红色"></button>
+                                    <button class="color-btn" data-theme-color="#FF9500" style="background-color: #FF9500;" title="橙色"></button>
+                                </div>
+                                <div class="color-picker-main">
+                                    <button class="color-btn" data-theme-color="#AF52DE" style="background-color: #AF52DE;" title="紫色"></button>
+                                    <button class="color-btn" data-theme-color="#FF2D55" style="background-color: #FF2D55;" title="粉色"></button>
+                                    <button class="color-btn" data-theme-color="#5AC8FA" style="background-color: #5AC8FA;" title="青色"></button>
+                                    <button class="color-btn" data-theme-color="#FFCC00" style="background-color: #FFCC00; border: 1px solid #ccc;" title="黄色"></button>
+                                </div>
+                            </div>
+                            <label class="color-picker-icon-btn" for="custom-theme-color-picker" title="自定义颜色" style="margin-top: 8px;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
+                                    <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
+                                </svg>
+                                <input type="color" id="custom-theme-color-picker" class="custom-color-picker-input" value="#007AFF">
+                            </label>
+                        </div>
                     </div>
                     
                     <!-- Canvas settings -->

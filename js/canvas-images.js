@@ -38,6 +38,11 @@ class CanvasImageManager {
                 <div class="selection-box">
                     <!-- Action buttons above selection -->
                     <div class="selection-action-buttons">
+                        <button class="selection-action-btn" id="canvas-image-done-btn" title="完成">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </button>
                         <button class="selection-action-btn" id="copy-image-btn" title="复制">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -101,6 +106,13 @@ class CanvasImageManager {
     
     setupSelectionEventListeners() {
         // Action buttons
+        document.getElementById('canvas-image-done-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.deselectImage();
+            // Auto-switch to pen tool after clicking done
+            window.dispatchEvent(new CustomEvent('canvasImageConfirmed'));
+        });
+        
         document.getElementById('copy-image-btn').addEventListener('click', (e) => {
             e.stopPropagation();
             this.copySelectedImage();
@@ -319,8 +331,8 @@ class CanvasImageManager {
             
             this.updateSelectionBox(image);
             
-            // Only update visually, don't redraw to canvas during drag
-            // This prevents duplication issues
+            // Redraw canvas during drag to keep images visible
+            this.redrawCanvas();
         }
     }
     
@@ -399,6 +411,8 @@ class CanvasImageManager {
         }
         
         this.updateSelectionBox(image);
+        // Redraw canvas during resize to keep images visible
+        this.redrawCanvas();
     }
     
     stopResize() {
@@ -445,6 +459,8 @@ class CanvasImageManager {
         while (image.rotation >= 360) image.rotation -= 360;
         
         this.updateSelectionBox(image);
+        // Redraw canvas during rotation to keep images visible
+        this.redrawCanvas();
     }
     
     stopRotate() {

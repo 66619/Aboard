@@ -14,6 +14,7 @@ class SettingsManager {
         this.canvasWidth = parseInt(localStorage.getItem('canvasWidth')) || 1920;
         this.canvasHeight = parseInt(localStorage.getItem('canvasHeight')) || 1080;
         this.canvasPreset = localStorage.getItem('canvasPreset') || 'custom';
+        this.themeColor = localStorage.getItem('themeColor') || '#007AFF';
     }
     
     loadPatternPreferences() {
@@ -152,6 +153,13 @@ class SettingsManager {
         document.querySelectorAll('.pattern-pref-checkbox').forEach(checkbox => {
             checkbox.checked = this.patternPreferences[checkbox.dataset.pattern] !== false;
         });
+        
+        // Load theme color
+        this.applyThemeColor();
+        document.getElementById('custom-theme-color-picker').value = this.themeColor;
+        document.querySelectorAll('.color-btn[data-theme-color]').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.themeColor === this.themeColor);
+        });
     }
     
     updateCanvasSizeSettings() {
@@ -196,5 +204,15 @@ class SettingsManager {
         this.canvasHeight = height;
         localStorage.setItem('canvasWidth', width);
         localStorage.setItem('canvasHeight', height);
+    }
+    
+    setThemeColor(color) {
+        this.themeColor = color;
+        localStorage.setItem('themeColor', color);
+        document.documentElement.style.setProperty('--theme-color', color);
+    }
+    
+    applyThemeColor() {
+        document.documentElement.style.setProperty('--theme-color', this.themeColor);
     }
 }

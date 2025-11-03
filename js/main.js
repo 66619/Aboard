@@ -162,7 +162,8 @@ class DrawingBoard {
             }
             
             // Auto-switch to pen mode if currently in background mode
-            if (this.drawingEngine.currentTool === 'background') {
+            // But not if image controls are active (user is manipulating background image)
+            if (this.drawingEngine.currentTool === 'background' && !this.imageControls.isActive) {
                 this.setTool('pen', false); // Don't show config panel
             }
             
@@ -283,12 +284,16 @@ class DrawingBoard {
         // History buttons
         document.getElementById('undo-btn').addEventListener('click', () => {
             if (this.historyManager.undo()) {
+                // Redraw canvas images after undo
+                this.canvasImageManager.drawImages();
                 this.updateUI();
             }
         });
         
         document.getElementById('redo-btn').addEventListener('click', () => {
             if (this.historyManager.redo()) {
+                // Redraw canvas images after redo
+                this.canvasImageManager.drawImages();
                 this.updateUI();
             }
         });
@@ -662,6 +667,21 @@ class DrawingBoard {
             this.updateFullscreenBtnVisibility();
         });
         
+        // Theme color buttons
+        document.querySelectorAll('.color-btn[data-theme-color]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.settingsManager.setThemeColor(e.target.dataset.themeColor);
+                document.querySelectorAll('.color-btn[data-theme-color]').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+            });
+        });
+        
+        const customThemeColorPicker = document.getElementById('custom-theme-color-picker');
+        customThemeColorPicker.addEventListener('input', (e) => {
+            this.settingsManager.setThemeColor(e.target.value);
+            document.querySelectorAll('.color-btn[data-theme-color]').forEach(b => b.classList.remove('active'));
+        });
+        
         // Pattern preferences
         document.querySelectorAll('.pattern-pref-checkbox').forEach(checkbox => {
             checkbox.addEventListener('change', (e) => {
@@ -721,6 +741,22 @@ class DrawingBoard {
             if (e.key === 'Escape') {
                 this.closeSettings();
                 this.closeConfigPanel();
+            }
+        });
+        
+        // Listen for image confirmed event from background image controls
+        window.addEventListener('imageConfirmed', () => {
+            // Auto-switch to pen tool when user confirms background image
+            if (this.drawingEngine.currentTool === 'background') {
+                this.setTool('pen', false);
+            }
+        });
+        
+        // Listen for canvas image confirmed event
+        window.addEventListener('canvasImageConfirmed', () => {
+            // Auto-switch to pen tool when user confirms canvas image
+            if (this.drawingEngine.currentTool === 'insert') {
+                this.setTool('pen', false);
             }
         });
     }
