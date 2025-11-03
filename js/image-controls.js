@@ -180,10 +180,7 @@ class ImageControls {
         const canvas = this.backgroundManager.bgCanvas;
         const rect = canvas.getBoundingClientRect();
         
-        // Get the canvas scale from computed transform
-        const computedStyle = window.getComputedStyle(canvas);
-        const matrix = new DOMMatrix(computedStyle.transform);
-        const canvasScale = matrix.a; // Scale factor from transform matrix
+        const canvasScale = this.getCanvasScale();
         
         // Calculate actual position and size accounting for canvas transform
         const actualX = rect.left + (this.imagePosition.x * canvasScale);
@@ -224,11 +221,7 @@ class ImageControls {
     drag(e) {
         if (!this.isDragging) return;
         
-        // Get canvas scale to convert screen coordinates to canvas coordinates
-        const canvas = this.backgroundManager.bgCanvas;
-        const computedStyle = window.getComputedStyle(canvas);
-        const matrix = new DOMMatrix(computedStyle.transform);
-        const canvasScale = matrix.a || 1;
+        const canvasScale = this.getCanvasScale();
         
         const deltaX = (e.clientX - this.dragStartPos.x) / canvasScale;
         const deltaY = (e.clientY - this.dragStartPos.y) / canvasScale;
@@ -255,11 +248,7 @@ class ImageControls {
     resize(e) {
         if (!this.isResizing) return;
         
-        // Get canvas scale to convert screen coordinates to canvas coordinates
-        const canvas = this.backgroundManager.bgCanvas;
-        const computedStyle = window.getComputedStyle(canvas);
-        const matrix = new DOMMatrix(computedStyle.transform);
-        const canvasScale = matrix.a || 1;
+        const canvasScale = this.getCanvasScale();
         
         const deltaX = (e.clientX - this.resizeStartPos.x) / canvasScale;
         const deltaY = (e.clientY - this.resizeStartPos.y) / canvasScale;
@@ -342,6 +331,14 @@ class ImageControls {
     
     stopRotate() {
         this.isRotating = false;
+    }
+    
+    getCanvasScale() {
+        // Helper method to get canvas transform scale
+        const canvas = this.backgroundManager.bgCanvas;
+        const computedStyle = window.getComputedStyle(canvas);
+        const matrix = new DOMMatrix(computedStyle.transform);
+        return matrix.a || 1;
     }
     
     resetImage() {
