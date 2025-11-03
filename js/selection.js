@@ -15,27 +15,9 @@ class SelectionManager {
         
         // For lasso/rectangle selection (future enhancement)
         this.selectionMode = 'click'; // 'click' or 'rectangle'
-
-        // Bind event listeners to ensure proper scope
-        this.canvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
-        this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
-        this.canvas.addEventListener('mouseup', (e) => this.handleMouseUp(e));
-    }
-
-    handleMouseDown(e) {
-        // Ensure the event is within the canvas bounds
-        if (!this.isEventOnCanvas(e)) return;
-        this.startSelection(e);
-    }
-
-    handleMouseMove(e) {
-        if (!this.isSelecting) return;
-        this.continueSelection(e);
-    }
-
-    handleMouseUp(e) {
-        if (!this.isSelecting) return;
-        this.endSelection();
+        
+        // Don't register event listeners here - they should be called from main.js
+        // based on the active tool to avoid conflicts
     }
 
     isEventOnCanvas(e) {
