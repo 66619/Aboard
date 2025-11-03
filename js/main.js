@@ -139,13 +139,15 @@ class DrawingBoard {
         // Canvas drawing events - use document-level listeners for continuous drawing
         document.addEventListener('mousedown', (e) => {
             // Skip if clicking on UI elements (except canvas)
-            if (e.target.closest('#toolbar') || 
-                e.target.closest('#config-area') || 
-                e.target.closest('#history-controls') || 
-                e.target.closest('#pagination-controls') ||
-                e.target.closest('.modal') ||
-                e.target.closest('.canvas-image-selection')) {
-                return;
+            if (e.target && e.target.closest) {
+                if (e.target.closest('#toolbar') || 
+                    e.target.closest('#config-area') || 
+                    e.target.closest('#history-controls') || 
+                    e.target.closest('#pagination-controls') ||
+                    e.target.closest('.modal') ||
+                    e.target.closest('.canvas-image-selection')) {
+                    return;
+                }
             }
             
             // Check if clicking on coordinate origin point (only when in background mode)
