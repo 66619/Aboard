@@ -221,6 +221,9 @@ class ImageControls {
     drag(e) {
         if (!this.isDragging) return;
         
+        // Get canvas scale to convert screen delta to canvas delta
+        // Screen coordinates (mouse position) need to be divided by scale
+        // to get the equivalent movement in canvas logical coordinates
         const canvasScale = this.getCanvasScale();
         
         const deltaX = (e.clientX - this.dragStartPos.x) / canvasScale;
@@ -248,6 +251,9 @@ class ImageControls {
     resize(e) {
         if (!this.isResizing) return;
         
+        // Get canvas scale to convert screen delta to canvas delta
+        // Resize handles move in screen coordinates but we need to
+        // update image size in canvas logical coordinates
         const canvasScale = this.getCanvasScale();
         
         const deltaX = (e.clientX - this.resizeStartPos.x) / canvasScale;
@@ -335,9 +341,13 @@ class ImageControls {
     
     getCanvasScale() {
         // Helper method to get canvas transform scale
+        // Returns the scale factor applied to the canvas via CSS transforms
+        // This is used to convert between screen coordinates (pixels on screen)
+        // and canvas coordinates (logical canvas units)
         const canvas = this.backgroundManager.bgCanvas;
         const computedStyle = window.getComputedStyle(canvas);
         const matrix = new DOMMatrix(computedStyle.transform);
+        // Return X-axis scale factor (assumes uniform scaling)
         return matrix.a || 1;
     }
     
