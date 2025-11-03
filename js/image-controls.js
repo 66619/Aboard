@@ -8,6 +8,7 @@ class ImageControls {
         this.isDragging = false;
         this.isResizing = false;
         this.isRotating = false;
+        this.isConfirmed = localStorage.getItem('backgroundImageConfirmed') === 'true'; // Track if image has been confirmed
         
         // Constants
         this.MIN_IMAGE_SIZE = 50;
@@ -59,23 +60,10 @@ class ImageControls {
                         </svg>
                     </div>
                     
-                    <!-- Control toolbar -->
+                    <!-- Control toolbar with only confirm button -->
                     <div class="image-controls-toolbar">
-                        <button id="image-reset-btn" class="image-control-btn" title="重置">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-                                <path d="M3 3v5h5"/>
-                            </svg>
-                        </button>
-                        <button id="image-fit-btn" class="image-control-btn" title="适应画布">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                <line x1="9" y1="9" x2="15" y2="15"></line>
-                                <line x1="15" y1="9" x2="9" y2="15"></line>
-                            </svg>
-                        </button>
-                        <button id="image-done-btn" class="image-control-btn image-done-btn" title="完成">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <button id="image-done-btn" class="image-control-btn image-done-btn" title="确定">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                 <polyline points="20 6 9 17 4 12"></polyline>
                             </svg>
                         </button>
@@ -135,13 +123,16 @@ class ImageControls {
             this.stopRotate();
         });
         
-        // Toolbar buttons
-        document.getElementById('image-reset-btn').addEventListener('click', () => this.resetImage());
-        document.getElementById('image-fit-btn').addEventListener('click', () => this.fitToCanvas());
-        document.getElementById('image-done-btn').addEventListener('click', () => this.hideControls());
+        // Toolbar button - only confirm button
+        document.getElementById('image-done-btn').addEventListener('click', () => this.confirmImage());
     }
     
     showControls(imageData) {
+        // Don't show controls if image has been confirmed
+        if (this.isConfirmed) {
+            return;
+        }
+        
         this.isActive = true;
         this.overlay.style.display = 'block';
         
@@ -171,14 +162,25 @@ class ImageControls {
         this.overlay.style.display = 'none';
     }
     
+    confirmImage() {
+        // Mark image as confirmed and hide controls
+        this.isConfirmed = true;
+        this.hideControls();
+        // Save the confirmed state to localStorage
+        localStorage.setItem('backgroundImageConfirmed', 'true');
+    }
+    
+    resetConfirmation() {
+        // Reset confirmation state (used when uploading new image)
+        this.isConfirmed = false;
+        localStorage.removeItem('backgroundImageConfirmed');
+    }
+    
     updateControlBox() {
         const canvas = this.backgroundManager.bgCanvas;
         const rect = canvas.getBoundingClientRect();
         
-        // Get the canvas scale from computed transform
-        const computedStyle = window.getComputedStyle(canvas);
-        const matrix = new DOMMatrix(computedStyle.transform);
-        const canvasScale = matrix.a; // Scale factor from transform matrix
+        const canvasScale = this.getCanvasScale();
         
         // Calculate actual position and size accounting for canvas transform
         const actualX = rect.left + (this.imagePosition.x * canvasScale);
@@ -219,8 +221,13 @@ class ImageControls {
     drag(e) {
         if (!this.isDragging) return;
         
-        const deltaX = e.clientX - this.dragStartPos.x;
-        const deltaY = e.clientY - this.dragStartPos.y;
+        // Get canvas scale to convert screen delta to canvas delta
+        // Screen coordinates (mouse position) need to be divided by scale
+        // to get the equivalent movement in canvas logical coordinates
+        const canvasScale = this.getCanvasScale();
+        
+        const deltaX = (e.clientX - this.dragStartPos.x) / canvasScale;
+        const deltaY = (e.clientY - this.dragStartPos.y) / canvasScale;
         
         this.imagePosition.x = this.dragStartImagePos.x + deltaX;
         this.imagePosition.y = this.dragStartImagePos.y + deltaY;
@@ -244,8 +251,13 @@ class ImageControls {
     resize(e) {
         if (!this.isResizing) return;
         
-        const deltaX = e.clientX - this.resizeStartPos.x;
-        const deltaY = e.clientY - this.resizeStartPos.y;
+        // Get canvas scale to convert screen delta to canvas delta
+        // Resize handles move in screen coordinates but we need to
+        // update image size in canvas logical coordinates
+        const canvasScale = this.getCanvasScale();
+        
+        const deltaX = (e.clientX - this.resizeStartPos.x) / canvasScale;
+        const deltaY = (e.clientY - this.resizeStartPos.y) / canvasScale;
         
         const aspectRatio = this.resizeStartSize.width / this.resizeStartSize.height;
         
@@ -325,6 +337,18 @@ class ImageControls {
     
     stopRotate() {
         this.isRotating = false;
+    }
+    
+    getCanvasScale() {
+        // Helper method to get canvas transform scale
+        // Returns the scale factor applied to the canvas via CSS transforms
+        // This is used to convert between screen coordinates (pixels on screen)
+        // and canvas coordinates (logical canvas units)
+        const canvas = this.backgroundManager.bgCanvas;
+        const computedStyle = window.getComputedStyle(canvas);
+        const matrix = new DOMMatrix(computedStyle.transform);
+        // Return X-axis scale factor (assumes uniform scaling)
+        return matrix.a || 1;
     }
     
     resetImage() {
