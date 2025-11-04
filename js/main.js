@@ -20,10 +20,8 @@ class DrawingBoard {
         this.historyManager = new HistoryManager(this.canvas, this.ctx);
         this.backgroundManager = new BackgroundManager(this.bgCanvas, this.bgCtx);
         this.imageControls = new ImageControls(this.backgroundManager);
-        this.canvasImageManager = new CanvasImageManager(this.canvas, this.ctx);
-        this.canvasImageControls = new CanvasImageControls(this.canvasImageManager, this.canvas, this.historyManager);
         this.strokeControls = new StrokeControls(this.drawingEngine, this.canvas, this.ctx, this.historyManager);
-        this.selectionManager = new SelectionManager(this.canvas, this.ctx, this.canvasImageManager, this.drawingEngine, this.strokeControls);
+        this.selectionManager = new SelectionManager(this.canvas, this.ctx, this.drawingEngine, this.strokeControls);
         this.settingsManager = new SettingsManager();
         this.exportManager = new ExportManager(this.canvas, this.bgCanvas);
         
@@ -132,11 +130,6 @@ class DrawingBoard {
         }
         
         this.backgroundManager.drawBackground();
-        
-        // Redraw canvas images if any
-        if (this.canvasImageManager) {
-            this.canvasImageManager.drawImages();
-        }
     }
     
     setupEventListeners() {
@@ -207,22 +200,6 @@ class DrawingBoard {
             if (this.drawingEngine.currentTool === 'select') {
                 this.selectionManager.startSelection(e);
                 this.updateUI();
-                return;
-            }
-            
-            // Handle insert tool - allow selecting images
-            if (this.drawingEngine.currentTool === 'insert') {
-                const rect = this.canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const imageId = this.canvasImageManager.getImageAtPoint(x, y);
-                if (imageId) {
-                    this.canvasImageManager.selectImage(imageId);
-                    this.updateUI();
-                } else {
-                    this.canvasImageManager.deselectImage();
-                    this.updateUI();
-                }
                 return;
             }
             
@@ -311,7 +288,6 @@ class DrawingBoard {
         document.getElementById('select-btn').addEventListener('click', () => this.setTool('select'));
         document.getElementById('pan-btn').addEventListener('click', () => this.setTool('pan'));
         document.getElementById('eraser-btn').addEventListener('click', () => this.setTool('eraser'));
-        document.getElementById('insert-btn').addEventListener('click', () => this.setTool('insert'));
         document.getElementById('background-btn').addEventListener('click', () => this.setTool('background'));
         document.getElementById('clear-btn').addEventListener('click', () => this.confirmClear());
         document.getElementById('settings-btn').addEventListener('click', () => this.openSettings());
@@ -321,8 +297,6 @@ class DrawingBoard {
         // History buttons
         document.getElementById('undo-btn').addEventListener('click', () => {
             if (this.historyManager.undo()) {
-                // Redraw canvas images after undo
-                this.canvasImageManager.drawImages();
                 // Clear stroke selection as strokes are no longer valid
                 this.drawingEngine.clearStrokes();
                 this.updateUI();
@@ -331,8 +305,6 @@ class DrawingBoard {
         
         document.getElementById('redo-btn').addEventListener('click', () => {
             if (this.historyManager.redo()) {
-                // Redraw canvas images after redo
-                this.canvasImageManager.drawImages();
                 // Clear stroke selection as strokes are no longer valid
                 this.drawingEngine.clearStrokes();
                 this.updateUI();
@@ -371,10 +343,17 @@ class DrawingBoard {
         this.setupKeyboardShortcuts();
         this.setupDraggablePanels();
         
+        // Debounce resize handler for better performance
+        let resizeTimeout;
         window.addEventListener('resize', () => {
-            this.resizeCanvas();
-            // Update toolbar text visibility on resize
-            this.settingsManager.updateToolbarTextVisibility();
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                this.resizeCanvas();
+                // Update toolbar text visibility on resize
+                this.settingsManager.updateToolbarTextVisibility();
+                // Reposition toolbars to ensure they stay within viewport
+                this.repositionToolbarsOnResize();
+            }, 150); // 150ms debounce delay
         });
         
         // Ctrl+scroll to zoom canvas
@@ -544,37 +523,6 @@ class DrawingBoard {
                 this.eraserCursor.style.width = e.target.value + 'px';
                 this.eraserCursor.style.height = e.target.value + 'px';
             }
-        });
-        
-        // 插入图片按钮 - 重新实现为类似背景图片的上传方式，但不改变背景
-        document.getElementById('insert-image-btn').addEventListener('click', () => {
-            document.getElementById('insert-image-upload').click();
-        });
-        
-        document.getElementById('insert-image-upload').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const imageData = event.target.result;
-                    // 在画布中心插入图片，不改变背景
-                    const rect = this.canvas.getBoundingClientRect();
-                    const centerX = rect.width / 2 - 100;
-                    const centerY = rect.height / 2 - 100;
-                    
-                    // 使用canvasImageManager添加图片到画布
-                    this.canvasImageManager.addImage(imageData, centerX, centerY, (imageId) => {
-                        // 自动选择新添加的图片，显示控制手柄
-                        this.canvasImageManager.selectImage(imageId);
-                        this.historyManager.saveState();
-                    });
-                    
-                    this.updateUI();
-                };
-                reader.readAsDataURL(file);
-            }
-            // 重置文件输入
-            e.target.value = '';
         });
         
         // Selection tool buttons
@@ -814,12 +762,72 @@ class DrawingBoard {
                 this.setTool('pen', false);
             }
         });
+    }
+    
+    repositionToolbarsOnResize() {
+        // Ensure all toolbars and panels stay within viewport after window resize
+        const EDGE_SPACING = 10; // Minimum spacing from viewport edges
+        const panels = [
+            document.getElementById('history-controls'),
+            document.getElementById('config-area'),
+            document.getElementById('toolbar'),
+            document.getElementById('pagination-controls')
+        ];
         
-        // Listen for canvas image confirmed event
-        window.addEventListener('canvasImageConfirmed', () => {
-            // Auto-switch to pen tool when user confirms canvas image
-            if (this.drawingEngine.currentTool === 'insert') {
-                this.setTool('pen', false);
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+        
+        panels.forEach(panel => {
+            if (!panel) return;
+            
+            const rect = panel.getBoundingClientRect();
+            const computedStyle = window.getComputedStyle(panel);
+            
+            // Get current position
+            let left = parseFloat(computedStyle.left) || 0;
+            let top = parseFloat(computedStyle.top) || 0;
+            let right = computedStyle.right !== 'auto' ? parseFloat(computedStyle.right) : null;
+            let bottom = computedStyle.bottom !== 'auto' ? parseFloat(computedStyle.bottom) : null;
+            
+            // Check if panel is positioned and might overflow
+            const hasCustomPosition = computedStyle.left !== 'auto' || computedStyle.top !== 'auto' || 
+                                     computedStyle.right !== 'auto' || computedStyle.bottom !== 'auto';
+            
+            if (!hasCustomPosition) return;
+            
+            // Adjust position if overflowing
+            if (right !== null) {
+                // Panel is right-aligned - check if actual left position would be negative
+                const actualLeft = windowWidth - right - rect.width;
+                if (actualLeft < 0) {
+                    panel.style.right = `${EDGE_SPACING}px`;
+                }
+            } else if (left + rect.width > windowWidth - EDGE_SPACING) {
+                // Panel overflows right edge (accounting for edge spacing)
+                const newLeft = Math.max(EDGE_SPACING, windowWidth - rect.width - EDGE_SPACING);
+                panel.style.left = `${newLeft}px`;
+                panel.style.right = 'auto';
+            }
+            
+            if (bottom !== null) {
+                // Panel is bottom-aligned - check if actual top position would be negative
+                const actualTop = windowHeight - bottom - rect.height;
+                if (actualTop < 0) {
+                    panel.style.bottom = `${EDGE_SPACING}px`;
+                }
+            } else if (top + rect.height > windowHeight - EDGE_SPACING) {
+                // Panel overflows bottom edge (accounting for edge spacing)
+                const newTop = Math.max(EDGE_SPACING, windowHeight - rect.height - EDGE_SPACING);
+                panel.style.top = `${newTop}px`;
+                panel.style.bottom = 'auto';
+            }
+            
+            // Also ensure panel doesn't overflow left or top edges
+            if (left < EDGE_SPACING) {
+                panel.style.left = `${EDGE_SPACING}px`;
+            }
+            if (top < EDGE_SPACING) {
+                panel.style.top = `${EDGE_SPACING}px`;
             }
         });
     }
@@ -954,17 +962,13 @@ class DrawingBoard {
         // 使用"移动"功能时隐藏config-area
         if (tool === 'pan') {
             document.getElementById('config-area').classList.remove('show');
-        } else if (showConfig && (tool === 'pen' || tool === 'eraser' || tool === 'background' || tool === 'insert' || tool === 'select')) {
+        } else if (showConfig && (tool === 'pen' || tool === 'eraser' || tool === 'background' || tool === 'select')) {
             document.getElementById('config-area').classList.add('show');
         }
     }
     
     handleDrawingComplete() {
         if (this.drawingEngine.stopDrawing()) {
-            // Redraw images after erasing to prevent them from being erased
-            if (this.drawingEngine.currentTool === 'eraser') {
-                this.canvasImageManager.drawImages();
-            }
             this.historyManager.saveState();
             this.closeConfigPanel();
         }
@@ -1022,10 +1026,6 @@ class DrawingBoard {
             document.getElementById('eraser-btn').classList.add('active');
             document.getElementById('eraser-config').classList.add('active');
             this.canvas.style.cursor = 'pointer';
-        } else if (tool === 'insert') {
-            document.getElementById('insert-btn').classList.add('active');
-            document.getElementById('insert-config').classList.add('active');
-            this.canvas.style.cursor = 'default';
         } else if (tool === 'background') {
             document.getElementById('background-btn').classList.add('active');
             document.getElementById('background-config').classList.add('active');
