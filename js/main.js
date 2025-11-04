@@ -802,9 +802,9 @@ class DrawingBoard {
                 if (actualLeft < 0) {
                     panel.style.right = `${EDGE_SPACING}px`;
                 }
-            } else if (left + rect.width > windowWidth) {
-                // Panel overflows right edge
-                const newLeft = Math.max(0, windowWidth - rect.width - EDGE_SPACING);
+            } else if (left + rect.width > windowWidth - EDGE_SPACING) {
+                // Panel overflows right edge (accounting for edge spacing)
+                const newLeft = Math.max(EDGE_SPACING, windowWidth - rect.width - EDGE_SPACING);
                 panel.style.left = `${newLeft}px`;
                 panel.style.right = 'auto';
             }
@@ -815,18 +815,18 @@ class DrawingBoard {
                 if (actualTop < 0) {
                     panel.style.bottom = `${EDGE_SPACING}px`;
                 }
-            } else if (top + rect.height > windowHeight) {
-                // Panel overflows bottom edge
-                const newTop = Math.max(0, windowHeight - rect.height - EDGE_SPACING);
+            } else if (top + rect.height > windowHeight - EDGE_SPACING) {
+                // Panel overflows bottom edge (accounting for edge spacing)
+                const newTop = Math.max(EDGE_SPACING, windowHeight - rect.height - EDGE_SPACING);
                 panel.style.top = `${newTop}px`;
                 panel.style.bottom = 'auto';
             }
             
             // Also ensure panel doesn't overflow left or top edges
-            if (left < 0) {
+            if (left < EDGE_SPACING) {
                 panel.style.left = `${EDGE_SPACING}px`;
             }
-            if (top < 0) {
+            if (top < EDGE_SPACING) {
                 panel.style.top = `${EDGE_SPACING}px`;
             }
         });
