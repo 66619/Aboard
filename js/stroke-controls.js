@@ -171,7 +171,8 @@ class StrokeControls {
         this.controlBox.style.top = `${actualY}px`;
         this.controlBox.style.width = `${actualWidth}px`;
         this.controlBox.style.height = `${actualHeight}px`;
-        this.controlBox.style.transform = 'none';
+        // Apply rotation transform instead of setting to 'none'
+        this.controlBox.style.transform = `rotate(${stroke.rotation || 0}deg)`;
     }
     
     startDrag(e) {
@@ -347,6 +348,11 @@ class StrokeControls {
             this.rotateStartAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI;
             this.rotateStartRotation = stroke.rotation || 0;
             
+            // Store original bounds at start of rotation to preserve dimensions
+            if (!stroke.originalBounds) {
+                stroke.originalBounds = this.drawingEngine.getStrokeBounds(stroke);
+            }
+            
             // Store original positions for all points
             for (let point of stroke.points) {
                 point.originalX = point.x;
@@ -368,11 +374,11 @@ class StrokeControls {
         const currentAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI;
         const angleDelta = currentAngle - this.rotateStartAngle;
         
-        // Normalize to 0-360 using modulo for better performance
+        // Update rotation angle only - do not modify width/height
         stroke.rotation = ((this.rotateStartRotation + angleDelta) % 360 + 360) % 360;
         
-        // Calculate stroke center
-        const bounds = this.drawingEngine.getStrokeBounds(stroke);
+        // Use original bounds for center calculation to maintain stability
+        const bounds = stroke.originalBounds || this.drawingEngine.getStrokeBounds(stroke);
         if (!bounds) return;
         
         const strokeCenterX = bounds.x + bounds.width / 2;
@@ -412,6 +418,8 @@ class StrokeControls {
                         delete point.originalX;
                         delete point.originalY;
                     }
+                    // Clear original bounds after rotation is complete
+                    delete stroke.originalBounds;
                 }
             }
         }

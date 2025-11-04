@@ -371,7 +371,11 @@ class DrawingBoard {
         this.setupKeyboardShortcuts();
         this.setupDraggablePanels();
         
-        window.addEventListener('resize', () => this.resizeCanvas());
+        window.addEventListener('resize', () => {
+            this.resizeCanvas();
+            // Update toolbar text visibility on resize
+            this.settingsManager.updateToolbarTextVisibility();
+        });
         
         // Ctrl+scroll to zoom canvas
         this.setupCanvasZoom();
