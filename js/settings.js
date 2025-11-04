@@ -99,6 +99,10 @@ class SettingsManager {
         const buttons = toolbar.querySelectorAll('.tool-btn');
         const windowWidth = window.innerWidth;
         
+        // Constants for responsive sizing
+        const ICON_ONLY_SIZE_RATIO = 0.8; // Size multiplier when text is hidden
+        const SCREEN_MARGIN = 40; // Margin from screen edge
+        
         // Calculate total toolbar width needed with text
         let totalWidthWithText = 0;
         const toolbarStyle = window.getComputedStyle(toolbar);
@@ -108,7 +112,8 @@ class SettingsManager {
         buttons.forEach((btn, index) => {
             const span = btn.querySelector('span');
             if (span) {
-                span.style.display = ''; // Show temporarily to measure
+                // Temporarily show to measure (inline is the default display for span)
+                span.style.display = 'inline';
             }
             const btnWidth = btn.offsetWidth;
             totalWidthWithText += btnWidth;
@@ -119,20 +124,19 @@ class SettingsManager {
         totalWidthWithText += toolbarPadding;
         
         // Check if toolbar fits with text
-        const margin = 40; // Margin from screen edge
-        const fitsWithText = totalWidthWithText + margin * 2 <= windowWidth;
+        const fitsWithText = totalWidthWithText + SCREEN_MARGIN * 2 <= windowWidth;
         
         // Show or hide text based on available space
         buttons.forEach(btn => {
             const span = btn.querySelector('span');
             if (span) {
                 if (fitsWithText) {
-                    span.style.display = '';
+                    span.style.display = 'inline';
                     btn.style.minWidth = `${this.toolbarSize}px`;
                 } else {
                     span.style.display = 'none';
                     // When text is hidden, reduce min-width to icon-only size
-                    btn.style.minWidth = `${this.toolbarSize * 0.8}px`;
+                    btn.style.minWidth = `${this.toolbarSize * ICON_ONLY_SIZE_RATIO}px`;
                 }
             }
         });
