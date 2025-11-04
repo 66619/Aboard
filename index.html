@@ -283,6 +283,13 @@
                         </svg>
                         <span>关于</span>
                     </button>
+                    <button class="settings-tab-icon" data-tab="announcement" title="公告">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span>公告</span>
+                    </button>
                 </div>
                 
                 <!-- Settings content area -->
@@ -518,6 +525,14 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Announcement settings -->
+                    <div id="announcement-settings" class="settings-tab-content">
+                        <h3>公告</h3>
+                        <div class="announcement-info">
+                            <div id="settings-announcement-content" class="settings-announcement-content"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -534,6 +549,22 @@
                 <div class="confirm-buttons">
                     <button id="confirm-cancel-btn" class="confirm-btn cancel-btn">取消</button>
                     <button id="confirm-ok-btn" class="confirm-btn ok-btn">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Announcement modal -->
+    <div id="announcement-modal" class="modal">
+        <div class="modal-content announcement-modal-content">
+            <div class="modal-header">
+                <h2 id="announcement-title">公告</h2>
+            </div>
+            <div class="modal-body">
+                <div id="announcement-content" class="announcement-content"></div>
+                <div class="announcement-buttons">
+                    <button id="announcement-ok-btn" class="announcement-btn ok-btn">确定</button>
+                    <button id="announcement-no-show-btn" class="announcement-btn no-show-btn">不再弹出</button>
                 </div>
             </div>
         </div>
@@ -618,6 +649,7 @@
     <script src="js/stroke-controls.js"></script>
     <script src="js/selection.js"></script>
     <script src="js/settings.js"></script>
+    <script src="js/announcement.js"></script>
     <script src="js/export.js"></script>
     <script src="js/main.js"></script>
 </body>

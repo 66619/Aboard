@@ -23,6 +23,7 @@ class DrawingBoard {
         this.strokeControls = new StrokeControls(this.drawingEngine, this.canvas, this.ctx, this.historyManager);
         this.selectionManager = new SelectionManager(this.canvas, this.ctx, this.drawingEngine, this.strokeControls);
         this.settingsManager = new SettingsManager();
+        this.announcementManager = new AnnouncementManager();
         this.exportManager = new ExportManager(this.canvas, this.bgCanvas);
         
         // Pagination

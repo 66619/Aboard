@@ -7,7 +7,7 @@ class SettingsManager {
         this.configScale = parseFloat(localStorage.getItem('configScale')) || 1.0;
         this.controlPosition = localStorage.getItem('controlPosition') || 'top-right';
         this.edgeSnapEnabled = localStorage.getItem('edgeSnapEnabled') !== 'false';
-        this.infiniteCanvas = localStorage.getItem('canvasMode') !== 'paginated';
+        this.infiniteCanvas = localStorage.getItem('canvasMode') === 'infinite';
         this.showZoomControls = localStorage.getItem('showZoomControls') !== 'false';
         this.showFullscreenBtn = localStorage.getItem('showFullscreenBtn') !== 'false';
         this.patternPreferences = this.loadPatternPreferences();

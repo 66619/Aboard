@@ -1009,6 +1009,68 @@ body {
     background-color: #E02020;
 }
 
+/* Announcement modal styles */
+.announcement-modal-content {
+    max-width: 500px;
+}
+
+.announcement-content {
+    font-size: 15px;
+    color: #333;
+    margin-bottom: 24px;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.announcement-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.announcement-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.announcement-btn.ok-btn {
+    background-color: var(--theme-color);
+    color: #ffffff;
+}
+
+.announcement-btn.ok-btn:hover {
+    opacity: 0.9;
+}
+
+.announcement-btn.no-show-btn {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.announcement-btn.no-show-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.settings-announcement-content {
+    font-size: 15px;
+    color: #333;
+    line-height: 1.8;
+    white-space: pre-wrap;
+}
+
+.announcement-info {
+    padding: 16px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .settings-modal-content {
