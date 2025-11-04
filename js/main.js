@@ -343,12 +343,17 @@ class DrawingBoard {
         this.setupKeyboardShortcuts();
         this.setupDraggablePanels();
         
+        // Debounce resize handler for better performance
+        let resizeTimeout;
         window.addEventListener('resize', () => {
-            this.resizeCanvas();
-            // Update toolbar text visibility on resize
-            this.settingsManager.updateToolbarTextVisibility();
-            // Reposition toolbars to ensure they stay within viewport
-            this.repositionToolbarsOnResize();
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                this.resizeCanvas();
+                // Update toolbar text visibility on resize
+                this.settingsManager.updateToolbarTextVisibility();
+                // Reposition toolbars to ensure they stay within viewport
+                this.repositionToolbarsOnResize();
+            }, 150); // 150ms debounce delay
         });
         
         // Ctrl+scroll to zoom canvas
