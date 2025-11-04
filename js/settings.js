@@ -102,19 +102,28 @@ class SettingsManager {
         // Constants for responsive sizing
         const ICON_ONLY_SIZE_RATIO = 0.8; // Size multiplier when text is hidden
         const SCREEN_MARGIN = 40; // Margin from screen edge
+        const DEFAULT_GAP = 12; // Default gap between buttons if not specified in CSS
         
         // Calculate total toolbar width needed with text
         let totalWidthWithText = 0;
         const toolbarStyle = window.getComputedStyle(toolbar);
         const toolbarPadding = parseFloat(toolbarStyle.paddingLeft) + parseFloat(toolbarStyle.paddingRight);
-        const gap = parseFloat(toolbarStyle.gap) || 12;
+        const gap = parseFloat(toolbarStyle.gap) || DEFAULT_GAP;
         
-        buttons.forEach((btn, index) => {
+        // Store original display values before measuring
+        const originalDisplayValues = new Map();
+        buttons.forEach(btn => {
             const span = btn.querySelector('span');
             if (span) {
-                // Temporarily show to measure (inline is the default display for span)
-                span.style.display = 'inline';
+                originalDisplayValues.set(span, window.getComputedStyle(span).display);
+                // Temporarily show to measure
+                if (originalDisplayValues.get(span) === 'none') {
+                    span.style.display = 'inline';
+                }
             }
+        });
+        
+        buttons.forEach((btn, index) => {
             const btnWidth = btn.offsetWidth;
             totalWidthWithText += btnWidth;
             if (index < buttons.length - 1) {
@@ -131,7 +140,9 @@ class SettingsManager {
             const span = btn.querySelector('span');
             if (span) {
                 if (fitsWithText) {
-                    span.style.display = 'inline';
+                    // Restore original display or use default
+                    const originalDisplay = originalDisplayValues.get(span);
+                    span.style.display = (originalDisplay !== 'none') ? originalDisplay : 'inline';
                     btn.style.minWidth = `${this.toolbarSize}px`;
                 } else {
                     span.style.display = 'none';
