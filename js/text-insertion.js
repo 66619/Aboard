@@ -32,6 +32,10 @@ class TextInsertionManager {
         
         this.HANDLE_SIZE = 8;
         this.ROTATION_HANDLE_DISTANCE = 30;
+        this.HANDLE_THRESHOLD = 5;
+        this.MIN_SCALE = 0.5;
+        this.MAX_SCALE = 3.0;
+        this.RESIZE_SENSITIVITY = 100;
     }
     
     // Start text input at mouse position
@@ -270,7 +274,7 @@ class TextInsertionManager {
         this.ctx.scale(textObj.scale, textObj.scale);
         
         const width = textObj.width;
-        const height = textObj.height * textObj.text.split('\n').length;
+        const height = textObj.height * this.getLineCount(textObj.text);
         
         // Draw box
         this.ctx.strokeStyle = '#007AFF';
@@ -447,6 +451,11 @@ class TextInsertionManager {
         }
     }
     
+    // Get line count for a text object
+    getLineCount(text) {
+        return text.split('\n').length;
+    }
+    
     // Check if click is on a handle
     hitTestHandle(x, y) {
         if (this.selectedTextIndex === null || this.selectedTextIndex < 0) return null;
@@ -465,9 +474,9 @@ class TextInsertionManager {
         const localY = (dx * sin + dy * cos) / textObj.scale;
         
         const width = textObj.width;
-        const height = textObj.height * textObj.text.split('\n').length;
+        const height = textObj.height * this.getLineCount(textObj.text);
         const handleSize = this.HANDLE_SIZE;
-        const threshold = handleSize + 5;
+        const threshold = handleSize + this.HANDLE_THRESHOLD;
         
         // Check rotation handle
         if (Math.abs(localX - width / 2) < threshold && 
@@ -528,7 +537,7 @@ class TextInsertionManager {
         const factor = this.resizeHandle.includes('b') || this.resizeHandle.includes('r') ? 1 : -1;
         
         // Update scale based on drag distance
-        textObj.scale = Math.max(0.5, Math.min(3.0, this.resizeStartScale + (factor * distance / 100)));
+        textObj.scale = Math.max(this.MIN_SCALE, Math.min(this.MAX_SCALE, this.resizeStartScale + (factor * distance / this.RESIZE_SENSITIVITY)));
         
         this.redrawCanvas();
     }
