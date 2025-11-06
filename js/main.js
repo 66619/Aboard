@@ -22,7 +22,7 @@ class DrawingBoard {
         this.imageControls = new ImageControls(this.backgroundManager);
         this.strokeControls = new StrokeControls(this.drawingEngine, this.canvas, this.ctx, this.historyManager);
         this.selectionManager = new SelectionManager(this.canvas, this.ctx, this.drawingEngine, this.strokeControls);
-        this.textInsertionManager = new TextInsertionManager(this.canvas, this.ctx, this.historyManager);
+        this.shapeInsertionManager = new ShapeInsertionManager(this.canvas, this.ctx, this.historyManager, this.drawingEngine);
         this.settingsManager = new SettingsManager();
         this.announcementManager = new AnnouncementManager();
         this.exportManager = new ExportManager(this.canvas, this.bgCanvas);
@@ -91,15 +91,31 @@ class DrawingBoard {
             localStorage.setItem('canvasScale', 0.7);
         }
         
-        // Reset pan offset on startup
-        const savedPanX = localStorage.getItem('panOffsetX');
-        const savedPanY = localStorage.getItem('panOffsetY');
-        if (!savedPanX && !savedPanY) {
-            this.drawingEngine.panOffset.x = 0;
-            this.drawingEngine.panOffset.y = 0;
-            localStorage.setItem('panOffsetX', 0);
-            localStorage.setItem('panOffsetY', 0);
-        }
+        // Center the canvas on startup
+        this.centerCanvas();
+    }
+    
+    centerCanvas() {
+        // Get the viewport dimensions
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        
+        // Get the canvas center (at 0,0 without pan offset, canvas is conceptually infinite)
+        // We want to move the canvas so that the origin (0,0) is centered in the viewport
+        // Pan offset moves the canvas, so positive offset moves content right/down
+        const centerX = viewportWidth / 2;
+        const centerY = viewportHeight / 2;
+        
+        // Set pan offset to center the origin
+        this.drawingEngine.panOffset.x = centerX / this.drawingEngine.canvasScale;
+        this.drawingEngine.panOffset.y = centerY / this.drawingEngine.canvasScale;
+        
+        // Save to localStorage
+        localStorage.setItem('panOffsetX', this.drawingEngine.panOffset.x);
+        localStorage.setItem('panOffsetY', this.drawingEngine.panOffset.y);
+        
+        // Apply the transform
+        this.applyPanTransform();
     }
     
     resizeCanvas() {
@@ -133,9 +149,9 @@ class DrawingBoard {
         
         this.backgroundManager.drawBackground();
         
-        // Redraw text objects after resize
-        if (this.textInsertionManager) {
-            this.textInsertionManager.redrawCanvas();
+        // Redraw shapes after resize
+        if (this.shapeInsertionManager) {
+            this.shapeInsertionManager.redrawCanvas();
         }
     }
     
@@ -203,25 +219,29 @@ class DrawingBoard {
                 this.setTool('pen', false); // Don't show config panel
             }
             
-            // Handle text tool - show text input dialog
-            if (this.drawingEngine.currentTool === 'text') {
-                this.textInsertionManager.startTextInput(e);
+            // Handle shape tool - insert shape at click position
+            if (this.drawingEngine.currentTool === 'shape') {
+                this.shapeInsertionManager.insertShape(e);
                 return;
             }
             
-            // Handle selection tool - check for text objects first
+            // Handle selection tool - check for shape objects first
             if (this.drawingEngine.currentTool === 'select') {
                 const rect = this.canvas.getBoundingClientRect();
                 const scaleX = this.canvas.offsetWidth / rect.width;
                 const scaleY = this.canvas.offsetHeight / rect.height;
-                const x = (e.clientX - rect.left) * scaleX;
-                const y = (e.clientY - rect.top) * scaleY;
+                let x = (e.clientX - rect.left) * scaleX;
+                let y = (e.clientY - rect.top) * scaleY;
                 
-                // Check if clicking on text object first
-                const textIndex = this.textInsertionManager.hitTestText(x, y);
-                if (textIndex >= 0) {
-                    this.textInsertionManager.selectText(textIndex);
-                    this.textInsertionManager.startDrag(e);
+                // Transform to canvas coordinate space
+                x = (x - this.drawingEngine.panOffset.x) / this.drawingEngine.canvasScale;
+                y = (y - this.drawingEngine.panOffset.y) / this.drawingEngine.canvasScale;
+                
+                // Check if clicking on shape object first
+                const shapeIndex = this.shapeInsertionManager.hitTestShape(x, y);
+                if (shapeIndex >= 0) {
+                    this.shapeInsertionManager.selectShape(shapeIndex);
+                    this.shapeInsertionManager.startDrag(e);
                     this.updateUI();
                     return;
                 }
@@ -242,8 +262,8 @@ class DrawingBoard {
         document.addEventListener('mousemove', (e) => {
             if (this.isDraggingCoordinateOrigin) {
                 this.dragCoordinateOrigin(e);
-            } else if (this.textInsertionManager.isDragging) {
-                this.textInsertionManager.dragText(e);
+            } else if (this.shapeInsertionManager.isDragging || this.shapeInsertionManager.isResizing || this.shapeInsertionManager.isRotating) {
+                this.shapeInsertionManager.dragShape(e);
             } else if (this.drawingEngine.isPanning) {
                 this.drawingEngine.pan(e);
                 this.applyPanTransform();
@@ -257,7 +277,7 @@ class DrawingBoard {
         
         document.addEventListener('mouseup', () => {
             this.stopDraggingCoordinateOrigin();
-            this.textInsertionManager.stopDrag();
+            this.shapeInsertionManager.stopDrag();
             this.handleDrawingComplete();
             this.drawingEngine.stopPanning();
         });
@@ -318,7 +338,7 @@ class DrawingBoard {
         // Toolbar buttons
         document.getElementById('pen-btn').addEventListener('click', () => this.setTool('pen'));
         document.getElementById('select-btn').addEventListener('click', () => this.setTool('select'));
-        document.getElementById('text-btn').addEventListener('click', () => this.setTool('text'));
+        document.getElementById('shape-btn').addEventListener('click', () => this.setTool('shape'));
         document.getElementById('pan-btn').addEventListener('click', () => this.setTool('pan'));
         document.getElementById('eraser-btn').addEventListener('click', () => this.setTool('eraser'));
         document.getElementById('background-btn').addEventListener('click', () => this.setTool('background'));
@@ -333,9 +353,9 @@ class DrawingBoard {
                 // Clear stroke selection as strokes are no longer valid
                 this.drawingEngine.clearStrokes();
                 this.updateUI();
-                // Redraw text objects after undo
-                if (this.textInsertionManager) {
-                    this.textInsertionManager.redrawCanvas();
+                // Redraw shapes after undo
+                if (this.shapeInsertionManager) {
+                    this.shapeInsertionManager.redrawCanvas();
                 }
             }
         });
@@ -345,9 +365,9 @@ class DrawingBoard {
                 // Clear stroke selection as strokes are no longer valid
                 this.drawingEngine.clearStrokes();
                 this.updateUI();
-                // Redraw text objects after redo
-                if (this.textInsertionManager) {
-                    this.textInsertionManager.redrawCanvas();
+                // Redraw shapes after redo
+                if (this.shapeInsertionManager) {
+                    this.shapeInsertionManager.redrawCanvas();
                 }
             }
         });
@@ -568,21 +588,45 @@ class DrawingBoard {
         
         // Selection tool buttons
         document.getElementById('select-copy-btn').addEventListener('click', () => {
-            // Try text copy first, then selection copy
-            if (this.textInsertionManager.hasSelection()) {
-                this.textInsertionManager.copySelectedText();
+            // Try shape copy first, then selection copy
+            if (this.shapeInsertionManager.hasSelection()) {
+                this.shapeInsertionManager.copySelectedShape();
             } else if (this.selectionManager.copySelection()) {
                 this.historyManager.saveState();
             }
         });
         
         document.getElementById('select-delete-btn').addEventListener('click', () => {
-            // Try text delete first, then selection delete
-            if (this.textInsertionManager.hasSelection()) {
-                this.textInsertionManager.deleteSelectedText();
+            // Try shape delete first, then selection delete
+            if (this.shapeInsertionManager.hasSelection()) {
+                this.shapeInsertionManager.deleteSelectedShape();
             } else if (this.selectionManager.deleteSelection()) {
                 this.historyManager.saveState();
             }
+        });
+        
+        // Shape type buttons
+        document.querySelectorAll('.pen-type-btn[data-shape-type]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.shapeInsertionManager.setShapeType(e.target.dataset.shapeType);
+                document.querySelectorAll('.pen-type-btn[data-shape-type]').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+            });
+        });
+        
+        // Shape color picker
+        document.querySelectorAll('.color-btn[data-shape-color]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.shapeInsertionManager.setShapeColor(e.target.dataset.shapeColor);
+                document.querySelectorAll('.color-btn[data-shape-color]').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+            });
+        });
+        
+        const customShapeColorPicker = document.getElementById('custom-shape-color-picker');
+        customShapeColorPicker.addEventListener('input', (e) => {
+            this.shapeInsertionManager.setShapeColor(e.target.value);
+            document.querySelectorAll('.color-btn[data-shape-color]').forEach(b => b.classList.remove('active'));
         });
     }
     
@@ -1002,7 +1046,7 @@ class DrawingBoard {
         // Clear selection when switching away from select tool
         if (tool !== 'select') {
             this.selectionManager.clearSelection();
-            this.textInsertionManager.deselectText();
+            this.shapeInsertionManager.deselectShape();
         }
         
         this.updateUI();
@@ -1010,7 +1054,7 @@ class DrawingBoard {
         // 使用"移动"功能时隐藏config-area
         if (tool === 'pan') {
             document.getElementById('config-area').classList.remove('show');
-        } else if (showConfig && (tool === 'pen' || tool === 'eraser' || tool === 'background' || tool === 'select' || tool === 'text')) {
+        } else if (showConfig && (tool === 'pen' || tool === 'eraser' || tool === 'background' || tool === 'select' || tool === 'shape')) {
             document.getElementById('config-area').classList.add('show');
         }
     }
@@ -1020,9 +1064,9 @@ class DrawingBoard {
             this.historyManager.saveState();
             this.closeConfigPanel();
         }
-        // Redraw text objects on top
-        if (this.textInsertionManager) {
-            this.textInsertionManager.redrawCanvas();
+        // Redraw shapes on top
+        if (this.shapeInsertionManager) {
+            this.shapeInsertionManager.redrawCanvas();
         }
     }
     
@@ -1044,7 +1088,7 @@ class DrawingBoard {
     
     clearCanvas(saveToHistory = true) {
         this.drawingEngine.clearCanvas();
-        this.textInsertionManager.clearAllText();
+        this.shapeInsertionManager.clearAllShapes();
         if (saveToHistory) {
             this.historyManager.saveState();
         }
@@ -1068,14 +1112,14 @@ class DrawingBoard {
             document.getElementById('select-btn').classList.add('active');
             document.getElementById('select-config').classList.add('active');
             this.canvas.style.cursor = 'default';
-            // Update selection buttons state - check both image/stroke selection and text selection
-            const hasSelection = this.selectionManager.hasSelection() || this.textInsertionManager.hasSelection();
+            // Update selection buttons state - check both selection and shape selection
+            const hasSelection = this.selectionManager.hasSelection() || this.shapeInsertionManager.hasSelection();
             document.getElementById('select-copy-btn').disabled = !hasSelection;
             document.getElementById('select-delete-btn').disabled = !hasSelection;
-        } else if (tool === 'text') {
-            document.getElementById('text-btn').classList.add('active');
-            document.getElementById('text-config').classList.add('active');
-            this.canvas.style.cursor = 'text';
+        } else if (tool === 'shape') {
+            document.getElementById('shape-btn').classList.add('active');
+            document.getElementById('shape-config').classList.add('active');
+            this.canvas.style.cursor = 'crosshair';
         } else if (tool === 'pan') {
             document.getElementById('pan-btn').classList.add('active');
             this.canvas.style.cursor = 'grab';
