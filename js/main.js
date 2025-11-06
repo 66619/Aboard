@@ -615,44 +615,40 @@ class DrawingBoard {
             }
         });
         
-        // Shape type buttons
-        document.querySelectorAll('.pen-type-btn[data-shape-type]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                this.shapeInsertionManager.setShapeType(e.target.dataset.shapeType);
-                document.querySelectorAll('.pen-type-btn[data-shape-type]').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-            });
-        });
+        // More config panel (time display checkboxes)
+        const showDateCheckboxMore = document.getElementById('show-date-checkbox-more');
+        const showTimeCheckboxMore = document.getElementById('show-time-checkbox-more');
         
-        // More config panel (time display toggle)
-        const toggleTimeDisplayBtn = document.getElementById('toggle-time-display-btn');
-        const timeDisplayStatus = document.getElementById('time-display-status');
-        const timeDisplayOptions = document.getElementById('time-display-options');
-        const showDateCheckbox = document.getElementById('show-date-checkbox');
-        const showTimeCheckbox = document.getElementById('show-time-checkbox');
-        
-        if (toggleTimeDisplayBtn) {
-            toggleTimeDisplayBtn.addEventListener('click', () => {
-                this.timeDisplayManager.toggle();
-                if (this.timeDisplayManager.enabled) {
-                    timeDisplayStatus.textContent = '隐藏时间';
-                    timeDisplayOptions.style.display = 'block';
+        // Load initial checkbox states
+        if (showDateCheckboxMore && showTimeCheckboxMore) {
+            showDateCheckboxMore.checked = this.timeDisplayManager.showDate;
+            showTimeCheckboxMore.checked = this.timeDisplayManager.showTime;
+            
+            // Update visibility based on initial state
+            if (showDateCheckboxMore.checked || showTimeCheckboxMore.checked) {
+                this.timeDisplayManager.show();
+            } else {
+                this.timeDisplayManager.hide();
+            }
+            
+            showDateCheckboxMore.addEventListener('change', (e) => {
+                this.timeDisplayManager.setShowDate(e.target.checked);
+                // Hide if both unchecked
+                if (!showDateCheckboxMore.checked && !showTimeCheckboxMore.checked) {
+                    this.timeDisplayManager.hide();
                 } else {
-                    timeDisplayStatus.textContent = '显示时间';
-                    timeDisplayOptions.style.display = 'none';
+                    this.timeDisplayManager.show();
                 }
             });
-        }
-        
-        if (showDateCheckbox) {
-            showDateCheckbox.addEventListener('change', (e) => {
-                this.timeDisplayManager.setShowDate(e.target.checked);
-            });
-        }
-        
-        if (showTimeCheckbox) {
-            showTimeCheckbox.addEventListener('change', (e) => {
+            
+            showTimeCheckboxMore.addEventListener('change', (e) => {
                 this.timeDisplayManager.setShowTime(e.target.checked);
+                // Hide if both unchecked
+                if (!showDateCheckboxMore.checked && !showTimeCheckboxMore.checked) {
+                    this.timeDisplayManager.hide();
+                } else {
+                    this.timeDisplayManager.show();
+                }
             });
         }
     }
@@ -1199,22 +1195,14 @@ class DrawingBoard {
             
             // Update More config panel state
             if (tool === 'more') {
-                const timeDisplayStatus = document.getElementById('time-display-status');
-                const timeDisplayOptions = document.getElementById('time-display-options');
-                const showDateCheckbox = document.getElementById('show-date-checkbox');
-                const showTimeCheckbox = document.getElementById('show-time-checkbox');
+                const showDateCheckboxMore = document.getElementById('show-date-checkbox-more');
+                const showTimeCheckboxMore = document.getElementById('show-time-checkbox-more');
                 
-                if (timeDisplayStatus) {
-                    timeDisplayStatus.textContent = this.timeDisplayManager.enabled ? '隐藏时间' : '显示时间';
+                if (showDateCheckboxMore) {
+                    showDateCheckboxMore.checked = this.timeDisplayManager.showDate;
                 }
-                if (timeDisplayOptions) {
-                    timeDisplayOptions.style.display = this.timeDisplayManager.enabled ? 'block' : 'none';
-                }
-                if (showDateCheckbox) {
-                    showDateCheckbox.checked = this.timeDisplayManager.showDate;
-                }
-                if (showTimeCheckbox) {
-                    showTimeCheckbox.checked = this.timeDisplayManager.showTime;
+                if (showTimeCheckboxMore) {
+                    showTimeCheckboxMore.checked = this.timeDisplayManager.showTime;
                 }
             }
         }
@@ -1425,7 +1413,7 @@ class DrawingBoard {
         const newScale = Math.min(currentScale + 0.1, 3.0);
         this.drawingEngine.canvasScale = newScale;
         this.updateZoomUI();
-        this.applyZoom();
+        this.applyZoom(false); // Don't update config-area scale on zoom
         localStorage.setItem('canvasScale', newScale);
     }
     
@@ -1434,7 +1422,7 @@ class DrawingBoard {
         const newScale = Math.max(currentScale - 0.1, 0.5);
         this.drawingEngine.canvasScale = newScale;
         this.updateZoomUI();
-        this.applyZoom();
+        this.applyZoom(false); // Don't update config-area scale on zoom
         localStorage.setItem('canvasScale', newScale);
     }
     
@@ -1448,7 +1436,7 @@ class DrawingBoard {
         const newScale = percent / 100;
         this.drawingEngine.canvasScale = newScale;
         this.updateZoomUI();
-        this.applyZoom();
+        this.applyZoom(false); // Don't update config-area scale on zoom
         localStorage.setItem('canvasScale', newScale);
     }
     
@@ -1631,7 +1619,7 @@ class DrawingBoard {
                 // Update scale
                 this.drawingEngine.canvasScale = newScale;
                 this.updateZoomUI();
-                this.applyZoom();
+                this.applyZoom(false); // Don't update config-area scale on zoom
                 
                 // Save to localStorage
                 localStorage.setItem('canvasScale', newScale);
@@ -1915,7 +1903,7 @@ class DrawingBoard {
             const newScale = Math.max(0.5, Math.min(3.0, this.drawingEngine.canvasScale * scale));
             
             this.drawingEngine.canvasScale = newScale;
-            this.applyZoom();
+            this.applyZoom(false); // Don't update config-area scale on zoom
             this.updateZoomUI();
             localStorage.setItem('canvasScale', newScale);
             

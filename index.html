@@ -130,13 +130,9 @@
         <!-- Shape configuration -->
         <div id="shape-config" class="config-panel">
             <div class="config-group">
-                <label>形状类型</label>
-                <div class="button-size-options" style="grid-template-columns: 1fr 1fr;">
-                    <button class="pen-type-btn active" data-shape-type="line">直线</button>
-                    <button class="pen-type-btn" data-shape-type="rectangle">矩形</button>
-                </div>
+                <label>线段</label>
+                <p class="settings-hint">使用当前笔的颜色和粗细绘制直线。点击画布确定第一个点，移动鼠标预览，再次点击完成绘制。按 Esc 取消。</p>
             </div>
-            <p class="settings-hint">形状使用当前笔的颜色和粗细。点击画布确定第一个点，移动鼠标预览，再次点击完成绘制。按 Esc 取消。</p>
         </div>
 
         <!-- Eraser configuration -->
@@ -225,23 +221,12 @@
         <div id="more-config" class="config-panel">
             <div class="config-group">
                 <label>时间显示</label>
-                <div class="button-size-options" style="grid-template-columns: 1fr;">
-                    <button id="toggle-time-display-btn" class="button-secondary">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 5px;">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                        <span id="time-display-status">显示时间</span>
-                    </button>
-                </div>
-            </div>
-            <div class="config-group" id="time-display-options" style="display: none;">
                 <label class="checkbox-label">
-                    <input type="checkbox" id="show-date-checkbox" checked>
+                    <input type="checkbox" id="show-date-checkbox-more">
                     <span>显示日期</span>
                 </label>
                 <label class="checkbox-label" style="margin-top: 8px;">
-                    <input type="checkbox" id="show-time-checkbox" checked>
+                    <input type="checkbox" id="show-time-checkbox-more">
                     <span>显示时间</span>
                 </label>
             </div>
