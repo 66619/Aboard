@@ -12,8 +12,8 @@ class ShapeInsertionManager {
         this.shapeObjects = [];
         this.selectedShapeIndex = null;
         
-        // Default shape properties
-        this.defaultShapeType = 'line'; // Default to 'line' as it's the first option in the UI
+        // Default shape properties - only line is supported now
+        this.defaultShapeType = 'line'; // Only line type
         this.defaultSize = 100;
         this.defaultColor = '#007AFF';
         this.defaultFillColor = 'rgba(0, 122, 255, 0.2)';
@@ -122,32 +122,24 @@ class ShapeInsertionManager {
         // Add dashed line to indicate preview
         this.ctx.setLineDash([5, 5]);
         
-        if (this.defaultShapeType === 'line') {
-            // Draw line preview
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.dragStart.x, this.dragStart.y);
-            this.ctx.lineTo(this.previewEnd.x, this.previewEnd.y);
-            this.ctx.stroke();
-            
-            // Draw dots at endpoints
-            this.ctx.setLineDash([]);
-            this.ctx.fillStyle = penColor;
-            this.ctx.beginPath();
-            this.ctx.arc(this.dragStart.x, this.dragStart.y, penSize / 2, 0, Math.PI * 2);
-            this.ctx.fill();
-            this.ctx.beginPath();
-            this.ctx.arc(this.previewEnd.x, this.previewEnd.y, penSize / 2, 0, Math.PI * 2);
-            this.ctx.fill();
-        } else if (this.defaultShapeType === 'rectangle') {
-            // Draw rectangle preview (using drag points as diagonal corners)
-            const width = this.previewEnd.x - this.dragStart.x;
-            const height = this.previewEnd.y - this.dragStart.y;
-            this.ctx.strokeRect(this.dragStart.x, this.dragStart.y, width, height);
-            
-            // Draw dots at corners
-            this.ctx.setLineDash([]);
-            this.ctx.fillStyle = penColor;
-            const corners = [
+        // Draw line preview (only line type supported)
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.dragStart.x, this.dragStart.y);
+        this.ctx.lineTo(this.previewEnd.x, this.previewEnd.y);
+        this.ctx.stroke();
+        
+        // Draw dots at endpoints
+        this.ctx.setLineDash([]);
+        this.ctx.fillStyle = penColor;
+        this.ctx.beginPath();
+        this.ctx.arc(this.dragStart.x, this.dragStart.y, penSize / 2, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.beginPath();
+        this.ctx.arc(this.previewEnd.x, this.previewEnd.y, penSize / 2, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        this.ctx.restore();
+    }
                 [this.dragStart.x, this.dragStart.y],
                 [this.dragStart.x + width, this.dragStart.y],
                 [this.dragStart.x, this.dragStart.y + height],
@@ -169,77 +161,74 @@ class ShapeInsertionManager {
         
         this.isDrawingShape = false;
         
-        // Use current pen properties for shapes
         const penColor = this.drawingEngine.currentColor;
         const penSize = this.drawingEngine.penSize;
         const penType = this.drawingEngine.penType;
         
-        const dx = this.previewEnd.x - this.dragStart.x;
-        const dy = this.previewEnd.y - this.dragStart.y;
+        // Calculate actual canvas coordinates
+        const startX = this.dragStart.x;
+        const startY = this.dragStart.y;
+        const endX = this.previewEnd.x;
+        const endY = this.previewEnd.y;
         
-        // Create shape object based on type
-        let shapeObj;
-        if (this.defaultShapeType === 'line') {
-            const length = Math.sqrt(dx * dx + dy * dy);
-            const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-            
-            // Check minimum length
-            if (length < this.MIN_SIZE) {
-                this.redrawCanvas();
-                return;
-            }
-            
-            shapeObj = {
-                type: 'line',
-                x: this.dragStart.x,
-                y: this.dragStart.y,
-                width: length,
-                height: 0,
-                rotation: angle,
-                color: penColor,
-                size: penSize,
-                penType: penType,
-                strokeWidth: penSize
-            };
-        } else if (this.defaultShapeType === 'rectangle') {
-            const width = Math.abs(dx);
-            const height = Math.abs(dy);
-            
-            // Check minimum size
-            if (width < this.MIN_SIZE || height < this.MIN_SIZE) {
-                this.redrawCanvas();
-                return;
-            }
-            
-            // Center is midpoint between two corners
-            const centerX = this.dragStart.x + dx / 2;
-            const centerY = this.dragStart.y + dy / 2;
-            
-            shapeObj = {
-                type: 'rectangle',
-                x: centerX,
-                y: centerY,
-                width: width,
-                height: height,
-                rotation: 0,
-                color: penColor,
-                size: penSize,
-                penType: penType,
-                strokeWidth: penSize
-            };
+        // Draw the final line using the drawing engine's stroke system
+        // This ensures the line is added as a stroke that can be selected
+        const points = [
+            { x: startX, y: startY },
+            { x: endX, y: endY }
+        ];
+        
+        const stroke = {
+            points: points,
+            color: penColor,
+            size: penSize,
+            type: penType,
+            tool: 'pen'
+        };
+        
+        // Add stroke to drawing engine's strokes array
+        this.drawingEngine.strokes.push(stroke);
+        
+        // Draw the stroke on canvas
+        this.ctx.save();
+        this.ctx.strokeStyle = penColor;
+        this.ctx.lineWidth = penSize;
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
+        
+        // Apply pen type alpha
+        switch(penType) {
+            case 'pencil':
+                this.ctx.globalAlpha = 0.7;
+                break;
+            case 'ballpoint':
+                this.ctx.globalAlpha = 0.9;
+                break;
+            case 'fountain':
+                this.ctx.globalAlpha = 1.0;
+                break;
+            case 'brush':
+                this.ctx.globalAlpha = 0.85;
+                this.ctx.lineWidth = penSize * 1.5;
+                break;
+            case 'normal':
+            default:
+                this.ctx.globalAlpha = 1.0;
+                break;
         }
         
-        if (shapeObj) {
-            this.shapeObjects.push(shapeObj);
-            // Don't select after creation to avoid cluttering the UI with control handles
-            // User can select the shape later if they want to edit it
-            this.selectedShapeIndex = null;
-            
-            if (this.historyManager) {
-                this.historyManager.saveState();
-            }
+        this.ctx.beginPath();
+        this.ctx.moveTo(startX, startY);
+        this.ctx.lineTo(endX, endY);
+        this.ctx.stroke();
+        this.ctx.restore();
+        
+        // Save to history
+        if (this.historyManager) {
+            this.historyManager.saveState();
         }
         
+        // Redraw canvas to remove preview
         this.redrawCanvas();
     }
     
