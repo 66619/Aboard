@@ -140,20 +140,6 @@ class ShapeInsertionManager {
         
         this.ctx.restore();
     }
-                [this.dragStart.x, this.dragStart.y],
-                [this.dragStart.x + width, this.dragStart.y],
-                [this.dragStart.x, this.dragStart.y + height],
-                [this.dragStart.x + width, this.dragStart.y + height]
-            ];
-            corners.forEach(([cx, cy]) => {
-                this.ctx.beginPath();
-                this.ctx.arc(cx, cy, penSize / 2, 0, Math.PI * 2);
-                this.ctx.fill();
-            });
-        }
-        
-        this.ctx.restore();
-    }
     
     // Finish drawing shape and add to shapeObjects
     finishDrawingShape() {
