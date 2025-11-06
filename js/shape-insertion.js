@@ -216,9 +216,6 @@ class ShapeInsertionManager {
         
         this.ctx.restore();
     }
-        
-        this.ctx.restore();
-    }
     
     // Draw selection handles for selected shape
     drawShapeSelection() {
