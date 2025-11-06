@@ -781,7 +781,8 @@ body {
     border-color: var(--theme-color);
 }
 
-.position-option-btn {
+.position-option-btn,
+.display-option-btn {
     flex: 1;
     padding: 12px 16px;
     border: 2px solid #ddd;
@@ -794,12 +795,14 @@ body {
     font-weight: 500;
 }
 
-.position-option-btn:hover {
+.position-option-btn:hover,
+.display-option-btn:hover {
     background-color: #f0f0f0;
     border-color: #ccc;
 }
 
-.position-option-btn.active {
+.position-option-btn.active,
+.display-option-btn.active {
     background-color: var(--theme-color);
     color: #ffffff;
     border-color: var(--theme-color);
@@ -2038,7 +2041,7 @@ body {
 /* Time Display Styles */
 #time-display {
     position: fixed;
-    top: 130px;  /* Below pagination controls (80px top + 36px height + 14px gap) */
+    top: 140px;  /* Below pagination controls with appropriate gap (80px top + 36px height + 24px gap) */
     right: 20px;
     padding: 12px 20px;
     background: rgba(255, 255, 255, 0.95);

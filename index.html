@@ -136,7 +136,7 @@
                     <button class="pen-type-btn" data-shape-type="rectangle">矩形</button>
                 </div>
             </div>
-            <p class="settings-hint">形状将使用当前笔的颜色、粗细和类型。点击第一个点，拖动鼠标实时预览，松开鼠标完成绘制。</p>
+            <p class="settings-hint">形状使用当前笔的颜色和粗细。点击画布确定第一个点，移动鼠标预览，再次点击完成绘制。按 Esc 取消。</p>
         </div>
 
         <!-- Eraser configuration -->
@@ -590,19 +590,34 @@
                             </label>
                             <p class="settings-hint">在右上角显示当前时间和日期</p>
                         </div>
-                        <div class="settings-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="show-date-only-checkbox">
-                                <span>仅显示日期</span>
-                            </label>
-                            <p class="settings-hint">仅显示日期，不显示时间</p>
+                        <div class="settings-group" id="time-display-settings" style="display: none;">
+                            <label>显示选项</label>
+                            <div class="button-size-options" style="grid-template-columns: 1fr 1fr 1fr;">
+                                <button class="display-option-btn active" data-display-type="both">日期和时间</button>
+                                <button class="display-option-btn" data-display-type="date-only">仅日期</button>
+                                <button class="display-option-btn" data-display-type="time-only">仅时间</button>
+                            </div>
                         </div>
-                        <div class="settings-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="show-time-only-checkbox">
-                                <span>仅显示时间</span>
-                            </label>
-                            <p class="settings-hint">仅显示时间，不显示日期</p>
+                        <div class="settings-group" id="timezone-settings" style="display: none;">
+                            <label>时区</label>
+                            <p class="settings-hint">选择要显示的时区</p>
+                            <select id="timezone-select" class="format-select">
+                                <option value="Asia/Shanghai">中国 (UTC+8)</option>
+                                <option value="America/New_York">纽约 (UTC-5/-4)</option>
+                                <option value="America/Los_Angeles">洛杉矶 (UTC-8/-7)</option>
+                                <option value="America/Chicago">芝加哥 (UTC-6/-5)</option>
+                                <option value="Europe/London">伦敦 (UTC+0/+1)</option>
+                                <option value="Europe/Paris">巴黎 (UTC+1/+2)</option>
+                                <option value="Europe/Berlin">柏林 (UTC+1/+2)</option>
+                                <option value="Asia/Tokyo">东京 (UTC+9)</option>
+                                <option value="Asia/Seoul">首尔 (UTC+9)</option>
+                                <option value="Asia/Hong_Kong">香港 (UTC+8)</option>
+                                <option value="Asia/Singapore">新加坡 (UTC+8)</option>
+                                <option value="Asia/Dubai">迪拜 (UTC+4)</option>
+                                <option value="Australia/Sydney">悉尼 (UTC+10/+11)</option>
+                                <option value="Pacific/Auckland">奥克兰 (UTC+12/+13)</option>
+                                <option value="UTC">UTC (协调世界时)</option>
+                            </select>
                         </div>
                         <div class="settings-group">
                             <label>时间格式</label>

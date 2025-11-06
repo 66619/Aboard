@@ -72,7 +72,7 @@ class DrawingBoard {
         this.historyManager.saveState();
         this.initializeCanvasView(); // Initialize canvas view (70% scale, centered)
         this.updateZoomUI();
-        this.applyZoom();
+        this.applyZoom(false); // Don't update config-area scale on refresh
         this.updateZoomControlsVisibility();
         this.updateFullscreenBtnVisibility();
         this.updatePatternGrid();
@@ -267,7 +267,7 @@ class DrawingBoard {
             if (this.isDraggingCoordinateOrigin) {
                 this.dragCoordinateOrigin(e);
             } else if (this.shapeInsertionManager.isDrawingShape) {
-                this.shapeInsertionManager.continueDrawingShape(e);
+                this.shapeInsertionManager.updateShapePreview(e);
             } else if (this.shapeInsertionManager.isDragging || this.shapeInsertionManager.isResizing || this.shapeInsertionManager.isRotating) {
                 this.shapeInsertionManager.dragShape(e);
             } else if (this.drawingEngine.isPanning) {
@@ -283,9 +283,7 @@ class DrawingBoard {
         
         document.addEventListener('mouseup', () => {
             this.stopDraggingCoordinateOrigin();
-            if (this.shapeInsertionManager.isDrawingShape) {
-                this.shapeInsertionManager.finishDrawingShape();
-            }
+            // Don't finish shape on mouseup anymore - shapes finish on second click
             this.shapeInsertionManager.stopDrag();
             this.handleDrawingComplete();
             this.drawingEngine.stopPanning();
@@ -424,6 +422,8 @@ class DrawingBoard {
                 this.settingsManager.updateToolbarTextVisibility();
                 // Reposition toolbars to ensure they stay within viewport
                 this.repositionToolbarsOnResize();
+                // Update config-area scale on window resize
+                this.updateConfigAreaScale();
             }, 150); // 150ms debounce delay
         });
         
@@ -827,36 +827,47 @@ class DrawingBoard {
         
         // Time display settings
         document.getElementById('show-time-display-checkbox').addEventListener('change', (e) => {
+            const timeDisplaySettings = document.getElementById('time-display-settings');
+            const timezoneSettings = document.getElementById('timezone-settings');
             if (e.target.checked) {
                 this.timeDisplayManager.show();
+                timeDisplaySettings.style.display = 'block';
+                timezoneSettings.style.display = 'block';
             } else {
                 this.timeDisplayManager.hide();
+                timeDisplaySettings.style.display = 'none';
+                timezoneSettings.style.display = 'none';
             }
         });
         
-        // Independent date/time checkboxes
-        const showDateOnlyCheckbox = document.getElementById('show-date-only-checkbox');
-        const showTimeOnlyCheckbox = document.getElementById('show-time-only-checkbox');
-        
-        if (showDateOnlyCheckbox) {
-            showDateOnlyCheckbox.addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    this.timeDisplayManager.setShowDate(true);
-                    this.timeDisplayManager.setShowTime(false);
-                    showTimeOnlyCheckbox.checked = false;
+        // Display type buttons (both, date-only, time-only)
+        document.querySelectorAll('.display-option-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const displayType = e.target.dataset.displayType;
+                document.querySelectorAll('.display-option-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                switch(displayType) {
+                    case 'both':
+                        this.timeDisplayManager.setShowDate(true);
+                        this.timeDisplayManager.setShowTime(true);
+                        break;
+                    case 'date-only':
+                        this.timeDisplayManager.setShowDate(true);
+                        this.timeDisplayManager.setShowTime(false);
+                        break;
+                    case 'time-only':
+                        this.timeDisplayManager.setShowDate(false);
+                        this.timeDisplayManager.setShowTime(true);
+                        break;
                 }
             });
-        }
+        });
         
-        if (showTimeOnlyCheckbox) {
-            showTimeOnlyCheckbox.addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    this.timeDisplayManager.setShowDate(false);
-                    this.timeDisplayManager.setShowTime(true);
-                    showDateOnlyCheckbox.checked = false;
-                }
-            });
-        }
+        // Timezone selector
+        document.getElementById('timezone-select').addEventListener('change', (e) => {
+            this.timeDisplayManager.setTimezone(e.target.value);
+        });
         
         document.getElementById('time-format-select').addEventListener('change', (e) => {
             this.timeDisplayManager.setTimeFormat(e.target.value);
@@ -968,6 +979,10 @@ class DrawingBoard {
             if (e.key === 'Escape') {
                 this.closeSettings();
                 this.closeConfigPanel();
+                // Cancel shape drawing if in progress
+                if (this.shapeInsertionManager.isDrawingShape) {
+                    this.shapeInsertionManager.cancelDrawing();
+                }
             }
         });
         
@@ -1224,7 +1239,29 @@ class DrawingBoard {
         document.getElementById('settings-modal').classList.add('show');
         
         // Update time display settings UI with current values
-        document.getElementById('show-time-display-checkbox').checked = this.timeDisplayManager.enabled;
+        const timeDisplayCheckbox = document.getElementById('show-time-display-checkbox');
+        timeDisplayCheckbox.checked = this.timeDisplayManager.enabled;
+        
+        // Show/hide time display settings based on enabled state
+        const timeDisplaySettings = document.getElementById('time-display-settings');
+        const timezoneSettings = document.getElementById('timezone-settings');
+        timeDisplaySettings.style.display = this.timeDisplayManager.enabled ? 'block' : 'none';
+        timezoneSettings.style.display = this.timeDisplayManager.enabled ? 'block' : 'none';
+        
+        // Set active display type button
+        document.querySelectorAll('.display-option-btn').forEach(btn => btn.classList.remove('active'));
+        let displayType = 'both';
+        if (this.timeDisplayManager.showDate && !this.timeDisplayManager.showTime) {
+            displayType = 'date-only';
+        } else if (!this.timeDisplayManager.showDate && this.timeDisplayManager.showTime) {
+            displayType = 'time-only';
+        }
+        const activeBtn = document.querySelector(`.display-option-btn[data-display-type="${displayType}"]`);
+        if (activeBtn) activeBtn.classList.add('active');
+        
+        // Set timezone selector
+        document.getElementById('timezone-select').value = this.timeDisplayManager.timezone;
+        
         document.getElementById('time-format-select').value = this.timeDisplayManager.timeFormat;
         document.getElementById('date-format-select').value = this.timeDisplayManager.dateFormat;
         document.getElementById('time-font-size-slider').value = this.timeDisplayManager.fontSize;
@@ -1415,7 +1452,7 @@ class DrawingBoard {
         localStorage.setItem('canvasScale', newScale);
     }
     
-    applyZoom() {
+    applyZoom(updateConfigScale = true) {
         // Apply zoom using CSS transform for better performance
         const panX = this.drawingEngine.panOffset.x;
         const panY = this.drawingEngine.panOffset.y;
@@ -1439,8 +1476,10 @@ class DrawingBoard {
         this.canvas.style.transformOrigin = 'center center';
         this.bgCanvas.style.transformOrigin = 'center center';
         
-        // Update config-area scale proportionally
-        this.updateConfigAreaScale();
+        // Update config-area scale proportionally only when requested (on resize, not on refresh)
+        if (updateConfigScale) {
+            this.updateConfigAreaScale();
+        }
     }
     
     updateConfigAreaScale() {
