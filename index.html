@@ -187,35 +187,49 @@
             </div>
         </div>
 
-        <!-- More configuration (Feature Buttons) -->
+        <!-- More configuration -->
         <div id="more-config" class="config-panel">
             <div class="config-group">
-                <label>小功能</label>
-                <div class="more-features-grid">
-                    <button id="time-display-feature-btn" class="feature-btn" title="时间显示">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                        <span>时间显示</span>
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Time Display Controls (hidden by default, shown when button clicked) -->
-            <div id="time-display-controls" class="config-group" style="display: none;">
-                <label>时间显示选项</label>
-                <label class="checkbox-label">
-                    <input type="checkbox" id="show-date-checkbox-more">
-                    <span>显示日期</span>
-                </label>
-                <label class="checkbox-label" style="margin-top: 8px;">
-                    <input type="checkbox" id="show-time-checkbox-more">
-                    <span>显示时间</span>
-                </label>
+                <label>更多功能</label>
+                <p class="settings-hint" style="font-size: 12px; color: #666; margin-top: -4px;">其他工具和配置项</p>
             </div>
         </div>
+    </div>
+
+    <!-- Feature buttons area (independent, draggable, with edge snapping) -->
+    <div id="feature-area" class="feature-area">
+        <!-- Close button for feature panel -->
+        <button id="feature-close-btn" class="config-close-btn" title="关闭">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        
+        <div class="config-group">
+            <label>小功能</label>
+            <div class="more-features-grid">
+                <button id="time-display-feature-btn" class="feature-btn" title="时间显示">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span>时间显示</span>
+                </button>
             </div>
+        </div>
+        
+        <!-- Time Display Controls (hidden by default, shown when button clicked) -->
+        <div id="time-display-controls" class="config-group" style="display: none;">
+            <label>时间显示选项</label>
+            <label class="checkbox-label">
+                <input type="checkbox" id="show-date-checkbox-more">
+                <span>显示日期</span>
+            </label>
+            <label class="checkbox-label" style="margin-top: 8px;">
+                <input type="checkbox" id="show-time-checkbox-more">
+                <span>显示时间</span>
+            </label>
         </div>
     </div>
 

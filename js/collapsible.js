@@ -16,7 +16,7 @@ class CollapsibleManager {
                 console.warn('Failed to load collapsed state:', e);
             }
         }
-        return {}; // All sections expanded by default
+        return { default: true }; // All sections collapsed by default
     }
     
     saveCollapsedState() {
@@ -61,6 +61,24 @@ class CollapsibleManager {
             return;
         }
         
+        // Check if this group has only one checkbox (and nothing else significant)
+        // Cache all queries for better performance
+        const checkboxes = group.querySelectorAll('input[type="checkbox"]');
+        const checkboxCount = checkboxes.length;
+        
+        // Early return optimization: if we have exactly 1 checkbox, check other elements
+        if (checkboxCount === 1) {
+            const otherInputs = group.querySelectorAll('input:not([type="checkbox"]), select, textarea, button');
+            const hints = group.querySelectorAll('.settings-hint');
+            
+            // Skip collapsible for simple single-checkbox settings
+            // We allow up to 1 hint (description text) without making it collapsible
+            const MAX_HINTS_FOR_SIMPLE_SETTING = 1;
+            if (otherInputs.length === 0 && hints.length <= MAX_HINTS_FOR_SIMPLE_SETTING) {
+                return;
+            }
+        }
+        
         // Mark as collapsible
         group.classList.add('collapsible');
         
@@ -99,8 +117,9 @@ class CollapsibleManager {
         group.appendChild(header);
         group.appendChild(content);
         
-        // Restore collapsed state
-        if (this.collapsedState[groupId]) {
+        // Restore collapsed state: default to collapsed unless explicitly saved as expanded (false)
+        // This ensures new groups start collapsed, and user preferences are preserved
+        if (this.collapsedState[groupId] !== false) {
             group.classList.add('collapsed');
         }
         

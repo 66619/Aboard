@@ -307,6 +307,7 @@ class DrawingBoard {
         document.getElementById('more-btn').addEventListener('click', () => this.setTool('more'));
         
         document.getElementById('config-close-btn').addEventListener('click', () => this.closeConfigPanel());
+        document.getElementById('feature-close-btn').addEventListener('click', () => this.closeFeaturePanel());
         
         // History buttons
         document.getElementById('undo-btn').addEventListener('click', () => {
@@ -1019,6 +1020,7 @@ class DrawingBoard {
         const panels = [
             document.getElementById('history-controls'),
             document.getElementById('config-area'),
+            document.getElementById('feature-area'),
             document.getElementById('toolbar'),
             document.getElementById('pagination-controls')
         ];
@@ -1084,9 +1086,10 @@ class DrawingBoard {
     setupDraggablePanels() {
         const historyControls = document.getElementById('history-controls');
         const configArea = document.getElementById('config-area');
+        const featureArea = document.getElementById('feature-area');
         const toolbar = document.getElementById('toolbar');
         
-        [historyControls, configArea, toolbar].forEach(element => {
+        [historyControls, configArea, featureArea, toolbar].forEach(element => {
             element.addEventListener('mousedown', (e) => {
                 if (e.target.closest('button') || e.target.closest('input')) return;
                 
@@ -1118,6 +1121,7 @@ class DrawingBoard {
             const windowHeight = window.innerHeight;
             const isToolbar = this.draggedElement.id === 'toolbar';
             const isConfigArea = this.draggedElement.id === 'config-area';
+            const isFeatureArea = this.draggedElement.id === 'feature-area';
             
             let snappedToEdge = false;
             let isVertical = false;
@@ -1135,7 +1139,7 @@ class DrawingBoard {
                 // Check for right edge snap
                 else if (x + this.draggedElementWidth > windowWidth - edgeSnapDistance) {
                     // When vertical, need to recalculate width
-                    if (isToolbar || isConfigArea) {
+                    if (isToolbar || isConfigArea || isFeatureArea) {
                         // Temporarily add vertical class to get correct dimensions
                         this.draggedElement.classList.add('vertical');
                         const tempWidth = this.draggedElement.getBoundingClientRect().width;
@@ -1203,23 +1207,25 @@ class DrawingBoard {
         
         this.updateUI();
         
-        // 使用"移动"功能时隐藏config-area
-        if (tool === 'pan') {
-            document.getElementById('config-area').classList.remove('show');
-        } else if (showConfig && (tool === 'pen' || tool === 'eraser' || tool === 'background' || tool === 'more')) {
+        // Hide both config-area and feature-area by default
+        document.getElementById('config-area').classList.remove('show');
+        document.getElementById('feature-area').classList.remove('show');
+        
+        // Show appropriate panel based on tool
+        if (showConfig && (tool === 'pen' || tool === 'eraser' || tool === 'background')) {
             document.getElementById('config-area').classList.add('show');
+        } else if (tool === 'more') {
+            document.getElementById('feature-area').classList.add('show');
             
             // Update More config panel state
-            if (tool === 'more') {
-                const showDateCheckboxMore = document.getElementById('show-date-checkbox-more');
-                const showTimeCheckboxMore = document.getElementById('show-time-checkbox-more');
-                
-                if (showDateCheckboxMore) {
-                    showDateCheckboxMore.checked = this.timeDisplayManager.showDate;
-                }
-                if (showTimeCheckboxMore) {
-                    showTimeCheckboxMore.checked = this.timeDisplayManager.showTime;
-                }
+            const showDateCheckboxMore = document.getElementById('show-date-checkbox-more');
+            const showTimeCheckboxMore = document.getElementById('show-time-checkbox-more');
+            
+            if (showDateCheckboxMore) {
+                showDateCheckboxMore.checked = this.timeDisplayManager.showDate;
+            }
+            if (showTimeCheckboxMore) {
+                showTimeCheckboxMore.checked = this.timeDisplayManager.showTime;
             }
         }
     }
@@ -1228,11 +1234,16 @@ class DrawingBoard {
         if (this.drawingEngine.stopDrawing()) {
             this.historyManager.saveState();
             this.closeConfigPanel();
+            this.closeFeaturePanel();
         }
     }
     
     closeConfigPanel() {
         document.getElementById('config-area').classList.remove('show');
+    }
+    
+    closeFeaturePanel() {
+        document.getElementById('feature-area').classList.remove('show');
     }
     
     openSettings() {
@@ -1341,7 +1352,8 @@ class DrawingBoard {
             this.canvas.style.cursor = 'default';
         } else if (tool === 'more') {
             document.getElementById('more-btn').classList.add('active');
-            document.getElementById('more-config').classList.add('active');
+            // Show feature-area instead of more-config
+            document.getElementById('feature-area').classList.add('show');
             this.canvas.style.cursor = 'default';
         }
         
