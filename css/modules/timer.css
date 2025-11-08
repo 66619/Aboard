@@ -25,8 +25,10 @@
     width: 90%;
     max-width: 500px;
     max-height: 90vh;
-    overflow-y: auto;
+    overflow: hidden;
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .timer-modal-header {
@@ -35,6 +37,7 @@
     align-items: center;
     padding: 20px 24px 12px;
     border-bottom: 1px solid #e5e5e5;
+    flex-shrink: 0;
 }
 
 .timer-modal-header h2 {
@@ -46,6 +49,8 @@
 
 .timer-modal-body {
     padding: 20px 24px;
+    overflow-y: auto;
+    flex: 1;
 }
 
 /* Timer Mode Selection */
@@ -369,6 +374,23 @@
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
+/* Auto-hide controls when inactive */
+.timer-display-widget.compact .timer-display-header,
+.timer-display-widget.compact .timer-display-controls,
+.timer-display-widget.compact .timer-display-actions,
+.timer-display-widget.compact .timer-font-size-control {
+    display: none;
+}
+
+.timer-display-widget.compact {
+    padding: 12px 16px;
+    min-width: auto;
+}
+
+.timer-display-widget.compact .timer-display-time {
+    margin: 0;
+}
+
 .timer-display-widget.fullscreen {
     position: fixed;
     top: 0;
@@ -408,7 +430,8 @@
 }
 
 .timer-display-widget.fullscreen .timer-display-time {
-    font-size: 120px;
+    /* Use viewport-based sizing for proportional fullscreen display */
+    font-size: 15vmin;
     color: #fff;
 }
 

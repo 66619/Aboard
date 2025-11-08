@@ -54,6 +54,19 @@ class TimeDisplayControls {
     
     showTimeDisplayArea() {
         this.timeDisplayArea.classList.add('show');
+        
+        // Position time-display-area above the "小功能" area (feature-area)
+        const featureArea = document.getElementById('feature-area');
+        if (featureArea && featureArea.classList.contains('show')) {
+            const featureRect = featureArea.getBoundingClientRect();
+            
+            // Position above the feature area
+            this.timeDisplayArea.style.bottom = 'auto';
+            this.timeDisplayArea.style.left = `${featureRect.left}px`;
+            this.timeDisplayArea.style.top = `${featureRect.top - 10}px`;
+            this.timeDisplayArea.style.transform = 'translateY(-100%)';
+        }
+        
         // Also show the time display if not already shown
         if (!this.timeDisplayManager.enabled) {
             this.timeDisplayManager.show();
