@@ -11,9 +11,7 @@
 /* Feature area - independent draggable box like config-area */
 #feature-area {
     position: fixed;
-    bottom: 100px;
-    left: 50%;
-    transform: translateX(-50%);
+    /* Position will be set dynamically above the "更多" button */
     z-index: 999;
     padding: 16px 24px;
     background-color: #ffffff;

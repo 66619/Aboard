@@ -3,7 +3,7 @@
 /* Time Display Area - Independent draggable box */
 #time-display-area {
     position: fixed;
-    bottom: 220px;  /* Above feature area by default */
+    /* Position will be set dynamically above feature-area */
     right: 20px;
     z-index: 998;
     padding: 16px 24px;

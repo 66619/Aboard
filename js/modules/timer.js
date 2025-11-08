@@ -38,14 +38,20 @@ class TimerInstance {
         this.displayElement = null;
         this.isFullscreen = false;
         this.fontSize = 32;
+        this.fullscreenFontSizePercent = 15; // percentage of viewport for fullscreen
         
         // For dragging
         this.isDragging = false;
         this.dragOffset = { x: 0, y: 0 };
         
+        // Auto-hide timer
+        this.inactivityTimer = null;
+        this.isCompact = false;
+        
         this.createDisplayElement();
         this.startTimerLoop();
         this.setupFullscreenChangeListener();
+        this.resetInactivityTimer();
     }
     
     setupFullscreenChangeListener() {
@@ -67,6 +73,27 @@ class TimerInstance {
         document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
         document.addEventListener('mozfullscreenchange', handleFullscreenChange);
         document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    }
+    
+    resetInactivityTimer() {
+        // Clear existing timer
+        if (this.inactivityTimer) {
+            clearTimeout(this.inactivityTimer);
+        }
+        
+        // Exit compact mode
+        if (this.isCompact) {
+            this.isCompact = false;
+            this.displayElement.classList.remove('compact');
+        }
+        
+        // Set new timer for 4 seconds
+        this.inactivityTimer = setTimeout(() => {
+            if (!this.isDragging && !this.isFullscreen) {
+                this.isCompact = true;
+                this.displayElement.classList.add('compact');
+            }
+        }, 4000);
     }
     
     createDisplayElement() {
@@ -151,16 +178,58 @@ class TimerInstance {
         const fullscreenBtn = this.displayElement.querySelector('.timer-fullscreen-btn');
         const fontSizeSlider = this.displayElement.querySelector('.timer-font-size-slider');
         
-        playPauseBtn.addEventListener('click', () => this.togglePlayPause());
-        resetBtn.addEventListener('click', () => this.resetTimer());
-        closeBtn.addEventListener('click', () => this.closeTimer());
-        adjustBtn.addEventListener('click', () => this.adjustTimer());
-        fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
-        fontSizeSlider.addEventListener('input', (e) => this.updateFontSize(e.target.value));
+        playPauseBtn.addEventListener('click', () => {
+            this.togglePlayPause();
+            this.resetInactivityTimer();
+        });
+        resetBtn.addEventListener('click', () => {
+            this.resetTimer();
+            this.resetInactivityTimer();
+        });
+        closeBtn.addEventListener('click', () => {
+            this.closeTimer();
+        });
+        adjustBtn.addEventListener('click', () => {
+            this.adjustTimer();
+            this.resetInactivityTimer();
+        });
+        fullscreenBtn.addEventListener('click', () => {
+            this.toggleFullscreen();
+            this.resetInactivityTimer();
+        });
+        fontSizeSlider.addEventListener('input', (e) => {
+            this.updateFontSize(e.target.value);
+            this.resetInactivityTimer();
+        });
+        
+        // Reset inactivity timer on any interaction with the widget
+        this.displayElement.addEventListener('click', () => {
+            this.resetInactivityTimer();
+        });
     }
     
     setupDragging() {
         const header = this.displayElement.querySelector('.timer-display-header');
+        const timeDisplay = this.displayElement.querySelector('.timer-display-time');
+        
+        const handleMouseDown = (e) => {
+            // Don't start dragging if clicking on close button
+            if (e.target.closest('.timer-close-btn')) return;
+            
+            this.isDragging = true;
+            this.displayElement.classList.add('dragging');
+            this.resetInactivityTimer();
+            
+            const rect = this.displayElement.getBoundingClientRect();
+            this.dragOffset.x = e.clientX - rect.left;
+            this.dragOffset.y = e.clientY - rect.top;
+            
+            e.preventDefault();
+        };
+        
+        // Allow dragging from header or time display (when compact)
+        header.addEventListener('mousedown', handleMouseDown);
+        timeDisplay.addEventListener('mousedown', handleMouseDown);
         
         const handleMouseMove = (e) => {
             if (!this.isDragging) return;
@@ -207,28 +276,14 @@ class TimerInstance {
             if (this.isDragging) {
                 this.isDragging = false;
                 this.displayElement.classList.remove('dragging');
+                this.resetInactivityTimer();
                 document.removeEventListener('mousemove', handleMouseMove);
                 document.removeEventListener('mouseup', handleMouseUp);
             }
         };
         
-        header.addEventListener('mousedown', (e) => {
-            // Don't start dragging if clicking on close button
-            if (e.target.closest('.timer-close-btn')) return;
-            
-            this.isDragging = true;
-            this.displayElement.classList.add('dragging');
-            
-            const rect = this.displayElement.getBoundingClientRect();
-            this.dragOffset.x = e.clientX - rect.left;
-            this.dragOffset.y = e.clientY - rect.top;
-            
-            // Add listeners only when dragging starts
-            document.addEventListener('mousemove', handleMouseMove);
-            document.addEventListener('mouseup', handleMouseUp);
-            
-            e.preventDefault();
-        });
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
     }
     
     startTimerLoop() {
@@ -442,6 +497,12 @@ class TimerInstance {
     enterFullscreen() {
         this.isFullscreen = true;
         
+        // Apply fullscreen font size based on saved percentage
+        const timeDisplay = this.displayElement.querySelector('.timer-display-time');
+        if (timeDisplay) {
+            timeDisplay.style.fontSize = `${this.fullscreenFontSizePercent}vmin`;
+        }
+        
         // Use browser's fullscreen API for true fullscreen
         if (this.displayElement.requestFullscreen) {
             this.displayElement.requestFullscreen().then(() => {
@@ -468,6 +529,12 @@ class TimerInstance {
     
     exitFullscreen() {
         this.isFullscreen = false;
+        
+        // Restore normal font size
+        const timeDisplay = this.displayElement.querySelector('.timer-display-time');
+        if (timeDisplay) {
+            timeDisplay.style.fontSize = `${this.fontSize}px`;
+        }
         
         // Exit browser fullscreen if active
         if (document.fullscreenElement === this.displayElement ||
@@ -501,6 +568,12 @@ class TimerInstance {
         if (this.intervalId) {
             clearInterval(this.intervalId);
             this.intervalId = null;
+        }
+        
+        // Clear inactivity timer
+        if (this.inactivityTimer) {
+            clearTimeout(this.inactivityTimer);
+            this.inactivityTimer = null;
         }
         
         // Stop any playing audio
@@ -552,6 +625,10 @@ class TimerManager {
             'digital-beep': 'sounds/digital-beep.MP3'
         };
         
+        // Preload all sounds on initialization
+        this.preloadedAudio = {};
+        this.preloadSounds();
+        
         // Current timer being adjusted (for adjust functionality)
         this.adjustingTimer = null;
         
@@ -560,6 +637,16 @@ class TimerManager {
         this.currentPreviewButton = null;
         
         this.setupEventListeners();
+    }
+    
+    preloadSounds() {
+        // Preload all preset sounds for immediate playback
+        Object.keys(this.sounds).forEach(key => {
+            const audio = new Audio(this.sounds[key]);
+            audio.preload = 'auto';
+            audio.load();
+            this.preloadedAudio[key] = audio;
+        });
     }
     
     setupEventListeners() {
@@ -598,7 +685,7 @@ class TimerManager {
             });
         });
         
-        // Sound preview buttons
+        // Sound preview buttons - immediate playback on click
         document.querySelectorAll('.sound-preview-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -669,6 +756,30 @@ class TimerManager {
             timerSettingsCloseBtn.addEventListener('click', () => {
                 this.hideSettingsModal();
             });
+        }
+        
+        // Timer alert modal OK button
+        const timerAlertOkBtn = document.getElementById('timer-alert-ok-btn');
+        if (timerAlertOkBtn) {
+            timerAlertOkBtn.addEventListener('click', () => {
+                this.hideAlertModal();
+            });
+        }
+    }
+    
+    showAlertModal(message) {
+        const modal = document.getElementById('timer-alert-modal');
+        const messageEl = document.getElementById('timer-alert-message');
+        if (modal && messageEl) {
+            messageEl.textContent = message;
+            modal.classList.add('show');
+        }
+    }
+    
+    hideAlertModal() {
+        const modal = document.getElementById('timer-alert-modal');
+        if (modal) {
+            modal.classList.remove('show');
         }
     }
     
@@ -833,8 +944,9 @@ class TimerManager {
         
         const duration = (hours * 3600 + minutes * 60 + seconds) * 1000;
         
+        // Use custom modal instead of browser alert
         if (mode === 'countdown' && duration === 0) {
-            alert('请设置倒计时时间');
+            this.showAlertModal('请设置倒计时时间');
             return;
         }
         
@@ -885,9 +997,11 @@ class TimerManager {
         // Stop any currently playing preview
         this.stopPreviewAudio();
         
-        const soundUrl = this.sounds[soundKey];
-        if (soundUrl) {
-            this.previewAudio = new Audio(soundUrl);
+        // Use preloaded audio for immediate playback
+        const preloadedAudio = this.preloadedAudio[soundKey];
+        if (preloadedAudio) {
+            // Clone the preloaded audio to allow concurrent previews
+            this.previewAudio = preloadedAudio.cloneNode();
             this.currentPreviewButton = previewButton;
             
             // Update button to show pause icon
@@ -904,6 +1018,7 @@ class TimerManager {
                 this.stopPreviewAudio();
             });
             
+            // Play immediately
             this.previewAudio.play().catch(err => {
                 console.warn('无法播放音频预览:', err);
                 this.stopPreviewAudio();
