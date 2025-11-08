@@ -555,6 +555,10 @@ class TimerManager {
         // Current timer being adjusted (for adjust functionality)
         this.adjustingTimer = null;
         
+        // Audio preview state
+        this.previewAudio = null;
+        this.currentPreviewButton = null;
+        
         this.setupEventListeners();
     }
     
@@ -570,11 +574,11 @@ class TimerManager {
             });
         });
         
-        // Sound checkbox
+        // Sound checkbox - handle enabling/disabling sound options
         const soundCheckbox = document.getElementById('timer-sound-checkbox');
         if (soundCheckbox) {
             soundCheckbox.addEventListener('change', (e) => {
-                // This is handled when creating the timer
+                this.updateSoundOptionsState(e.target.checked);
             });
         }
         
@@ -600,7 +604,7 @@ class TimerManager {
                 e.stopPropagation();
                 const presetBtn = e.currentTarget.closest('.sound-preset-btn');
                 if (presetBtn && presetBtn.dataset.sound) {
-                    this.previewSound(presetBtn.dataset.sound);
+                    this.previewSound(presetBtn.dataset.sound, e.currentTarget);
                 }
             });
         });
@@ -612,10 +616,21 @@ class TimerManager {
                 const file = e.target.files[0];
                 if (file && file.type.startsWith('audio/')) {
                     const url = URL.createObjectURL(file);
+                    const fileName = file.name;
+                    
+                    // Store custom sound URL
                     soundUploadInput.dataset.customSoundUrl = url;
-                    // Update UI to show custom sound is selected
+                    soundUploadInput.dataset.customSoundName = fileName;
+                    
+                    // Add custom sound button to presets
+                    this.addCustomSoundButton(fileName, url);
+                    
+                    // Select the custom sound
                     document.querySelectorAll('.sound-preset-btn').forEach(b => b.classList.remove('active'));
-                    alert('自定义音频已上传');
+                    const customBtn = document.querySelector('.sound-preset-btn[data-sound="custom"]');
+                    if (customBtn) {
+                        customBtn.classList.add('active');
+                    }
                 }
             });
         }
@@ -662,8 +677,12 @@ class TimerManager {
         if (soundGroup) {
             if (mode === 'countdown') {
                 soundGroup.classList.remove('disabled');
+                soundGroup.style.display = 'block';
             } else {
                 soundGroup.classList.add('disabled');
+                soundGroup.style.display = 'none';
+                // Stop any playing preview when switching to stopwatch mode
+                this.stopPreviewAudio();
             }
         }
     }
@@ -701,6 +720,7 @@ class TimerManager {
             
             // Reset sound settings
             document.getElementById('timer-sound-checkbox').checked = false;
+            this.updateSoundOptionsState(false); // Disable sound options initially
             document.querySelectorAll('.sound-preset-btn').forEach(b => b.classList.remove('active'));
             document.querySelector('.sound-preset-btn[data-sound="class-bell"]').classList.add('active');
             
@@ -749,6 +769,7 @@ class TimerManager {
             
             // Set sound settings
             document.getElementById('timer-sound-checkbox').checked = timer.playSound;
+            this.updateSoundOptionsState(timer.playSound); // Enable/disable based on timer settings
             
             // Set loop settings
             const loopCheckbox = document.getElementById('timer-loop-checkbox');
@@ -799,8 +820,12 @@ class TimerManager {
         const playSound = document.getElementById('timer-sound-checkbox').checked;
         const activeSoundBtn = document.querySelector('.sound-preset-btn.active');
         const selectedSound = activeSoundBtn ? activeSoundBtn.dataset.sound : 'class-bell';
-        const soundUploadInput = document.getElementById('timer-sound-upload');
-        const customSoundUrl = soundUploadInput ? soundUploadInput.dataset.customSoundUrl : null;
+        
+        // Get custom sound URL if custom sound is selected
+        let customSoundUrl = null;
+        if (selectedSound === 'custom' && activeSoundBtn) {
+            customSoundUrl = activeSoundBtn.dataset.customUrl;
+        }
         
         // Get loop settings
         const loopSound = document.getElementById('timer-loop-checkbox').checked;
@@ -831,13 +856,172 @@ class TimerManager {
         this.timers.delete(id);
     }
     
-    previewSound(soundKey) {
+    stopPreviewAudio() {
+        if (this.previewAudio) {
+            this.previewAudio.pause();
+            this.previewAudio.currentTime = 0;
+            this.previewAudio = null;
+        }
+        
+        // Reset all preview button states
+        if (this.currentPreviewButton) {
+            this.currentPreviewButton.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+            `;
+            this.currentPreviewButton.title = '试听';
+            this.currentPreviewButton = null;
+        }
+    }
+    
+    previewSound(soundKey, previewButton) {
+        // If same button clicked and audio is playing, pause it
+        if (this.currentPreviewButton === previewButton && this.previewAudio && !this.previewAudio.paused) {
+            this.stopPreviewAudio();
+            return;
+        }
+        
+        // Stop any currently playing preview
+        this.stopPreviewAudio();
+        
         const soundUrl = this.sounds[soundKey];
         if (soundUrl) {
-            const audio = new Audio(soundUrl);
-            audio.play().catch(err => {
+            this.previewAudio = new Audio(soundUrl);
+            this.currentPreviewButton = previewButton;
+            
+            // Update button to show pause icon
+            previewButton.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="6" y="4" width="4" height="16"></rect>
+                    <rect x="14" y="4" width="4" height="16"></rect>
+                </svg>
+            `;
+            previewButton.title = '暂停';
+            
+            // Reset button when audio ends
+            this.previewAudio.addEventListener('ended', () => {
+                this.stopPreviewAudio();
+            });
+            
+            this.previewAudio.play().catch(err => {
                 console.warn('无法播放音频预览:', err);
+                this.stopPreviewAudio();
             });
         }
+    }
+    
+    previewCustomSound(soundUrl, previewButton) {
+        // If same button clicked and audio is playing, pause it
+        if (this.currentPreviewButton === previewButton && this.previewAudio && !this.previewAudio.paused) {
+            this.stopPreviewAudio();
+            return;
+        }
+        
+        // Stop any currently playing preview
+        this.stopPreviewAudio();
+        
+        if (soundUrl) {
+            this.previewAudio = new Audio(soundUrl);
+            this.currentPreviewButton = previewButton;
+            
+            // Update button to show pause icon
+            previewButton.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="6" y="4" width="4" height="16"></rect>
+                    <rect x="14" y="4" width="4" height="16"></rect>
+                </svg>
+            `;
+            previewButton.title = '暂停';
+            
+            // Reset button when audio ends
+            this.previewAudio.addEventListener('ended', () => {
+                this.stopPreviewAudio();
+            });
+            
+            this.previewAudio.play().catch(err => {
+                console.warn('无法播放音频预览:', err);
+                this.stopPreviewAudio();
+            });
+        }
+    }
+    
+    updateSoundOptionsState(enabled) {
+        const soundPresets = document.querySelector('.sound-presets');
+        const soundLoopSettings = document.querySelector('.sound-loop-settings');
+        const soundUploadGroup = document.querySelector('.sound-upload-group');
+        
+        if (enabled) {
+            // Enable sound options
+            if (soundPresets) soundPresets.style.pointerEvents = 'auto';
+            if (soundLoopSettings) soundLoopSettings.style.pointerEvents = 'auto';
+            if (soundUploadGroup) soundUploadGroup.style.pointerEvents = 'auto';
+            
+            if (soundPresets) soundPresets.style.opacity = '1';
+            if (soundLoopSettings) soundLoopSettings.style.opacity = '1';
+            if (soundUploadGroup) soundUploadGroup.style.opacity = '1';
+        } else {
+            // Disable sound options
+            if (soundPresets) soundPresets.style.pointerEvents = 'none';
+            if (soundLoopSettings) soundLoopSettings.style.pointerEvents = 'none';
+            if (soundUploadGroup) soundUploadGroup.style.pointerEvents = 'none';
+            
+            if (soundPresets) soundPresets.style.opacity = '0.5';
+            if (soundLoopSettings) soundLoopSettings.style.opacity = '0.5';
+            if (soundUploadGroup) soundUploadGroup.style.opacity = '0.5';
+            
+            // Stop any playing preview
+            this.stopPreviewAudio();
+        }
+    }
+    
+    addCustomSoundButton(fileName, soundUrl) {
+        const soundPresets = document.querySelector('.sound-presets');
+        if (!soundPresets) return;
+        
+        // Remove existing custom sound button if any
+        const existingCustomBtn = soundPresets.querySelector('.sound-preset-btn[data-sound="custom"]');
+        if (existingCustomBtn) {
+            existingCustomBtn.remove();
+        }
+        
+        // Create new custom sound button
+        const customBtn = document.createElement('button');
+        customBtn.className = 'sound-preset-btn';
+        customBtn.dataset.sound = 'custom';
+        customBtn.dataset.customUrl = soundUrl;
+        
+        // Truncate filename if too long
+        const displayName = fileName.length > 20 ? fileName.substring(0, 17) + '...' : fileName;
+        
+        customBtn.innerHTML = `
+            ${displayName}
+            <button class="sound-preview-btn" title="试听">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+            </button>
+        `;
+        
+        // Add click handler for selecting
+        customBtn.addEventListener('click', (e) => {
+            if (e.target.classList.contains('sound-preview-btn') || 
+                e.target.closest('.sound-preview-btn')) {
+                return; // Let the preview button handle it
+            }
+            
+            document.querySelectorAll('.sound-preset-btn').forEach(b => b.classList.remove('active'));
+            customBtn.classList.add('active');
+        });
+        
+        // Add preview button handler
+        const previewBtn = customBtn.querySelector('.sound-preview-btn');
+        previewBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.previewCustomSound(soundUrl, e.currentTarget);
+        });
+        
+        // Insert before upload button group
+        soundPresets.appendChild(customBtn);
     }
 }

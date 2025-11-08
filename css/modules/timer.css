@@ -178,13 +178,14 @@
 }
 
 .sound-presets {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 10px;
     margin-bottom: 16px;
 }
 
 .sound-preset-btn {
+    width: 100%;
     padding: 12px 8px;
     border: 2px solid #ddd;
     border-radius: 8px;
@@ -196,7 +197,7 @@
     color: #666;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: 6px;
     position: relative;
 }

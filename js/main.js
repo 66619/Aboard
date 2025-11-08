@@ -378,8 +378,8 @@ class DrawingBoard {
                 this.settingsManager.updateToolbarTextVisibility();
                 // Reposition toolbars to ensure they stay within viewport
                 this.repositionToolbarsOnResize();
-                // Update config-area scale on window resize
-                this.updateConfigAreaScale();
+                // Don't update config-area scale on window resize (fix #2)
+                // this.updateConfigAreaScale();
             }, 150); // 150ms debounce delay
         });
         

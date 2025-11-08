@@ -56,7 +56,22 @@
 ### 在线使用
 直接打开 `index.html` 文件即可开始使用，无需安装任何依赖。
 
-### 一键部署到 Cloudflare Pages
+### 一键部署
+
+#### 部署到 Vercel
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/lifeafter619/Aboard)
+
+#### 部署到 GitHub Pages
+1. Fork 本仓库到你的 GitHub 账号
+2. 进入仓库设置 (Settings)
+3. 在 Pages 选项中，选择 Source 为 `main` 分支
+4. 点击 Save，等待部署完成
+5. 访问 `https://你的用户名.github.io/Aboard`
+
+或使用 GitHub Actions 自动部署：
+[![GitHub Pages](https://img.shields.io/badge/Deploy%20to-GitHub%20Pages-blue?logo=github)](https://github.com/lifeafter619/Aboard/settings/pages)
+
+#### 部署到 Cloudflare Pages
 
 [![Deploy to Cloudflare Pages](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/lifeafter619/Aboard)
 

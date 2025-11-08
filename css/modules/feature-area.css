@@ -12,7 +12,8 @@
 #feature-area {
     position: fixed;
     bottom: 100px;
-    right: 20px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 999;
     padding: 16px 24px;
     background-color: #ffffff;
