@@ -24,6 +24,7 @@ class DrawingBoard {
         this.strokeControls = new StrokeControls(this.drawingEngine, this.canvas, this.ctx, this.historyManager);
         this.timeDisplayManager = new TimeDisplayManager(this.settingsManager);
         this.timeDisplayControls = new TimeDisplayControls(this.timeDisplayManager);
+        this.timerManager = new TimerManager();
         this.collapsibleManager = new CollapsibleManager();
         this.announcementManager = new AnnouncementManager();
         this.exportManager = new ExportManager(this.canvas, this.bgCanvas, this);
@@ -569,6 +570,22 @@ class DrawingBoard {
             });
         }
         
+        // Timer Feature Button
+        const timerFeatureBtn = document.getElementById('timer-feature-btn');
+        if (timerFeatureBtn) {
+            timerFeatureBtn.addEventListener('click', () => {
+                this.timerManager.showSettingsModal();
+            });
+        }
+        
+        // Timer settings modal close button
+        const timerSettingsCloseBtn = document.getElementById('timer-settings-close-btn');
+        if (timerSettingsCloseBtn) {
+            timerSettingsCloseBtn.addEventListener('click', () => {
+                this.timerManager.hideSettingsModal();
+            });
+        }
+        
         // Load initial checkbox states
         if (showDateCheckboxMore && showTimeCheckboxMore) {
             showDateCheckboxMore.checked = this.timeDisplayManager.showDate;
@@ -1029,7 +1046,8 @@ class DrawingBoard {
             document.getElementById('time-display-area'),
             document.getElementById('feature-area'),
             document.getElementById('toolbar'),
-            document.getElementById('pagination-controls')
+            document.getElementById('pagination-controls'),
+            document.getElementById('timer-display')
         ];
         
         const windowWidth = window.innerWidth;

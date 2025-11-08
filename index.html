@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/modules/time-display.css">
     <link rel="stylesheet" href="css/modules/feature-area.css">
     <link rel="stylesheet" href="css/modules/export.css">
+    <link rel="stylesheet" href="css/modules/timer.css">
 </head>
 <body>
     <!-- Zoom controls in top right corner -->
@@ -241,6 +242,15 @@
                         <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
                     <span>时间</span>
+                </button>
+                <button id="timer-feature-btn" class="feature-btn" title="计时器">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="13" r="8"></circle>
+                        <path d="M12 9v4l2 2"></path>
+                        <path d="M9 2h6"></path>
+                        <path d="M12 2v2"></path>
+                    </svg>
+                    <span>计时</span>
                 </button>
             </div>
         </div>
@@ -865,6 +875,158 @@
         </div>
     </div>
 
+    <!-- Timer Settings Modal -->
+    <div id="timer-settings-modal">
+        <div class="timer-modal-content">
+            <div class="timer-modal-header">
+                <h2>计时器设置</h2>
+                <button id="timer-settings-close-btn" class="modal-close-btn" title="关闭">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="timer-modal-body">
+                <!-- Timer Mode Selection -->
+                <div class="timer-mode-group">
+                    <label>选择模式</label>
+                    <div class="timer-mode-buttons">
+                        <button class="timer-mode-btn active" data-mode="stopwatch">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="13" r="8"></circle>
+                                <path d="M12 9v4l2 2"></path>
+                                <path d="M9 2h6"></path>
+                            </svg>
+                            正计时
+                        </button>
+                        <button class="timer-mode-btn" data-mode="countdown">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="13" r="8"></circle>
+                                <path d="M12 9v4l2 2"></path>
+                                <path d="M9 2h6"></path>
+                                <path d="M16 6l-4 4"></path>
+                            </svg>
+                            倒计时
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Time Input -->
+                <div class="timer-input-group">
+                    <label>设置时间</label>
+                    <div class="time-inputs">
+                        <div class="time-input-field">
+                            <label>小时</label>
+                            <input type="number" id="timer-hours" min="0" max="23" value="0">
+                        </div>
+                        <div class="time-input-field">
+                            <label>分钟</label>
+                            <input type="number" id="timer-minutes" min="0" max="59" value="0">
+                        </div>
+                        <div class="time-input-field">
+                            <label>秒</label>
+                            <input type="number" id="timer-seconds" min="0" max="59" value="0">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sound Settings (only for countdown) -->
+                <div class="timer-sound-group disabled">
+                    <div class="sound-checkbox">
+                        <input type="checkbox" id="timer-sound-checkbox">
+                        <label for="timer-sound-checkbox">倒计时结束时播放提示音</label>
+                    </div>
+                    
+                    <div class="sound-presets">
+                        <button class="sound-preset-btn active" data-sound="class-bell">
+                            下课铃
+                            <button class="sound-preview-btn" title="试听">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </button>
+                        </button>
+                        <button class="sound-preset-btn" data-sound="exam-end">
+                            考试结束
+                            <button class="sound-preview-btn" title="试听">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </button>
+                        </button>
+                        <button class="sound-preset-btn" data-sound="gentle-alarm">
+                            柔和提醒
+                            <button class="sound-preview-btn" title="试听">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </button>
+                        </button>
+                        <button class="sound-preset-btn" data-sound="digital-beep">
+                            数字提示音
+                            <button class="sound-preview-btn" title="试听">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                            </button>
+                        </button>
+                    </div>
+                    
+                    <div class="sound-upload-group">
+                        <label for="timer-sound-upload" class="sound-upload-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            上传自定义音频
+                        </label>
+                        <input type="file" id="timer-sound-upload" accept="audio/*" style="display: none;">
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="timer-action-buttons">
+                    <button class="timer-action-btn timer-cancel-btn" id="timer-cancel-btn">取消</button>
+                    <button class="timer-action-btn timer-start-btn" id="timer-start-btn">开始</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timer Display Widget -->
+    <div id="timer-display">
+        <div class="timer-display-header">
+            <div class="timer-display-mode">正计时</div>
+            <button class="timer-close-btn" id="timer-display-close-btn" title="关闭">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="timer-display-time">00:00:00</div>
+        <div class="timer-display-controls">
+            <button class="timer-control-btn" id="timer-play-pause-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="6" y="4" width="4" height="16"></rect>
+                    <rect x="14" y="4" width="4" height="16"></rect>
+                </svg>
+                暂停
+            </button>
+            <button class="timer-control-btn" id="timer-reset-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                    <path d="M21 3v5h-5"></path>
+                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                    <path d="M3 21v-5h5"></path>
+                </svg>
+                重置
+            </button>
+        </div>
+    </div>
+
     <script src="js/drawing.js"></script>
     <script src="js/history.js"></script>
     <script src="js/background.js"></script>
@@ -873,6 +1035,7 @@
     <script src="js/collapsible.js"></script>
     <script src="js/time-display.js"></script>
     <script src="js/modules/time-display-controls.js"></script>
+    <script src="js/modules/timer.js"></script>
     <script src="js/settings.js"></script>
     <script src="js/announcement.js"></script>
     <script src="js/export.js"></script>

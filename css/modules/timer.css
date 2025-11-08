@@ -1,0 +1,445 @@
+/* Timer Module Styles */
+
+/* Timer Settings Modal */
+#timer-settings-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10001;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+#timer-settings-modal.show {
+    display: flex;
+}
+
+.timer-modal-content {
+    background-color: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.timer-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 28px 16px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.timer-modal-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.timer-modal-body {
+    padding: 24px 28px;
+}
+
+/* Timer Mode Selection */
+.timer-mode-group {
+    margin-bottom: 24px;
+}
+
+.timer-mode-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.timer-mode-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.timer-mode-btn {
+    padding: 16px;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.timer-mode-btn:hover {
+    background-color: #f0f0f0;
+    border-color: var(--theme-color);
+}
+
+.timer-mode-btn.active {
+    background-color: var(--theme-color);
+    color: #ffffff;
+    border-color: var(--theme-color);
+}
+
+.timer-mode-btn.active svg {
+    stroke: #ffffff;
+}
+
+/* Time Input Group */
+.timer-input-group {
+    margin-bottom: 24px;
+}
+
+.timer-input-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.time-inputs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.time-input-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.time-input-field label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #666;
+    margin: 0;
+}
+
+.time-input-field input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    color: #333;
+}
+
+.time-input-field input:focus {
+    outline: none;
+    border-color: var(--theme-color);
+}
+
+/* Sound Settings */
+.timer-sound-group {
+    margin-bottom: 24px;
+}
+
+.timer-sound-group.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.sound-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.sound-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.sound-checkbox label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+    margin: 0;
+}
+
+.sound-presets {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.sound-preset-btn {
+    padding: 12px 8px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 13px;
+    font-weight: 500;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    position: relative;
+}
+
+.sound-preset-btn:hover {
+    background-color: #f0f0f0;
+    border-color: var(--theme-color);
+}
+
+.sound-preset-btn.active {
+    background-color: var(--theme-color);
+    color: #ffffff;
+    border-color: var(--theme-color);
+}
+
+.sound-preset-btn.active svg {
+    stroke: #ffffff;
+}
+
+.sound-preview-btn {
+    padding: 6px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.sound-preview-btn:hover {
+    transform: scale(1.1);
+}
+
+.sound-preview-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.sound-upload-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.sound-upload-btn {
+    flex: 1;
+    padding: 12px;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    background-color: #f8f8f8;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 13px;
+    font-weight: 500;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.sound-upload-btn:hover {
+    background-color: #f0f0f0;
+    border-color: var(--theme-color);
+}
+
+.sound-upload-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Timer Action Buttons */
+.timer-action-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e5e5;
+}
+
+.timer-action-btn {
+    flex: 1;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.timer-cancel-btn {
+    background-color: #f0f0f0;
+    color: #666;
+}
+
+.timer-cancel-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.timer-start-btn {
+    background-color: var(--theme-color);
+    color: #ffffff;
+}
+
+.timer-start-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+}
+
+/* Timer Display Widget */
+#timer-display {
+    position: fixed;
+    top: 180px;
+    right: 20px;
+    padding: 16px 24px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    z-index: 950;
+    cursor: move;
+    user-select: none;
+    min-width: 200px;
+    display: none;
+}
+
+#timer-display.show {
+    display: block;
+}
+
+#timer-display.dragging {
+    cursor: grabbing;
+}
+
+.timer-display-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 12px;
+}
+
+.timer-display-mode {
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+}
+
+.timer-close-btn {
+    padding: 4px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    transition: all 0.2s ease;
+}
+
+.timer-close-btn:hover {
+    color: #ff3b30;
+    transform: scale(1.1);
+}
+
+.timer-close-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.timer-display-time {
+    font-size: 32px;
+    font-weight: 700;
+    color: #333;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.5px;
+}
+
+.timer-display-controls {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.timer-control-btn {
+    flex: 1;
+    padding: 8px 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.timer-control-btn:hover {
+    background-color: #f0f0f0;
+    border-color: var(--theme-color);
+}
+
+.timer-control-btn.active {
+    background-color: var(--theme-color);
+    color: #ffffff;
+    border-color: var(--theme-color);
+}
+
+.timer-control-btn.active svg {
+    stroke: #ffffff;
+}
+
+.timer-control-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Timer running state */
+.timer-display-time.running {
+    color: var(--theme-color);
+}
+
+.timer-display-time.paused {
+    color: #ff9500;
+}
+
+.timer-display-time.finished {
+    color: #ff3b30;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
