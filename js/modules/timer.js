@@ -36,6 +36,10 @@ class TimerInstance {
         
         // UI elements
         this.displayElement = null;
+        this.fullscreenModal = null;
+        this.fullscreenContent = null;
+        this.fullscreenFontSlider = null;
+        this.fullscreenUpdateInterval = null;
         this.isFullscreen = false;
         this.fontSize = 32;
         this.fullscreenFontSizePercent = 15; // percentage of viewport for fullscreen
@@ -48,12 +52,51 @@ class TimerInstance {
         this.isMinimal = false;
         
         this.createDisplayElement();
+        this.setupFullscreenModal();
         this.startTimerLoop();
         this.setupFullscreenChangeListener();
     }
     
     setupFullscreenChangeListener() {
         // No browser fullscreen API listeners needed - using CSS fullscreen only
+    }
+    
+    setupFullscreenModal() {
+        // Get or create fullscreen modal elements
+        this.fullscreenModal = document.getElementById('timer-fullscreen-modal');
+        this.fullscreenContent = document.getElementById('timer-fullscreen-content');
+        this.fullscreenFontSlider = document.getElementById('timer-fullscreen-font-slider');
+        
+        if (!this.fullscreenModal || !this.fullscreenContent || !this.fullscreenFontSlider) {
+            console.warn('Timer fullscreen modal elements not found');
+            return;
+        }
+        
+        // Set initial slider value
+        this.fullscreenFontSlider.value = this.fullscreenFontSizePercent;
+        
+        // Setup close button
+        const closeBtn = document.getElementById('timer-fullscreen-close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                this.exitFullscreen();
+            });
+        }
+        
+        // Setup font size slider
+        this.fullscreenFontSlider.addEventListener('input', (e) => {
+            this.fullscreenFontSizePercent = parseFloat(e.target.value);
+            if (this.isFullscreen) {
+                this.updateFullscreenDisplay();
+            }
+        });
+        
+        // ESC key to exit fullscreen
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.isFullscreen) {
+                this.exitFullscreen();
+            }
+        });
     }
 
     createDisplayElement() {
@@ -477,31 +520,74 @@ class TimerInstance {
     }
     
     enterFullscreen() {
-        this.isFullscreen = true;
-        
-        // Apply fullscreen font size based on saved percentage (10-85%)
-        // Constrain the value to be within the safe range
-        const constrainedPercent = Math.max(10, Math.min(85, this.fullscreenFontSizePercent));
-        const timeDisplay = this.displayElement.querySelector('.timer-display-time');
-        if (timeDisplay) {
-            timeDisplay.style.fontSize = `${constrainedPercent}vmin`;
+        if (!this.fullscreenModal || !this.fullscreenContent) {
+            console.warn('Timer fullscreen modal not available');
+            return;
         }
         
-        // Use CSS fullscreen only (no browser fullscreen API)
-        this.displayElement.classList.add('fullscreen');
+        this.isFullscreen = true;
+        this.fullscreenModal.classList.add('show');
+        this.startFullscreenUpdating();
     }
     
     exitFullscreen() {
-        this.isFullscreen = false;
-        
-        // Restore normal font size
-        const timeDisplay = this.displayElement.querySelector('.timer-display-time');
-        if (timeDisplay) {
-            timeDisplay.style.fontSize = `${this.fontSize}px`;
+        if (!this.fullscreenModal) {
+            return;
         }
         
-        // Remove CSS fullscreen class
-        this.displayElement.classList.remove('fullscreen');
+        this.isFullscreen = false;
+        this.fullscreenModal.classList.remove('show');
+        this.stopFullscreenUpdating();
+    }
+    
+    startFullscreenUpdating() {
+        // Update immediately
+        this.updateFullscreenDisplay();
+        
+        // Update every 100ms for smooth countdown
+        this.fullscreenUpdateInterval = setInterval(() => {
+            this.updateFullscreenDisplay();
+        }, 100);
+    }
+    
+    stopFullscreenUpdating() {
+        if (this.fullscreenUpdateInterval) {
+            clearInterval(this.fullscreenUpdateInterval);
+            this.fullscreenUpdateInterval = null;
+        }
+    }
+    
+    updateFullscreenDisplay() {
+        if (!this.fullscreenContent) {
+            return;
+        }
+        
+        // Get current time to display
+        let milliseconds;
+        if (this.mode === 'stopwatch') {
+            milliseconds = this.elapsedTime;
+        } else {
+            milliseconds = this.remainingTime;
+        }
+        
+        // Format time
+        const totalSeconds = Math.floor(milliseconds / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        const timeString = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        
+        // Calculate font size based on slider value
+        const vmin = Math.min(window.innerWidth, window.innerHeight);
+        const timeFontSize = Math.floor(vmin * (this.fullscreenFontSizePercent / 100));
+        const modeFontSize = Math.floor(vmin * 0.02);
+        
+        // Update content
+        const modeText = this.mode === 'stopwatch' ? '正计时' : '倒计时';
+        this.fullscreenContent.innerHTML = `
+            <div class="timer-fullscreen-mode" style="font-size: ${modeFontSize}px;">${modeText}</div>
+            <div class="timer-fullscreen-time" style="font-size: ${timeFontSize}px;">${timeString}</div>
+        `;
     }
     
     updateFontSize(size) {
@@ -513,6 +599,11 @@ class TimerInstance {
     }
     
     closeTimer() {
+        // Exit fullscreen if active
+        if (this.isFullscreen) {
+            this.exitFullscreen();
+        }
+        
         // Stop the timer
         if (this.intervalId) {
             clearInterval(this.intervalId);

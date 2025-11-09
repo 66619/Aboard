@@ -890,6 +890,21 @@
         </div>
     </div>
 
+    <!-- Fullscreen Timer Display Modal -->
+    <div id="timer-fullscreen-modal" class="timer-fullscreen-modal">
+        <button id="timer-fullscreen-close-btn" class="timer-fullscreen-close-btn" title="关闭全屏">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        <div id="timer-fullscreen-content"></div>
+        <div class="timer-fullscreen-controls">
+            <div class="timer-fullscreen-slider-label">字体大小调节 (10%-85%)</div>
+            <input type="range" id="timer-fullscreen-font-slider" class="timer-fullscreen-slider" min="10" max="85" value="15" step="0.5">
+        </div>
+    </div>
+
     <!-- Timer Settings Modal -->
     <div id="timer-settings-modal">
         <div class="timer-modal-content">

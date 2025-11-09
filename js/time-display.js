@@ -12,7 +12,9 @@ class TimeDisplayManager {
         this.isFullscreen = false;
         
         // Load settings from localStorage
-        this.enabled = localStorage.getItem('timeDisplayEnabled') === 'true';
+        // Default to true if no value is stored (first time load)
+        const storedEnabled = localStorage.getItem('timeDisplayEnabled');
+        this.enabled = storedEnabled === null ? true : storedEnabled === 'true';
         this.timeFormat = localStorage.getItem('timeDisplayTimeFormat') || '24h';
         this.dateFormat = localStorage.getItem('timeDisplayDateFormat') || 'yyyy-mm-dd';
         this.color = localStorage.getItem('timeDisplayColor') || '#000000';
