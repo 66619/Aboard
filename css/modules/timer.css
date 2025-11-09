@@ -156,6 +156,24 @@
     border-color: var(--theme-color);
 }
 
+.timer-title-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #333;
+}
+
+.timer-title-input:focus {
+    outline: none;
+    border-color: var(--theme-color);
+}
+
+.timer-title-input::placeholder {
+    color: #999;
+}
+
 /* Sound Settings */
 .timer-sound-group {
     margin-bottom: 20px;
@@ -421,6 +439,10 @@
     cursor: pointer;
 }
 
+.timer-display-widget.minimal .timer-display-title {
+    display: none;
+}
+
 .timer-display-widget.minimal .timer-display-time {
     margin: 0;
 }
@@ -543,6 +565,16 @@
 .timer-close-btn svg {
     width: 18px;
     height: 18px;
+}
+
+.timer-display-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    text-align: center;
+    margin: 8px 12px 4px;
+    word-wrap: break-word;
+    max-width: 100%;
 }
 
 .timer-display-time {
@@ -759,6 +791,13 @@
     font-size: 2vmin;
     margin-bottom: 2vmin;
     opacity: 0.7;
+}
+
+#timer-fullscreen-content .timer-fullscreen-title {
+    font-size: 3vmin;
+    margin-bottom: 1.5vmin;
+    opacity: 0.85;
+    font-weight: 600;
 }
 
 #timer-fullscreen-content .timer-fullscreen-time {

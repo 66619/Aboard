@@ -3,10 +3,11 @@
 
 // Single Timer Instance Class
 class TimerInstance {
-    constructor(id, mode, duration, playSound, selectedSound, customSoundUrl, loopSound, loopCount, manager) {
+    constructor(id, mode, duration, playSound, selectedSound, customSoundUrl, loopSound, loopCount, manager, title = '') {
         this.id = id;
         this.mode = mode; // 'stopwatch' or 'countdown'
         this.manager = manager;
+        this.title = title; // Timer title
         
         // Timer state
         this.isRunning = false;
@@ -104,6 +105,8 @@ class TimerInstance {
         display.className = 'timer-display-widget';
         display.dataset.timerId = this.id;
         
+        const titleHTML = this.title ? `<div class="timer-display-title">${this.title}</div>` : '';
+        
         display.innerHTML = `
             <div class="timer-display-header">
                 <div class="timer-display-mode">${this.mode === 'stopwatch' ? '正计时' : '倒计时'}</div>
@@ -114,6 +117,7 @@ class TimerInstance {
                     </svg>
                 </button>
             </div>
+            ${titleHTML}
             <div class="timer-display-time">00:00:00</div>
             <div class="timer-display-controls">
                 <button class="timer-control-btn timer-play-pause-btn">
@@ -581,11 +585,15 @@ class TimerInstance {
         const vmin = Math.min(window.innerWidth, window.innerHeight);
         const timeFontSize = Math.floor(vmin * (this.fullscreenFontSizePercent / 100));
         const modeFontSize = Math.floor(vmin * 0.02);
+        const titleFontSize = Math.floor(vmin * 0.03);
         
-        // Update content
+        // Update content with title if available
         const modeText = this.mode === 'stopwatch' ? '正计时' : '倒计时';
+        const titleHTML = this.title ? `<div class="timer-fullscreen-title" style="font-size: ${titleFontSize}px;">${this.title}</div>` : '';
+        
         this.fullscreenContent.innerHTML = `
             <div class="timer-fullscreen-mode" style="font-size: ${modeFontSize}px;">${modeText}</div>
+            ${titleHTML}
             <div class="timer-fullscreen-time" style="font-size: ${timeFontSize}px;">${timeString}</div>
         `;
     }
@@ -633,7 +641,7 @@ class TimerInstance {
         this.manager.removeTimer(this.id);
     }
     
-    updateSettings(duration, playSound, selectedSound, customSoundUrl, loopSound, loopCount) {
+    updateSettings(duration, playSound, selectedSound, customSoundUrl, loopSound, loopCount, title = '') {
         this.countdownDuration = duration;
         
         if (this.mode === 'stopwatch') {
@@ -647,6 +655,27 @@ class TimerInstance {
         this.customSoundUrl = customSoundUrl;
         this.loopSound = loopSound;
         this.loopCount = loopCount;
+        this.title = title;
+        
+        // Update title in display if changed
+        const oldTitleElement = this.displayElement.querySelector('.timer-display-title');
+        if (this.title) {
+            if (oldTitleElement) {
+                oldTitleElement.textContent = this.title;
+            } else {
+                // Insert title after header
+                const header = this.displayElement.querySelector('.timer-display-header');
+                const titleElement = document.createElement('div');
+                titleElement.className = 'timer-display-title';
+                titleElement.textContent = this.title;
+                header.insertAdjacentElement('afterend', titleElement);
+            }
+        } else {
+            // Remove title if it was cleared
+            if (oldTitleElement) {
+                oldTitleElement.remove();
+            }
+        }
         
         // Reset timer with new settings
         this.resetTimer();
@@ -1087,6 +1116,9 @@ class TimerManager {
         const minutes = parseInt(document.getElementById('timer-minutes').value) || 0;
         const seconds = parseInt(document.getElementById('timer-seconds').value) || 0;
         
+        // Get title
+        const title = document.getElementById('timer-title-input').value.trim();
+        
         // Get mode
         const activeMode = document.querySelector('.timer-mode-btn.active');
         const mode = activeMode ? activeMode.dataset.mode : 'stopwatch';
@@ -1116,12 +1148,12 @@ class TimerManager {
         
         if (this.adjustingTimer) {
             // Update existing timer
-            this.adjustingTimer.updateSettings(duration, playSound, selectedSound, customSoundUrl, loopSound, loopCount);
+            this.adjustingTimer.updateSettings(duration, playSound, selectedSound, customSoundUrl, loopSound, loopCount, title);
             this.adjustingTimer = null;
         } else {
             // Create new timer
             const id = this.nextTimerId++;
-            const timer = new TimerInstance(id, mode, duration, playSound, selectedSound, customSoundUrl, loopSound, loopCount, this);
+            const timer = new TimerInstance(id, mode, duration, playSound, selectedSound, customSoundUrl, loopSound, loopCount, this, title);
             this.timers.set(id, timer);
         }
         
