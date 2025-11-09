@@ -29,10 +29,15 @@ class ExportManager {
                         <div class="export-options">
                             <div class="export-group">
                                 <label>导出范围</label>
-                                <div class="button-size-options button-size-options-2">
+                                <div class="button-size-options button-size-options-3">
                                     <button class="export-scope-btn active" data-scope="current">当前页</button>
                                     <button class="export-scope-btn" data-scope="all">全部页面</button>
+                                    <button class="export-scope-btn" data-scope="specific">指定页面</button>
                                 </div>
+                            </div>
+                            <div class="export-group" id="page-selection-group" style="display: none;">
+                                <label>选择要导出的页面</label>
+                                <div id="page-selection-buttons" class="page-selection-buttons"></div>
                             </div>
                             <div class="export-group">
                                 <label>图片格式</label>
@@ -45,9 +50,10 @@ class ExportManager {
                                 <label>图片质量 <span id="export-quality-value">90</span>%</label>
                                 <input type="range" id="export-quality-slider" min="1" max="100" value="90" class="slider">
                             </div>
-                            <div class="export-group">
-                                <label>文件名</label>
+                            <div class="export-group" id="filename-group">
+                                <label id="filename-label">文件名</label>
                                 <input type="text" id="export-filename" class="export-filename-input" value="aboard-export" placeholder="输入文件名">
+                                <p class="export-hint" id="export-filename-hint" style="display: none;">导出多个页面时，将自动在文件名后添加页码（例如：文件名-1, 文件名-2）</p>
                             </div>
                             <div class="export-actions">
                                 <button id="export-cancel-btn" class="button-secondary">取消</button>
@@ -76,6 +82,9 @@ class ExportManager {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.export-scope-btn').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
+                
+                const scope = e.target.dataset.scope;
+                this.updateUIForScope(scope);
             });
         });
         
@@ -125,11 +134,76 @@ class ExportManager {
         });
     }
     
+    updateUIForScope(scope) {
+        const pageSelectionGroup = document.getElementById('page-selection-group');
+        const filenameHint = document.getElementById('export-filename-hint');
+        const filenameLabel = document.getElementById('filename-label');
+        
+        if (scope === 'specific') {
+            pageSelectionGroup.style.display = 'block';
+            filenameHint.style.display = 'block';
+            filenameLabel.textContent = '文件名前缀';
+            this.generatePageSelectionButtons();
+        } else if (scope === 'all') {
+            pageSelectionGroup.style.display = 'none';
+            filenameHint.style.display = 'block';
+            filenameLabel.textContent = '文件名前缀';
+        } else {
+            pageSelectionGroup.style.display = 'none';
+            filenameHint.style.display = 'none';
+            filenameLabel.textContent = '文件名';
+        }
+    }
+    
+    generatePageSelectionButtons() {
+        const container = document.getElementById('page-selection-buttons');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        if (!this.drawingBoard || !this.drawingBoard.pages) {
+            container.innerHTML = '<p class="export-hint">当前为无限画布模式，请在设置中启用分页模式以使用此功能。</p>';
+            return;
+        }
+        
+        const pageCount = this.drawingBoard.pages.length;
+        if (pageCount === 0) {
+            container.innerHTML = '<p class="export-hint">没有可导出的页面。</p>';
+            return;
+        }
+        
+        // Create a checkbox button for each page
+        for (let i = 0; i < pageCount; i++) {
+            const pageNum = i + 1;
+            const button = document.createElement('button');
+            button.className = 'page-selection-btn';
+            button.dataset.pageNum = pageNum;
+            button.textContent = pageNum;
+            
+            // Select current page by default
+            if (this.drawingBoard.currentPage === pageNum) {
+                button.classList.add('selected');
+            }
+            
+            button.addEventListener('click', () => {
+                button.classList.toggle('selected');
+            });
+            
+            container.appendChild(button);
+        }
+    }
+    
     showModal() {
         // Set default filename with timestamp (format: YYYY-MM-DDTHH-MM-SS)
         const now = new Date();
         const timestamp = now.toISOString().slice(0, 19).replace(/:/g, '-');
         document.getElementById('export-filename').value = `aboard-${timestamp}`;
+        
+        // Reset to current page scope
+        document.querySelectorAll('.export-scope-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('.export-scope-btn[data-scope="current"]').classList.add('active');
+        this.updateUIForScope('current');
+        
         this.exportModal.classList.add('show');
     }
     
@@ -149,6 +223,9 @@ class ExportManager {
         } else if (scope === 'all' && this.drawingBoard) {
             // Export all pages
             this.exportAllPages(filename, format, quality);
+        } else if (scope === 'specific' && this.drawingBoard) {
+            // Export specific pages
+            this.exportSpecificPages(filename, format, quality);
         } else {
             // Fallback to current page if drawingBoard is not available
             this.exportSinglePage(filename, format, quality);
@@ -194,31 +271,91 @@ class ExportManager {
         
         // Save current state
         const currentPage = this.drawingBoard.currentPage;
-        const currentCanvasData = this.canvas.toDataURL();
         
-        // Export each page
-        for (let i = 0; i < this.drawingBoard.pages.length; i++) {
-            const pageNum = i + 1;
+        // Export each page sequentially
+        const exportPage = (pageIndex) => {
+            if (pageIndex >= this.drawingBoard.pages.length) {
+                // All pages exported, restore original page
+                if (currentPage !== this.drawingBoard.currentPage) {
+                    this.drawingBoard.switchToPage(currentPage);
+                }
+                return;
+            }
+            
+            const pageNum = pageIndex + 1;
             
             // Switch to page
             if (this.drawingBoard.currentPage !== pageNum) {
                 this.drawingBoard.switchToPage(pageNum);
             }
             
-            // Give a moment for the page to render
+            // Wait a bit for the page to render
             setTimeout(() => {
-                const filename = this.drawingBoard.pages.length > 1 
-                    ? `${baseFilename}-page${pageNum}` 
-                    : baseFilename;
+                const filename = `${baseFilename}-${pageNum}`;
                 this.exportSinglePage(filename, format, quality);
                 
-                // If last page, restore original page
-                if (i === this.drawingBoard.pages.length - 1 && currentPage !== pageNum) {
-                    setTimeout(() => {
-                        this.drawingBoard.switchToPage(currentPage);
-                    }, 100);
-                }
-            }, i * 200);
+                // Export next page
+                setTimeout(() => {
+                    exportPage(pageIndex + 1);
+                }, 100);
+            }, 100);
+        };
+        
+        // Start exporting from the first page
+        exportPage(0);
+    }
+    
+    exportSpecificPages(baseFilename, format, quality) {
+        if (!this.drawingBoard || !this.drawingBoard.pages || this.drawingBoard.pages.length === 0) {
+            // No pages to export, just export current
+            this.exportSinglePage(baseFilename, format, quality);
+            return;
         }
+        
+        // Get selected page buttons
+        const selectedButtons = document.querySelectorAll('.page-selection-btn.selected');
+        if (selectedButtons.length === 0) {
+            alert('请至少选择一个页面进行导出');
+            return;
+        }
+        
+        // Get selected page numbers
+        const selectedPages = Array.from(selectedButtons).map(btn => parseInt(btn.dataset.pageNum));
+        selectedPages.sort((a, b) => a - b);
+        
+        // Save current state
+        const currentPage = this.drawingBoard.currentPage;
+        
+        // Export selected pages sequentially
+        const exportPage = (pageIndex) => {
+            if (pageIndex >= selectedPages.length) {
+                // All selected pages exported, restore original page
+                if (currentPage !== this.drawingBoard.currentPage) {
+                    this.drawingBoard.switchToPage(currentPage);
+                }
+                return;
+            }
+            
+            const pageNum = selectedPages[pageIndex];
+            
+            // Switch to page
+            if (this.drawingBoard.currentPage !== pageNum) {
+                this.drawingBoard.switchToPage(pageNum);
+            }
+            
+            // Wait a bit for the page to render
+            setTimeout(() => {
+                const filename = `${baseFilename}-${pageNum}`;
+                this.exportSinglePage(filename, format, quality);
+                
+                // Export next page
+                setTimeout(() => {
+                    exportPage(pageIndex + 1);
+                }, 100);
+            }, 100);
+        };
+        
+        // Start exporting from the first selected page
+        exportPage(0);
     }
 }
