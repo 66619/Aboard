@@ -71,6 +71,14 @@ class DrawingBoard {
         this.backgroundManager.drawBackground();
         this.updateUI();
         this.historyManager.saveState();
+        
+        // Initialize pages array for pagination mode
+        if (!this.settingsManager.infiniteCanvas && this.pages.length === 0) {
+            this.pages.push(this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height));
+            this.currentPage = 1;
+            this.updatePaginationUI();
+        }
+        
         this.initializeCanvasView(); // Initialize canvas view (70% scale, centered)
         this.updateZoomUI();
         this.applyZoom(false); // Don't update config-area scale on refresh
