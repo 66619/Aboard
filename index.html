@@ -6,6 +6,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Aboard - 简约白板</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modules/time-display.css">
+    <link rel="stylesheet" href="css/modules/feature-area.css">
+    <link rel="stylesheet" href="css/modules/export.css">
+    <link rel="stylesheet" href="css/modules/timer.css">
 </head>
 <body>
     <!-- Zoom controls in top right corner -->
@@ -34,7 +38,7 @@
             </svg>
         </button>
         <button id="fullscreen-btn" class="history-btn" title="全屏 (F11)">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
             </svg>
         </button>
@@ -103,37 +107,7 @@
             </div>
         </div>
 
-        <!-- Selection configuration -->
-        <div id="select-config" class="config-panel">
-            <div class="config-group">
-                <label>选择操作</label>
-                <p class="settings-hint">点击画布上的图片或文字进行选择</p>
-                <div class="button-size-options" style="grid-template-columns: 1fr 1fr;">
-                    <button id="select-copy-btn" class="button-secondary" disabled>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 5px;">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                        </svg>
-                        复制
-                    </button>
-                    <button id="select-delete-btn" class="button-secondary" disabled>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 5px;">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
-                        </svg>
-                        删除
-                    </button>
-                </div>
-            </div>
-        </div>
 
-        <!-- Text configuration -->
-        <div id="text-config" class="config-panel">
-            <div class="config-group">
-                <label>文字工具</label>
-                <p class="settings-hint">点击画布插入文字</p>
-            </div>
-        </div>
 
         <!-- Eraser configuration -->
         <div id="eraser-config" class="config-panel">
@@ -216,6 +190,68 @@
                 </div>
             </div>
         </div>
+
+        <!-- More configuration -->
+        <div id="more-config" class="config-panel">
+            <div class="config-group">
+                <label>更多功能</label>
+                <p class="settings-hint" style="font-size: 12px; color: #666; margin-top: -4px;">其他工具和配置项</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Time Display Area (independent, draggable, with edge snapping) -->
+    <div id="time-display-area">
+        <!-- Close button for time display area -->
+        <button id="time-display-area-close-btn" class="config-close-btn" title="关闭">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        
+        <div class="config-group">
+            <label>时间显示选项</label>
+            <label class="checkbox-label">
+                <input type="checkbox" id="show-date-checkbox-area">
+                <span>显示日期</span>
+            </label>
+            <label class="checkbox-label" style="margin-top: 8px;">
+                <input type="checkbox" id="show-time-checkbox-area">
+                <span>显示时间</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Feature buttons area (independent, draggable, with edge snapping) -->
+    <div id="feature-area" class="feature-area">
+        <!-- Close button for feature panel -->
+        <button id="feature-close-btn" class="config-close-btn" title="关闭">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        
+        <div class="config-group">
+            <label>小功能</label>
+            <div class="more-features-grid">
+                <button id="time-display-feature-btn" class="feature-btn" title="时间显示">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span>时间</span>
+                </button>
+                <button id="timer-feature-btn" class="feature-btn" title="计时器">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="13" r="8"></circle>
+                        <path d="M12 9v4l2 2"></path>
+                        <path d="M9 2h6"></path>
+                        <path d="M12 2v2"></path>
+                    </svg>
+                    <span>计时</span>
+                </button>
             </div>
         </div>
     </div>
@@ -298,6 +334,14 @@
                         </svg>
                         <span>公告</span>
                     </button>
+                    <button class="settings-tab-icon" data-tab="more" title="更多">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="1"></circle>
+                            <circle cx="12" cy="5" r="1"></circle>
+                            <circle cx="12" cy="19" r="1"></circle>
+                        </svg>
+                        <span>更多</span>
+                    </button>
                 </div>
                 
                 <!-- Settings content area -->
@@ -305,6 +349,22 @@
                     <!-- General settings -->
                     <div id="general-settings" class="settings-tab-content active">
                         <h3>通用设置</h3>
+                        <div class="settings-group">
+                            <label>全局字体</label>
+                            <p class="settings-hint">选择应用程序使用的字体</p>
+                            <select id="global-font-select" class="format-select">
+                                <option value="system">系统默认</option>
+                                <option value="serif">宋体（衬线体）</option>
+                                <option value="sans-serif">黑体（无衬线体）</option>
+                                <option value="monospace">等宽字体</option>
+                                <option value="cursive">手写体</option>
+                                <option value="Microsoft YaHei">微软雅黑</option>
+                                <option value="SimSun">宋体</option>
+                                <option value="SimHei">黑体</option>
+                                <option value="KaiTi">楷体</option>
+                                <option value="FangSong">仿宋</option>
+                            </select>
+                        </div>
                         <div class="settings-group">
                             <label class="checkbox-label">
                                 <input type="checkbox" id="edge-snap-checkbox" checked>
@@ -529,7 +589,7 @@
                             
                             <div class="about-section">
                                 <h4>版本</h4>
-                                <p>v2.0.0</p>
+                                <p>v2.1.0</p>
                             </div>
                         </div>
                     </div>
@@ -539,6 +599,152 @@
                         <h3>公告</h3>
                         <div class="announcement-info">
                             <div id="settings-announcement-content" class="settings-announcement-content"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- More settings -->
+                    <div id="more-settings" class="settings-tab-content">
+                        <h3>更多设置</h3>
+                        <div class="settings-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="show-time-display-checkbox">
+                                <span>显示时间和日期</span>
+                            </label>
+                            <p class="settings-hint">在右上角显示当前时间和日期</p>
+                        </div>
+                        <div class="settings-group" id="time-display-settings" style="display: none;">
+                            <label>显示选项</label>
+                            <div class="button-size-options" style="grid-template-columns: 1fr 1fr 1fr;">
+                                <button class="display-option-btn active" data-display-type="both">日期和时间</button>
+                                <button class="display-option-btn" data-display-type="date-only">仅日期</button>
+                                <button class="display-option-btn" data-display-type="time-only">仅时间</button>
+                            </div>
+                        </div>
+                        <div class="settings-group" id="timezone-settings" style="display: none;">
+                            <label>时区</label>
+                            <p class="settings-hint">选择要显示的时区</p>
+                            <select id="timezone-select" class="format-select">
+                                <option value="Asia/Shanghai">中国 (UTC+8)</option>
+                                <option value="America/New_York">纽约 (UTC-5/-4)</option>
+                                <option value="America/Los_Angeles">洛杉矶 (UTC-8/-7)</option>
+                                <option value="America/Chicago">芝加哥 (UTC-6/-5)</option>
+                                <option value="Europe/London">伦敦 (UTC+0/+1)</option>
+                                <option value="Europe/Paris">巴黎 (UTC+1/+2)</option>
+                                <option value="Europe/Berlin">柏林 (UTC+1/+2)</option>
+                                <option value="Asia/Tokyo">东京 (UTC+9)</option>
+                                <option value="Asia/Seoul">首尔 (UTC+9)</option>
+                                <option value="Asia/Hong_Kong">香港 (UTC+8)</option>
+                                <option value="Asia/Singapore">新加坡 (UTC+8)</option>
+                                <option value="Asia/Dubai">迪拜 (UTC+4)</option>
+                                <option value="Australia/Sydney">悉尼 (UTC+10/+11)</option>
+                                <option value="Pacific/Auckland">奥克兰 (UTC+12/+13)</option>
+                                <option value="UTC">UTC (协调世界时)</option>
+                            </select>
+                        </div>
+                        <div class="settings-group" id="time-format-settings" style="display: none;">
+                            <label>时间格式</label>
+                            <p class="settings-hint">选择时间的显示格式</p>
+                            <select id="time-format-select" class="format-select">
+                                <option value="12h">12小时制 (上午/下午)</option>
+                                <option value="24h">24小时制</option>
+                            </select>
+                        </div>
+                        <div class="settings-group" id="date-format-settings" style="display: none;">
+                            <label>日期格式</label>
+                            <p class="settings-hint">选择日期的显示格式</p>
+                            <select id="date-format-select" class="format-select">
+                                <option value="yyyy-mm-dd">年-月-日 (2024-01-01)</option>
+                                <option value="mm-dd-yyyy">月-日-年 (01-01-2024)</option>
+                                <option value="dd-mm-yyyy">日-月-年 (01-01-2024)</option>
+                                <option value="chinese">中文 (2024年1月1日)</option>
+                            </select>
+                        </div>
+                        <div class="settings-group" id="time-color-settings" style="display: none;">
+                            <label>颜色设置</label>
+                            <p class="settings-hint">设置时间显示的字体和背景颜色</p>
+                            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 200px;">
+                                    <label style="font-size: 11px; color: #666; display: block; margin-bottom: 8px;">字体颜色</label>
+                                    <div class="color-picker-row">
+                                        <div class="color-picker-main">
+                                            <button class="color-btn active" data-time-color="#000000" style="background-color: #000000;" title="黑色"></button>
+                                            <button class="color-btn" data-time-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;" title="白色"></button>
+                                            <button class="color-btn" data-time-color="#007AFF" style="background-color: #007AFF;" title="蓝色"></button>
+                                            <button class="color-btn" data-time-color="#FF0000" style="background-color: #FF0000;" title="红色"></button>
+                                        </div>
+                                        <div class="color-picker-main">
+                                            <button class="color-btn" data-time-color="#00FF00" style="background-color: #00FF00;" title="绿色"></button>
+                                            <button class="color-btn" data-time-color="#FFFF00" style="background-color: #FFFF00; border: 1px solid #ccc;" title="黄色"></button>
+                                            <button class="color-btn" data-time-color="#FF8800" style="background-color: #FF8800;" title="橙色"></button>
+                                            <button class="color-btn" data-time-color="#8800FF" style="background-color: #8800FF;" title="紫色"></button>
+                                        </div>
+                                    </div>
+                                    <label class="color-picker-icon-btn" for="custom-time-color-picker" title="自定义颜色" style="margin-top: 8px;">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
+                                            <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
+                                        </svg>
+                                        <input type="color" id="custom-time-color-picker" class="custom-color-picker-input" value="#000000">
+                                    </label>
+                                </div>
+                                <div style="flex: 1; min-width: 200px;">
+                                    <label style="font-size: 11px; color: #666; display: block; margin-bottom: 8px;">背景颜色</label>
+                                    <div class="color-picker-row">
+                                        <div class="color-picker-main">
+                                            <button class="color-btn" data-time-bg-color="transparent" style="background: linear-gradient(135deg, #fff 45%, #f00 45%, #f00 55%, #fff 55%); border: 1px solid #ccc;" title="透明"></button>
+                                            <button class="color-btn active" data-time-bg-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;" title="白色"></button>
+                                            <button class="color-btn" data-time-bg-color="#000000" style="background-color: #000000;" title="黑色"></button>
+                                            <button class="color-btn" data-time-bg-color="#007AFF" style="background-color: #007AFF;" title="蓝色"></button>
+                                        </div>
+                                        <div class="color-picker-main">
+                                            <button class="color-btn" data-time-bg-color="#FF0000" style="background-color: #FF0000;" title="红色"></button>
+                                            <button class="color-btn" data-time-bg-color="#00FF00" style="background-color: #00FF00;" title="绿色"></button>
+                                            <button class="color-btn" data-time-bg-color="#FFFF00" style="background-color: #FFFF00; border: 1px solid #ccc;" title="黄色"></button>
+                                            <button class="color-btn" data-time-bg-color="#8800FF" style="background-color: #8800FF;" title="紫色"></button>
+                                        </div>
+                                    </div>
+                                    <label class="color-picker-icon-btn" for="custom-time-bg-color-picker" title="自定义颜色" style="margin-top: 8px;">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
+                                            <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
+                                        </svg>
+                                        <input type="color" id="custom-time-bg-color-picker" class="custom-color-picker-input" value="#FFFFFF">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="settings-group" id="time-font-size-settings" style="display: none;">
+                            <label>字体大小 <span id="time-font-size-value">16</span>px</label>
+                            <p class="settings-hint">调整时间显示的字体大小</p>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="range" id="time-font-size-slider" min="12" max="48" value="16" class="slider" style="flex: 1;">
+                                <input type="number" id="time-font-size-input" min="12" max="48" value="16" class="size-input">
+                            </div>
+                        </div>
+                        <div class="settings-group" id="time-opacity-settings" style="display: none;">
+                            <label>透明度 <span id="time-opacity-value">100</span>%</label>
+                            <p class="settings-hint">调整时间显示的透明度</p>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="range" id="time-opacity-slider" min="10" max="100" value="100" class="slider" style="flex: 1;">
+                                <input type="number" id="time-opacity-input" min="10" max="100" value="100" class="size-input">
+                            </div>
+                        </div>
+                        <div class="settings-group" id="time-fullscreen-settings" style="display: none;">
+                            <label>全屏模式</label>
+                            <p class="settings-hint">选择如何触发时间全屏显示</p>
+                            <div class="button-size-options" style="grid-template-columns: 1fr 1fr 1fr;">
+                                <button class="fullscreen-mode-btn" data-mode="disabled">关闭</button>
+                                <button class="fullscreen-mode-btn" data-mode="single">单击</button>
+                                <button class="fullscreen-mode-btn active" data-mode="double">双击</button>
+                            </div>
+                        </div>
+                        <div class="settings-group" id="time-fullscreen-font-size-settings" style="display: none;">
+                            <label>全屏字体大小 <span id="time-fullscreen-font-size-value">15</span>%</label>
+                            <p class="settings-hint">调整全屏时间显示的字体大小，范围10%-85%</p>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="range" id="time-fullscreen-font-size-slider" min="10" max="85" value="15" class="slider" style="flex: 1;">
+                                <input type="number" id="time-fullscreen-font-size-input" min="10" max="85" value="15" class="size-input">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -578,6 +784,21 @@
         </div>
     </div>
 
+    <!-- Timer Alert Modal (Warning Level) -->
+    <div id="timer-alert-modal" class="modal">
+        <div class="modal-content confirm-modal-content">
+            <div class="modal-header">
+                <h2>⚠️ 提示</h2>
+            </div>
+            <div class="modal-body">
+                <p class="confirm-message" id="timer-alert-message">请设置倒计时时间</p>
+                <div class="confirm-buttons">
+                    <button id="timer-alert-ok-btn" class="confirm-btn ok-btn">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bottom toolbar -->
     <div id="toolbar">
         <button id="undo-btn" class="tool-btn" data-tool="undo" title="撤销 (Ctrl+Z)">
@@ -602,21 +823,6 @@
                 <circle cx="11" cy="11" r="2"></circle>
             </svg>
             <span>笔</span>
-        </button>
-        <button id="select-btn" class="tool-btn" data-tool="select" title="选择 (可选择笔迹、图片和文字)">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"></path>
-                <path d="M13 13l6 6"></path>
-            </svg>
-            <span>选择</span>
-        </button>
-        <button id="text-btn" class="tool-btn" data-tool="text" title="插入文字">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="4 7 4 4 20 4 20 7"></polyline>
-                <line x1="9" y1="20" x2="15" y2="20"></line>
-                <line x1="12" y1="4" x2="12" y2="20"></line>
-            </svg>
-            <span>文字</span>
         </button>
         <button id="pan-btn" class="tool-btn" data-tool="pan" title="移动画布 (Shift+拖动)">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -649,6 +855,14 @@
             </svg>
             <span>清空</span>
         </button>
+        <button id="more-btn" class="tool-btn" data-tool="more" title="更多">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="1"></circle>
+                <circle cx="12" cy="5" r="1"></circle>
+                <circle cx="12" cy="19" r="1"></circle>
+            </svg>
+            <span>更多</span>
+        </button>
         <button id="settings-btn" class="tool-btn" data-tool="settings" title="设置">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="3"></circle>
@@ -658,13 +872,201 @@
         </button>
     </div>
 
+    <!-- Time Display (for More feature) -->
+    <div id="time-display" style="display: none;"></div>
+
+    <!-- Fullscreen Time Display Modal -->
+    <div id="time-fullscreen-modal" class="time-fullscreen-modal">
+        <button id="time-fullscreen-close-btn" class="time-fullscreen-close-btn" title="关闭全屏">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        <div id="time-fullscreen-content"></div>
+        <div class="time-fullscreen-controls">
+            <div class="time-fullscreen-slider-label">字体大小调节 (10%-85%)</div>
+            <input type="range" id="time-fullscreen-font-slider" class="time-fullscreen-slider" min="10" max="85" value="15" step="0.5">
+        </div>
+    </div>
+
+    <!-- Fullscreen Timer Display Modal -->
+    <div id="timer-fullscreen-modal" class="timer-fullscreen-modal">
+        <button id="timer-fullscreen-close-btn" class="timer-fullscreen-close-btn" title="关闭全屏">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        <div id="timer-fullscreen-content"></div>
+        <div class="timer-fullscreen-controls">
+            <div class="timer-fullscreen-slider-label">字体大小调节 (10%-85%)</div>
+            <input type="range" id="timer-fullscreen-font-slider" class="timer-fullscreen-slider" min="10" max="85" value="15" step="0.5">
+        </div>
+    </div>
+
+    <!-- Timer Settings Modal -->
+    <div id="timer-settings-modal">
+        <div class="timer-modal-content">
+            <div class="timer-modal-header">
+                <h2>计时器设置</h2>
+                <button id="timer-settings-close-btn" class="modal-close-btn" title="关闭">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="timer-modal-body">
+                <!-- Timer Mode Selection -->
+                <div class="timer-mode-group">
+                    <label>选择模式</label>
+                    <div class="timer-mode-buttons">
+                        <button class="timer-mode-btn active" data-mode="stopwatch">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="13" r="8"></circle>
+                                <path d="M12 9v4l2 2"></path>
+                                <path d="M9 2h6"></path>
+                            </svg>
+                            正计时
+                        </button>
+                        <button class="timer-mode-btn" data-mode="countdown">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="13" r="8"></circle>
+                                <path d="M12 9v4l2 2"></path>
+                                <path d="M9 2h6"></path>
+                                <path d="M16 6l-4 4"></path>
+                            </svg>
+                            倒计时
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Timer Title Input -->
+                <div class="timer-input-group">
+                    <label for="timer-title-input">计时器标题（可选）</label>
+                    <input type="text" id="timer-title-input" class="timer-title-input" placeholder="例如：课堂演讲、考试时间等" maxlength="50">
+                </div>
+                
+                <!-- Time Input -->
+                <div class="timer-input-group">
+                    <label id="timer-time-label">设置时间</label>
+                    <div class="time-inputs">
+                        <div class="time-input-field">
+                            <label>小时</label>
+                            <input type="number" id="timer-hours" min="0" max="23" value="0">
+                        </div>
+                        <div class="time-input-field">
+                            <label>分钟</label>
+                            <input type="number" id="timer-minutes" min="0" max="59" value="0">
+                        </div>
+                        <div class="time-input-field">
+                            <label>秒</label>
+                            <input type="number" id="timer-seconds" min="0" max="59" value="0">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sound Settings (only for countdown) -->
+                <div class="timer-sound-group disabled">
+                    <div class="sound-checkbox">
+                        <input type="checkbox" id="timer-sound-checkbox">
+                        <label for="timer-sound-checkbox">倒计时结束时播放提示音</label>
+                    </div>
+                    
+                    <div class="sound-settings-content" id="sound-settings-content" style="display: none;">
+                        <div class="sound-presets sound-presets-grid">
+                            <button class="sound-preset-btn active" data-sound="class-bell" data-url="sounds/class-bell.MP3">
+                                开始铃声(10s)
+                            </button>
+                            <button class="sound-preset-btn" data-sound="exam-end" data-url="sounds/exam-end.MP3">
+                                考试结束(4s)
+                            </button>
+                            <button class="sound-preset-btn" data-sound="gentle-alarm" data-url="sounds/gentle-alarm.MP3">
+                                柔和(17s)
+                            </button>
+                            <button class="sound-preset-btn" data-sound="digital-beep" data-url="sounds/digital-beep.MP3">
+                                结束铃声(4s)
+                            </button>
+                        </div>
+                        
+                        <div class="sound-loop-settings">
+                            <div class="sound-checkbox">
+                                <input type="checkbox" id="timer-loop-checkbox">
+                                <label for="timer-loop-checkbox">循环播放</label>
+                            </div>
+                            <div class="sound-loop-count" id="sound-loop-count-group" style="display: none;">
+                                <label for="timer-loop-count">循环次数</label>
+                                <input type="number" id="timer-loop-count" min="1" max="100" value="3" class="loop-count-input">
+                            </div>
+                        </div>
+                        
+                        <div class="sound-upload-group">
+                            <label for="timer-sound-upload" class="sound-upload-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                上传自定义音频
+                            </label>
+                            <input type="file" id="timer-sound-upload" accept="audio/*" multiple style="display: none;">
+                        </div>
+                        
+                        <div id="custom-sounds-list" class="sound-presets" style="margin-top: 10px;"></div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="timer-action-buttons">
+                    <button class="timer-action-btn timer-cancel-btn" id="timer-cancel-btn">取消</button>
+                    <button class="timer-action-btn timer-start-btn" id="timer-start-btn">开始</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timer Display Widget -->
+    <div id="timer-display">
+        <div class="timer-display-header">
+            <div class="timer-display-mode">正计时</div>
+            <button class="timer-close-btn" id="timer-display-close-btn" title="关闭">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="timer-display-time">00:00:00</div>
+        <div class="timer-display-controls">
+            <button class="timer-control-btn" id="timer-play-pause-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="6" y="4" width="4" height="16"></rect>
+                    <rect x="14" y="4" width="4" height="16"></rect>
+                </svg>
+                暂停
+            </button>
+            <button class="timer-control-btn" id="timer-reset-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                    <path d="M21 3v5h-5"></path>
+                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                    <path d="M3 21v-5h5"></path>
+                </svg>
+                重置
+            </button>
+        </div>
+    </div>
+
     <script src="js/drawing.js"></script>
     <script src="js/history.js"></script>
     <script src="js/background.js"></script>
     <script src="js/image-controls.js"></script>
     <script src="js/stroke-controls.js"></script>
-    <script src="js/selection.js"></script>
-    <script src="js/text-insertion.js"></script>
+    <script src="js/collapsible.js"></script>
+    <script src="js/time-display.js"></script>
+    <script src="js/modules/time-display-controls.js"></script>
+    <script src="js/modules/timer.js"></script>
     <script src="js/settings.js"></script>
     <script src="js/announcement.js"></script>
     <script src="js/export.js"></script>

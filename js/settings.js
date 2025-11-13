@@ -15,6 +15,7 @@ class SettingsManager {
         this.canvasHeight = parseInt(localStorage.getItem('canvasHeight')) || 1080;
         this.canvasPreset = localStorage.getItem('canvasPreset') || 'custom';
         this.themeColor = localStorage.getItem('themeColor') || '#007AFF';
+        this.globalFont = localStorage.getItem('globalFont') || 'system';
     }
     
     loadPatternPreferences() {
@@ -159,7 +160,7 @@ class SettingsManager {
         localStorage.setItem('configScale', this.configScale);
     }
     
-    setControlPosition(position) {
+    setControlPosition(position, timeDisplayManager = null) {
         this.controlPosition = position;
         localStorage.setItem('controlPosition', position);
         
@@ -181,6 +182,11 @@ class SettingsManager {
                 btn.classList.add('active');
             }
         });
+        
+        // Update time display position if manager is provided
+        if (timeDisplayManager) {
+            timeDisplayManager.updatePosition();
+        }
     }
     
     loadSettings() {
@@ -222,6 +228,10 @@ class SettingsManager {
         document.querySelectorAll('.color-btn[data-theme-color]').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.themeColor === this.themeColor);
         });
+        
+        // Load global font
+        this.applyGlobalFont();
+        document.getElementById('global-font-select').value = this.globalFont;
     }
     
     updateCanvasSizeSettings() {
@@ -276,5 +286,50 @@ class SettingsManager {
     
     applyThemeColor() {
         document.documentElement.style.setProperty('--theme-color', this.themeColor);
+    }
+    
+    setGlobalFont(font) {
+        this.globalFont = font;
+        localStorage.setItem('globalFont', font);
+        this.applyGlobalFont();
+    }
+    
+    applyGlobalFont() {
+        let fontFamily;
+        switch(this.globalFont) {
+            case 'system':
+                fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+                break;
+            case 'serif':
+                fontFamily = 'SimSun, "Times New Roman", Times, Georgia, serif';
+                break;
+            case 'sans-serif':
+                fontFamily = 'SimHei, Arial, "Helvetica Neue", Helvetica, sans-serif';
+                break;
+            case 'monospace':
+                fontFamily = '"Courier New", Courier, "Consolas", monospace';
+                break;
+            case 'cursive':
+                fontFamily = '"Comic Sans MS", "Apple Chancery", cursive';
+                break;
+            case 'Microsoft YaHei':
+                fontFamily = '"Microsoft YaHei", "微软雅黑", Arial, sans-serif';
+                break;
+            case 'SimSun':
+                fontFamily = 'SimSun, "宋体", Georgia, serif';
+                break;
+            case 'SimHei':
+                fontFamily = 'SimHei, "黑体", Arial, sans-serif';
+                break;
+            case 'KaiTi':
+                fontFamily = 'KaiTi, "楷体", Georgia, serif';
+                break;
+            case 'FangSong':
+                fontFamily = 'FangSong, "仿宋", Georgia, serif';
+                break;
+            default:
+                fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+        }
+        document.body.style.fontFamily = fontFamily;
     }
 }

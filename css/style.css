@@ -149,7 +149,6 @@ body {
 /* Configuration area */
 #config-area {
     position: fixed;
-    bottom: 100px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 999;
@@ -699,6 +698,62 @@ body {
     gap: 12px;
 }
 
+.settings-group.collapsible {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 8px;
+    background: #fafafa;
+}
+
+/* Increase padding for settings groups with sliders */
+.settings-group.collapsible:has(.slider) {
+    padding: 12px;
+    min-height: 60px;
+}
+
+.settings-group-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.collapse-toggle {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+.collapse-toggle svg {
+    width: 12px;
+    height: 12px;
+}
+
+.settings-group.collapsed .collapse-toggle {
+    transform: rotate(-90deg);
+}
+
+.settings-group-content {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    overflow: hidden;
+}
+
+.settings-group.collapsed .settings-group-content {
+    max-height: 0 !important;
+    opacity: 0;
+    margin-top: 0;
+}
+
 .settings-group label {
     font-size: 14px;
     color: #333;
@@ -781,7 +836,8 @@ body {
     border-color: var(--theme-color);
 }
 
-.position-option-btn {
+.position-option-btn,
+.display-option-btn {
     flex: 1;
     padding: 12px 16px;
     border: 2px solid #ddd;
@@ -794,12 +850,14 @@ body {
     font-weight: 500;
 }
 
-.position-option-btn:hover {
+.position-option-btn:hover,
+.display-option-btn:hover {
     background-color: #f0f0f0;
     border-color: #ccc;
 }
 
-.position-option-btn.active {
+.position-option-btn.active,
+.display-option-btn.active {
     background-color: var(--theme-color);
     color: #ffffff;
     border-color: var(--theme-color);
@@ -2035,3 +2093,43 @@ body {
     gap: 12px;
 }
 
+/* Format Select Styles */
+.format-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: white;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.format-select:hover {
+    border-color: #999;
+}
+
+.format-select:focus {
+    border-color: var(--theme-color, #007AFF);
+}
+
+/* Size Input Styles */
+.size-input {
+    width: 70px;
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.size-input:hover {
+    border-color: #999;
+}
+
+.size-input:focus {
+    border-color: var(--theme-color, #007AFF);
+}
