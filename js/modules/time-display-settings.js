@@ -286,7 +286,7 @@ class TimeDisplaySettingsModal {
         if (fsFontInput) this.timeDisplayManager.fullscreenFontSize = parseInt(fsFontInput.value);
         
         // Apply changes to the time display
-        this.timeDisplayManager.applyStyles();
+        this.timeDisplayManager.applySettings();
         this.timeDisplayManager.updateDisplay();
         this.timeDisplayManager.saveSettings();
     }
