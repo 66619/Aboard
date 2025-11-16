@@ -24,6 +24,7 @@ class DrawingBoard {
         this.strokeControls = new StrokeControls(this.drawingEngine, this.canvas, this.ctx, this.historyManager);
         this.timeDisplayManager = new TimeDisplayManager(this.settingsManager);
         this.timeDisplayControls = new TimeDisplayControls(this.timeDisplayManager);
+        this.timeDisplaySettingsModal = new TimeDisplaySettingsModal(this.timeDisplayManager);
         this.timerManager = new TimerManager();
         this.collapsibleManager = new CollapsibleManager();
         this.announcementManager = new AnnouncementManager();

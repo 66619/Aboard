@@ -166,6 +166,9 @@ body {
     border-radius: 16px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     min-width: 320px;
+    max-width: 600px; /* Prevent excessive width */
+    max-height: calc(100vh - 120px); /* Prevent touching top - leave space for positioning */
+    overflow-y: auto; /* Add scroll if content exceeds max height */
     display: none;
     cursor: move;
     /* Improved touch device support */

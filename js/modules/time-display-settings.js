@@ -6,6 +6,7 @@ class TimeDisplaySettingsModal {
         this.timeDisplayManager = timeDisplayManager;
         this.modal = document.getElementById('time-display-settings-modal');
         this.setupEventListeners();
+        this.setupSettingsControls();
     }
     
     setupEventListeners() {
@@ -14,10 +15,16 @@ class TimeDisplaySettingsModal {
         const widgetSettingsBtn = document.getElementById('time-display-settings-btn');
         
         if (areaSettingsBtn) {
-            areaSettingsBtn.addEventListener('click', () => this.show());
+            areaSettingsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.show();
+            });
         }
         if (widgetSettingsBtn) {
-            widgetSettingsBtn.addEventListener('click', () => this.show());
+            widgetSettingsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.show();
+            });
         }
         
         // Close button
@@ -32,6 +39,96 @@ class TimeDisplaySettingsModal {
                 if (e.target === this.modal) {
                     this.hide();
                 }
+            });
+        }
+        
+        // Apply button
+        const applyBtn = document.getElementById('td-settings-apply-btn');
+        if (applyBtn) {
+            applyBtn.addEventListener('click', () => {
+                this.applySettings();
+                this.hide();
+            });
+        }
+    }
+    
+    setupSettingsControls() {
+        // Display type buttons
+        document.querySelectorAll('.display-option-btn[data-td-display-type]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.display-option-btn[data-td-display-type]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+        
+        // Fullscreen mode buttons
+        document.querySelectorAll('.fullscreen-mode-btn[data-td-mode]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.fullscreen-mode-btn[data-td-mode]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+        
+        // Color buttons
+        document.querySelectorAll('.color-btn[data-td-time-color]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.color-btn[data-td-time-color]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+        
+        document.querySelectorAll('.color-btn[data-td-time-bg-color]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.color-btn[data-td-time-bg-color]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+        
+        // Font size slider sync
+        const fontSlider = document.getElementById('td-time-font-size-slider');
+        const fontInput = document.getElementById('td-time-font-size-input');
+        const fontValue = document.getElementById('td-time-font-size-value');
+        
+        if (fontSlider && fontInput) {
+            fontSlider.addEventListener('input', () => {
+                fontInput.value = fontSlider.value;
+                if (fontValue) fontValue.textContent = fontSlider.value;
+            });
+            fontInput.addEventListener('input', () => {
+                fontSlider.value = fontInput.value;
+                if (fontValue) fontValue.textContent = fontInput.value;
+            });
+        }
+        
+        // Opacity slider sync
+        const opacitySlider = document.getElementById('td-time-opacity-slider');
+        const opacityInput = document.getElementById('td-time-opacity-input');
+        const opacityValue = document.getElementById('td-time-opacity-value');
+        
+        if (opacitySlider && opacityInput) {
+            opacitySlider.addEventListener('input', () => {
+                opacityInput.value = opacitySlider.value;
+                if (opacityValue) opacityValue.textContent = opacitySlider.value;
+            });
+            opacityInput.addEventListener('input', () => {
+                opacitySlider.value = opacityInput.value;
+                if (opacityValue) opacityValue.textContent = opacityInput.value;
+            });
+        }
+        
+        // Fullscreen font size slider sync
+        const fsFontSlider = document.getElementById('td-time-fullscreen-font-size-slider');
+        const fsFontInput = document.getElementById('td-time-fullscreen-font-size-input');
+        const fsFontValue = document.getElementById('td-time-fullscreen-font-size-value');
+        
+        if (fsFontSlider && fsFontInput) {
+            fsFontSlider.addEventListener('input', () => {
+                fsFontInput.value = fsFontSlider.value;
+                if (fsFontValue) fsFontValue.textContent = fsFontSlider.value;
+            });
+            fsFontInput.addEventListener('input', () => {
+                fsFontSlider.value = fsFontInput.value;
+                if (fsFontValue) fsFontValue.textContent = fsFontInput.value;
             });
         }
     }
@@ -50,7 +147,117 @@ class TimeDisplaySettingsModal {
     }
     
     syncSettings() {
-        // Sync current settings to the modal
-        // This will be populated with actual sync logic
+        if (!this.timeDisplayManager) return;
+        
+        // Sync display type
+        const displayType = this.timeDisplayManager.showTime && this.timeDisplayManager.showDate ? 'both' :
+                           this.timeDisplayManager.showDate ? 'date-only' : 'time-only';
+        document.querySelectorAll('.display-option-btn[data-td-display-type]').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tdDisplayType === displayType);
+        });
+        
+        // Sync timezone
+        const tzSelect = document.getElementById('td-timezone-select');
+        if (tzSelect) tzSelect.value = this.timeDisplayManager.timezone || 'Asia/Shanghai';
+        
+        // Sync time format
+        const tfSelect = document.getElementById('td-time-format-select');
+        if (tfSelect) tfSelect.value = this.timeDisplayManager.timeFormat || '24h';
+        
+        // Sync date format
+        const dfSelect = document.getElementById('td-date-format-select');
+        if (dfSelect) dfSelect.value = this.timeDisplayManager.dateFormat || 'yyyy-mm-dd';
+        
+        // Sync font size
+        const fontSlider = document.getElementById('td-time-font-size-slider');
+        const fontInput = document.getElementById('td-time-font-size-input');
+        const fontValue = document.getElementById('td-time-font-size-value');
+        if (fontSlider && fontInput) {
+            fontSlider.value = this.timeDisplayManager.fontSize || 16;
+            fontInput.value = this.timeDisplayManager.fontSize || 16;
+            if (fontValue) fontValue.textContent = this.timeDisplayManager.fontSize || 16;
+        }
+        
+        // Sync opacity
+        const opacitySlider = document.getElementById('td-time-opacity-slider');
+        const opacityInput = document.getElementById('td-time-opacity-input');
+        const opacityValue = document.getElementById('td-time-opacity-value');
+        const opacity = Math.round((this.timeDisplayManager.opacity || 1) * 100);
+        if (opacitySlider && opacityInput) {
+            opacitySlider.value = opacity;
+            opacityInput.value = opacity;
+            if (opacityValue) opacityValue.textContent = opacity;
+        }
+        
+        // Sync fullscreen mode
+        const fsMode = this.timeDisplayManager.fullscreenMode || 'double';
+        document.querySelectorAll('.fullscreen-mode-btn[data-td-mode]').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tdMode === fsMode);
+        });
+        
+        // Sync fullscreen font size
+        const fsFontSlider = document.getElementById('td-time-fullscreen-font-size-slider');
+        const fsFontInput = document.getElementById('td-time-fullscreen-font-size-input');
+        const fsFontValue = document.getElementById('td-time-fullscreen-font-size-value');
+        if (fsFontSlider && fsFontInput) {
+            fsFontSlider.value = this.timeDisplayManager.fullscreenFontSize || 15;
+            fsFontInput.value = this.timeDisplayManager.fullscreenFontSize || 15;
+            if (fsFontValue) fsFontValue.textContent = this.timeDisplayManager.fullscreenFontSize || 15;
+        }
     }
+    
+    applySettings() {
+        if (!this.timeDisplayManager) return;
+        
+        // Get display type
+        const activeDisplayBtn = document.querySelector('.display-option-btn[data-td-display-type].active');
+        const displayType = activeDisplayBtn ? activeDisplayBtn.dataset.tdDisplayType : 'both';
+        this.timeDisplayManager.showDate = displayType === 'both' || displayType === 'date-only';
+        this.timeDisplayManager.showTime = displayType === 'both' || displayType === 'time-only';
+        
+        // Get timezone
+        const tzSelect = document.getElementById('td-timezone-select');
+        if (tzSelect) this.timeDisplayManager.timezone = tzSelect.value;
+        
+        // Get time format
+        const tfSelect = document.getElementById('td-time-format-select');
+        if (tfSelect) this.timeDisplayManager.timeFormat = tfSelect.value;
+        
+        // Get date format
+        const dfSelect = document.getElementById('td-date-format-select');
+        if (dfSelect) this.timeDisplayManager.dateFormat = dfSelect.value;
+        
+        // Get colors
+        const activeColorBtn = document.querySelector('.color-btn[data-td-time-color].active');
+        if (activeColorBtn) this.timeDisplayManager.timeColor = activeColorBtn.dataset.tdTimeColor;
+        
+        const activeBgColorBtn = document.querySelector('.color-btn[data-td-time-bg-color].active');
+        if (activeBgColorBtn) this.timeDisplayManager.bgColor = activeBgColorBtn.dataset.tdTimeBgColor;
+        
+        // Get font size
+        const fontInput = document.getElementById('td-time-font-size-input');
+        if (fontInput) this.timeDisplayManager.fontSize = parseInt(fontInput.value);
+        
+        // Get opacity
+        const opacityInput = document.getElementById('td-time-opacity-input');
+        if (opacityInput) this.timeDisplayManager.opacity = parseInt(opacityInput.value) / 100;
+        
+        // Get fullscreen mode
+        const activeFsBtn = document.querySelector('.fullscreen-mode-btn[data-td-mode].active');
+        if (activeFsBtn) this.timeDisplayManager.fullscreenMode = activeFsBtn.dataset.tdMode;
+        
+        // Get fullscreen font size
+        const fsFontInput = document.getElementById('td-time-fullscreen-font-size-input');
+        if (fsFontInput) this.timeDisplayManager.fullscreenFontSize = parseInt(fsFontInput.value);
+        
+        // Apply changes to the time display
+        this.timeDisplayManager.applyStyles();
+        this.timeDisplayManager.updateDisplay();
+        this.timeDisplayManager.saveSettings();
+    }
+}
+
+// Export for use in main.js
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = TimeDisplaySettingsModal;
 }
