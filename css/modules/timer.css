@@ -625,7 +625,7 @@
 }
 
 .timer-display-title {
-    font-size: 14px;
+    font-size: 14px !important; /* Fixed size, not affected by slider */
     font-weight: 600;
     color: #666;
     text-align: center;

@@ -42,6 +42,30 @@
     width: auto;
 }
 
+/* Time display area settings button */
+.time-display-settings-icon-btn {
+    position: absolute;
+    top: 8px;
+    right: 40px; /* Position to the left of close button */
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    color: #666;
+    padding: 0;
+}
+
+.time-display-settings-icon-btn:hover {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
 /* Time Display Widget */
 #time-display {
     position: fixed;
