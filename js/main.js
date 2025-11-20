@@ -24,6 +24,7 @@ class DrawingBoard {
         this.strokeControls = new StrokeControls(this.drawingEngine, this.canvas, this.ctx, this.historyManager);
         this.timeDisplayManager = new TimeDisplayManager(this.settingsManager);
         this.timeDisplayControls = new TimeDisplayControls(this.timeDisplayManager);
+        this.timeDisplaySettingsModal = new TimeDisplaySettingsModal(this.timeDisplayManager);
         this.timerManager = new TimerManager();
         this.collapsibleManager = new CollapsibleManager();
         this.announcementManager = new AnnouncementManager();
@@ -386,6 +387,8 @@ class DrawingBoard {
                 this.settingsManager.updateToolbarTextVisibility();
                 // Reposition toolbars to ensure they stay within viewport
                 this.repositionToolbarsOnResize();
+                // Reposition modals to ensure they stay within viewport
+                this.repositionModalsOnResize();
                 // Don't update config-area scale on window resize (fix #2)
                 // this.updateConfigAreaScale();
             }, 150); // 150ms debounce delay
@@ -1124,6 +1127,42 @@ class DrawingBoard {
         });
     }
     
+    repositionModalsOnResize() {
+        // Reposition modal content to stay within viewport on window resize
+        const modals = [
+            document.querySelector('#settings-modal .settings-modal-content'),
+            document.querySelector('#timer-settings-modal .timer-modal-content'),
+            document.querySelector('#time-display-settings-modal .timer-modal-content')
+        ];
+        
+        modals.forEach(modalContent => {
+            if (!modalContent) return;
+            
+            // Only reposition if modal is currently visible
+            const modal = modalContent.closest('.show, [style*="display: flex"]');
+            if (!modal) return;
+            
+            const rect = modalContent.getBoundingClientRect();
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            
+            // Check if modal content exceeds viewport
+            const EDGE_SPACING = 20;
+            
+            // Reset any transforms or positions first
+            modalContent.style.transform = '';
+            modalContent.style.position = '';
+            
+            // If modal is larger than viewport, it will be scrollable via parent
+            // Just ensure it's centered
+            if (rect.width > windowWidth - 2 * EDGE_SPACING || 
+                rect.height > windowHeight - 2 * EDGE_SPACING) {
+                // Modal is too large - parent modal should handle scrolling
+                // No specific positioning needed
+            }
+        });
+    }
+    
     setupDraggablePanels() {
         const historyControls = document.getElementById('history-controls');
         const configArea = document.getElementById('config-area');
@@ -1131,32 +1170,45 @@ class DrawingBoard {
         const featureArea = document.getElementById('feature-area');
         const toolbar = document.getElementById('toolbar');
         
+        // Unified start handler for mouse and touch events
+        const handleDragStart = (e, element) => {
+            if (e.target.closest('button') || e.target.closest('input')) return;
+            
+            this.isDraggingPanel = true;
+            this.draggedElement = element;
+            
+            const rect = element.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            this.dragOffset.x = clientX - rect.left;
+            this.dragOffset.y = clientY - rect.top;
+            
+            this.draggedElementWidth = rect.width;
+            this.draggedElementHeight = rect.height;
+            
+            element.classList.add('dragging');
+            element.style.transition = 'none';
+            
+            e.preventDefault();
+        };
+        
         [historyControls, configArea, timeDisplayArea, featureArea, toolbar].forEach(element => {
-            element.addEventListener('mousedown', (e) => {
-                if (e.target.closest('button') || e.target.closest('input')) return;
-                
-                this.isDraggingPanel = true;
-                this.draggedElement = element;
-                
-                const rect = element.getBoundingClientRect();
-                this.dragOffset.x = e.clientX - rect.left;
-                this.dragOffset.y = e.clientY - rect.top;
-                
-                this.draggedElementWidth = rect.width;
-                this.draggedElementHeight = rect.height;
-                
-                element.classList.add('dragging');
-                element.style.transition = 'none';
-                
-                e.preventDefault();
-            });
+            // Mouse events
+            element.addEventListener('mousedown', (e) => handleDragStart(e, element));
+            // Touch events - improve compatibility with large-screen touch devices
+            element.addEventListener('touchstart', (e) => handleDragStart(e, element), { passive: false });
         });
         
-        document.addEventListener('mousemove', (e) => {
+        // Unified move handler for mouse and touch events
+        const handleDragMove = (e) => {
             if (!this.isDraggingPanel || !this.draggedElement) return;
             
-            let x = e.clientX - this.dragOffset.x;
-            let y = e.clientY - this.dragOffset.y;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            let x = clientX - this.dragOffset.x;
+            let y = clientY - this.dragOffset.y;
             
             const edgeSnapDistance = 30;
             const windowWidth = window.innerWidth;
@@ -1228,16 +1280,24 @@ class DrawingBoard {
             this.draggedElement.style.transform = 'none';
             this.draggedElement.style.right = 'auto';
             this.draggedElement.style.bottom = 'auto';
-        });
+        };
         
-        document.addEventListener('mouseup', () => {
+        // Unified end handler for mouse and touch events
+        const handleDragEnd = () => {
             if (this.isDraggingPanel && this.draggedElement) {
                 this.draggedElement.classList.remove('dragging');
                 this.draggedElement.style.transition = '';
                 this.isDraggingPanel = false;
                 this.draggedElement = null;
             }
-        });
+        };
+        
+        // Add both mouse and touch event listeners for better touch device support
+        document.addEventListener('mousemove', handleDragMove);
+        document.addEventListener('mouseup', handleDragEnd);
+        document.addEventListener('touchmove', handleDragMove, { passive: false });
+        document.addEventListener('touchend', handleDragEnd);
+        document.addEventListener('touchcancel', handleDragEnd);
     }
     
     setTool(tool, showConfig = true) {

@@ -174,6 +174,59 @@
     color: #999;
 }
 
+/* Timer Color Settings */
+.timer-color-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.timer-color-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.timer-color-checkbox label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+    margin: 0;
+}
+
+.timer-color-settings {
+    margin-top: 12px;
+}
+
+.timer-color-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.timer-color-item {
+    flex: 1;
+    min-width: 180px;
+}
+
+.timer-color-item > label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+/* Center the color picker icon button */
+.timer-color-picker-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 8px;
+}
+
 /* Sound Settings */
 .timer-sound-group {
     margin-bottom: 20px;
@@ -418,6 +471,10 @@
     min-width: 220px;
     max-width: 300px;
     transition: all 0.3s ease;
+    /* Improved touch device support */
+    touch-action: none;
+    /* Performance optimization */
+    will-change: transform, left, top;
 }
 
 .timer-display-widget.dragging {
@@ -568,7 +625,7 @@
 }
 
 .timer-display-title {
-    font-size: 14px;
+    font-size: 14px !important; /* Fixed size, not affected by slider */
     font-weight: 600;
     color: #666;
     text-align: center;
@@ -857,4 +914,33 @@
     cursor: pointer;
     border: none;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Display option and fullscreen mode buttons */
+.display-option-btn,
+.fullscreen-mode-btn {
+    flex: 1;
+    padding: 10px 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #666;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.display-option-btn:hover,
+.fullscreen-mode-btn:hover {
+    background-color: #f0f0f0;
+    border-color: #ccc;
+}
+
+.display-option-btn.active,
+.fullscreen-mode-btn.active {
+    background-color: var(--theme-color);
+    color: #ffffff;
+    border-color: var(--theme-color);
 }

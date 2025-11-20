@@ -56,15 +56,21 @@ class TimeDisplayControls {
         this.timeDisplayArea.classList.add('show');
         
         // Position time-display-area above the "小功能" area (feature-area)
+        // Fixed: Use proper inset positioning instead of transform for better accuracy
         const featureArea = document.getElementById('feature-area');
         if (featureArea && featureArea.classList.contains('show')) {
             const featureRect = featureArea.getBoundingClientRect();
+            const timeDisplayHeight = this.timeDisplayArea.offsetHeight || 200; // Estimate if not rendered yet
             
-            // Position above the feature area
-            this.timeDisplayArea.style.bottom = 'auto';
+            // Position above the feature area using inset (top, right, bottom, left)
+            // Calculate top position: feature area top - time display height - gap
+            const topPosition = featureRect.top - timeDisplayHeight - 10;
+            
+            this.timeDisplayArea.style.transform = 'none';
+            this.timeDisplayArea.style.top = `${topPosition}px`;
             this.timeDisplayArea.style.left = `${featureRect.left}px`;
-            this.timeDisplayArea.style.top = `${featureRect.top - 10}px`;
-            this.timeDisplayArea.style.transform = 'translateY(-100%)';
+            this.timeDisplayArea.style.right = 'auto';
+            this.timeDisplayArea.style.bottom = 'auto';
         }
         
         // Also show the time display if not already shown

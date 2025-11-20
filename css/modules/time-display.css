@@ -13,6 +13,10 @@
     min-width: 280px;
     display: none;
     cursor: move;
+    /* Improved touch device support */
+    touch-action: none;
+    /* Performance optimization */
+    will-change: transform, left, top;
 }
 
 #time-display-area.show {
@@ -30,6 +34,49 @@
     max-height: 80vh;
     overflow-y: auto;
     overflow-x: hidden;
+}
+
+/* Time display area specific checkbox styling - narrower width */
+#time-display-area .checkbox-label {
+    max-width: fit-content;
+    width: auto;
+}
+
+/* Time display options row - flex layout for checkboxes and settings button */
+.time-display-options-row {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Reduced from 12px for even less spacing */
+    width: fit-content; /* Fix layout bug when not at edge */
+}
+
+.time-display-checkboxes {
+    flex: 0 0 auto;
+}
+
+/* Time display area settings button - positioned to the right of checkboxes */
+.time-display-settings-icon-btn {
+    position: relative; /* Changed from absolute */
+    width: 64px; /* Match the height of two checkbox rows */
+    height: 64px; /* Same as two rows with gap */
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #f8f8f8;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    color: #666;
+    padding: 0;
+    flex-shrink: 0; /* Don't allow shrinking to maintain size */
+    margin-left: 0; /* Remove any extra margin */
+}
+
+.time-display-settings-icon-btn:hover {
+    background-color: #e8e8e8;
+    border-color: var(--theme-color);
+    color: #333;
 }
 
 /* Time Display Widget */
@@ -202,4 +249,22 @@
     cursor: pointer;
     border: none;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Time Display Settings Modal */
+#time-display-settings-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10001;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+#time-display-settings-modal.show {
+    display: flex;
 }
