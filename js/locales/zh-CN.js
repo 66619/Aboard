@@ -64,6 +64,8 @@ window.translations = {
             normal: '普通橡皮',
             pixel: '像素橡皮',
             size: '橡皮大小',
+            sizeLabel: '橡皮擦大小',
+            shape: '形状',
             shapeCircle: '圆形',
             shapeRectangle: '方形'
         },
@@ -89,6 +91,8 @@ window.translations = {
         musicStaff: '五线谱',
         coordinate: '坐标系',
         image: '图片',
+        density: '密度',
+        size: '大小',
         opacity: '背景透明度',
         opacityHint: '调整背景的透明度,100%为完全不透明',
         contrast: '对比度',
@@ -124,6 +128,15 @@ window.translations = {
             theme: '主题',
             themeHint: '选择应用主题',
             themeColor: '主题色',
+            showZoomControls: '显示缩放控件',
+            showZoomControlsHint: '勾选后，在画布上方显示缩放控件',
+            showFullscreenBtn: '显示全屏按钮',
+            showFullscreenBtnHint: '勾选后，在缩放控件旁显示全屏按钮',
+            toolbarSize: '工具栏大小',
+            toolbarSizeHint: '调整底部工具栏的大小',
+            configScale: '属性栏大小',
+            configScaleHint: '调整弹出具体属性面板的大小',
+            themeColorHint: '工具栏被选中时的颜色',
             colorOptions: {
                 blue: '蓝色',
                 purple: '紫色',
@@ -139,40 +152,84 @@ window.translations = {
         general: {
             title: '通用设置',
             language: '语言',
-            languageHint: '选择界面语言',
+            languageHint: '选择界面语言 / Choose interface language',
+            globalFont: '全局字体',
+            globalFontHint: '选择应用程序使用的字体',
+            edgeSnap: '启用边缘吸附',
+            edgeSnapHint: '拖动控制面板时自动吸附到屏幕边缘',
+            controlPosition: '控制按钮位置',
+            controlPositionHint: '选择缩放和分页控件在屏幕上的显示位置',
+            positionTopLeft: '左上角',
+            positionTopRight: '右上角',
+            positionBottomLeft: '左下角',
+            positionBottomRight: '右下角',
             canvasMode: '画布模式',
-            canvasModeHint: '选择分页模式或无限画布模式',
+            canvasModeHint: '选择画布的显示模式',
             pagination: '分页模式',
             infiniteCanvas: '无限画布',
             autoSave: '自动保存',
             autoSaveHint: '定期保存您的绘图内容'
+        },
+        canvas: {
+            title: '画布设置',
+            mode: '画布模式',
+            modeHint: '选择画布的显示模式',
+            size: '画布尺寸',
+            sizeHint: '选择预设尺寸或自定义画布比例和大小',
+            infiniteCanvas: '无限画布',
+            pagination: '分页模式'
+        },
+        background: {
+            title: '背景设置',
+            opacity: '背景透明度',
+            opacityHint: '调整背景的透明度,100%为完全不透明',
+            patternIntensity: '图案透明度',
+            patternIntensityHint: '调整背景图案线条的明暗程度',
+            preference: '背景图案偏好',
+            preferenceHint: '选择在属性栏中显示的图案'
+        },
+        announcement: {
+            title: '公告'
+        },
+        more: {
+            title: '更多设置',
+            showTimeDisplay: '显示时间和日期',
+            showTimeDisplayHint: '在右上角显示当前时间和日期'
         },
         time: {
             title: '时间显示设置',
             showDate: '显示日期',
             showTime: '显示时间',
             timezone: '时区',
+            timezoneHint: '选择要显示的时区',
             timeFormat: '时间格式',
+            timeFormatHint: '选择时间的显示格式',
             timeFormat12: '12小时制 (上午/下午)',
             timeFormat24: '24小时制',
             dateFormat: '日期格式',
+            dateFormatHint: '选择日期的显示格式',
             dateFormatYMD: '年-月-日 (2024-01-01)',
             dateFormatMDY: '月-日-年 (01-01-2024)',
             dateFormatDMY: '日-月-年 (01-01-2024)',
             dateFormatChinese: '中文 (2024年1月1日)',
             colorSettings: '颜色设置',
+            colorSettingsHint: '设置时间显示的字体和背景颜色',
             colorHint: '设置时间显示的字体和背景颜色',
             textColor: '字体颜色',
             bgColor: '背景颜色',
             fontSize: '字体大小',
+            fontSizeHint: '调整时间显示的字体大小',
             opacity: '透明度',
+            opacityHint: '调整时间显示的透明度',
             fullscreenMode: '全屏模式',
+            fullscreenModeHint: '选择如何触发时间全屏显示',
             fullscreenDisabled: '关闭',
             fullscreenSingle: '单击',
             fullscreenDouble: '双击',
             fullscreenFontSize: '全屏字体大小',
             fullscreenFontSizeHint: '调整全屏时间显示的字体大小，范围10%-85%',
-            customColor: '自定义颜色'
+            customColor: '自定义颜色',
+            displayOptions: '显示选项'
         },
         about: {
             title: '关于 Aboard',
@@ -197,12 +254,14 @@ window.translations = {
     // Feature Area
     features: {
         title: '小功能',
+        moreFeatures: '更多功能',
         time: '时间',
         timer: '计时'
     },
 
     // Time Display
     timeDisplay: {
+        title: '时间显示',
         options: '时间显示选项',
         showDate: '显示日期',
         showTime: '显示时间',

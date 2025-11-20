@@ -64,6 +64,8 @@ window.translations = {
             normal: 'Normal Eraser',
             pixel: 'Pixel Eraser',
             size: 'Eraser Size',
+            sizeLabel: 'Eraser Size',
+            shape: 'Shape',
             shapeCircle: 'Circle',
             shapeRectangle: 'Rectangle'
         },
@@ -89,6 +91,8 @@ window.translations = {
         musicStaff: 'Music Staff',
         coordinate: 'Coordinate',
         image: 'Image',
+        density: 'Density',
+        size: 'Size',
         opacity: 'Background Opacity',
         opacityHint: 'Adjust background transparency, 100% is fully opaque',
         contrast: 'Contrast',
@@ -124,6 +128,15 @@ window.translations = {
             theme: 'Theme',
             themeHint: 'Choose application theme',
             themeColor: 'Theme Color',
+            showZoomControls: 'Show Zoom Controls',
+            showZoomControlsHint: 'Show zoom controls above the canvas',
+            showFullscreenBtn: 'Show Fullscreen Button',
+            showFullscreenBtnHint: 'Show fullscreen button next to zoom controls',
+            toolbarSize: 'Toolbar Size',
+            toolbarSizeHint: 'Adjust the size of the bottom toolbar',
+            configScale: 'Config Panel Size',
+            configScaleHint: 'Adjust the size of popup config panels',
+            themeColorHint: 'Color for selected toolbar items',
             colorOptions: {
                 blue: 'Blue',
                 purple: 'Purple',
@@ -140,6 +153,16 @@ window.translations = {
             title: 'General Settings',
             language: 'Language',
             languageHint: 'Choose interface language',
+            globalFont: 'Global Font',
+            globalFontHint: 'Choose the font used in the application',
+            edgeSnap: 'Enable Edge Snapping',
+            edgeSnapHint: 'Automatically snap control panels to screen edges when dragging',
+            controlPosition: 'Control Button Position',
+            controlPositionHint: 'Choose where to display zoom and pagination controls on the screen',
+            positionTopLeft: 'Top Left',
+            positionTopRight: 'Top Right',
+            positionBottomLeft: 'Bottom Left',
+            positionBottomRight: 'Bottom Right',
             canvasMode: 'Canvas Mode',
             canvasModeHint: 'Choose between pagination or infinite canvas mode',
             pagination: 'Pagination',
@@ -147,32 +170,66 @@ window.translations = {
             autoSave: 'Auto Save',
             autoSaveHint: 'Automatically save your drawings periodically'
         },
+        canvas: {
+            title: 'Canvas Settings',
+            mode: 'Canvas Mode',
+            modeHint: 'Choose the canvas display mode',
+            size: 'Canvas Size',
+            sizeHint: 'Choose preset sizes or customize canvas aspect ratio and size',
+            infiniteCanvas: 'Infinite Canvas',
+            pagination: 'Pagination Mode'
+        },
+        background: {
+            title: 'Background Settings',
+            opacity: 'Background Opacity',
+            opacityHint: 'Adjust background transparency, 100% is fully opaque',
+            patternIntensity: 'Pattern Intensity',
+            patternIntensityHint: 'Adjust the darkness of background pattern lines',
+            preference: 'Background Pattern Preference',
+            preferenceHint: 'Choose which patterns to display in the config panel'
+        },
+        announcement: {
+            title: 'Announcement'
+        },
+        more: {
+            title: 'More Settings',
+            showTimeDisplay: 'Show Time and Date',
+            showTimeDisplayHint: 'Display current time and date in the top right corner'
+        },
         time: {
             title: 'Time Display Settings',
             showDate: 'Show Date',
             showTime: 'Show Time',
             timezone: 'Timezone',
+            timezoneHint: 'Choose the timezone to display',
             timeFormat: 'Time Format',
+            timeFormatHint: 'Choose the time display format',
             timeFormat12: '12-hour (AM/PM)',
             timeFormat24: '24-hour',
             dateFormat: 'Date Format',
+            dateFormatHint: 'Choose the date display format',
             dateFormatYMD: 'Year-Month-Day (2024-01-01)',
             dateFormatMDY: 'Month-Day-Year (01-01-2024)',
             dateFormatDMY: 'Day-Month-Year (01-01-2024)',
             dateFormatChinese: 'Chinese (2024年1月1日)',
             colorSettings: 'Color Settings',
+            colorSettingsHint: 'Set font and background colors for time display',
             colorHint: 'Set font and background colors for time display',
             textColor: 'Text Color',
             bgColor: 'Background Color',
             fontSize: 'Font Size',
+            fontSizeHint: 'Adjust time display font size',
             opacity: 'Opacity',
+            opacityHint: 'Adjust time display opacity',
             fullscreenMode: 'Fullscreen Mode',
+            fullscreenModeHint: 'Choose how to trigger fullscreen time display',
             fullscreenDisabled: 'Disabled',
             fullscreenSingle: 'Single Click',
             fullscreenDouble: 'Double Click',
             fullscreenFontSize: 'Fullscreen Font Size',
             fullscreenFontSizeHint: 'Adjust fullscreen time display font size, range 10%-85%',
-            customColor: 'Custom Color'
+            customColor: 'Custom Color',
+            displayOptions: 'Display Options'
         },
         about: {
             title: 'About Aboard',
@@ -197,12 +254,14 @@ window.translations = {
     // Feature Area
     features: {
         title: 'Features',
+        moreFeatures: 'More Features',
         time: 'Time',
         timer: 'Timer'
     },
 
     // Time Display
     timeDisplay: {
+        title: 'Time Display',
         options: 'Time Display Options',
         showDate: 'Show Date',
         showTime: 'Show Time',

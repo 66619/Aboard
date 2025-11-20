@@ -236,9 +236,62 @@ class I18n {
         
         // Translate modals
         this.translateModals();
+        
+        // Translate pagination and other controls
+        this.translatePageControls();
+    }
+    
+    translatePageControls() {
+        // Translate pagination buttons
+        const prevBtn = document.getElementById('prev-page-btn');
+        if (prevBtn) {
+            prevBtn.title = this.t('page.previous');
+        }
+        
+        const nextBtn = document.getElementById('next-or-add-page-btn');
+        if (nextBtn) {
+            const isLastPage = true; // This will be determined by context
+            nextBtn.title = this.t('page.next');
+        }
+        
+        const pageInput = document.getElementById('page-input');
+        if (pageInput) {
+            pageInput.title = this.t('page.jumpPlaceholder');
+        }
     }
     
     translateConfigPanels() {
+        // Translate all config panel labels
+        const labelMappings = {
+            '笔触类型': 'tools.pen.type',
+            '颜色与粗细': 'tools.pen.colorAndSize',
+            '形状': 'tools.eraser.shape',
+            '橡皮擦大小': 'tools.eraser.sizeLabel',
+            '背景颜色': 'background.color',
+            '背景图案': 'background.pattern',
+            '密度': 'background.density',
+            '大小': 'background.size',
+            '更多功能': 'features.moreFeatures',
+            '小功能': 'features.title',
+            '时间显示选项': 'timeDisplay.options'
+        };
+        
+        // Translate labels in config panels
+        document.querySelectorAll('#config-area label, #feature-area label, #time-display-area label').forEach(label => {
+            const text = label.childNodes[0]?.textContent?.trim();
+            if (text && labelMappings[text]) {
+                const translation = this.t(labelMappings[text]);
+                if (translation !== labelMappings[text]) {
+                    // Preserve the structure (e.g., keep span elements for values)
+                    if (label.childNodes.length === 1) {
+                        label.textContent = translation;
+                    } else {
+                        label.childNodes[0].textContent = translation;
+                    }
+                }
+            }
+        });
+        
         // Pen configuration
         const penTypeButtons = {
             'normal': 'tools.pen.normal',
@@ -285,9 +338,53 @@ class I18n {
                 btn.textContent = this.t(patterns[pattern]);
             }
         });
+        
+        // Feature area buttons
+        this.translateFeatureArea();
+    }
+    
+    translateFeatureArea() {
+        // Translate feature buttons
+        const timeDisplayBtn = document.getElementById('time-display-feature-btn');
+        if (timeDisplayBtn) {
+            const span = timeDisplayBtn.querySelector('span');
+            if (span) {
+                span.textContent = this.t('features.time');
+            }
+            timeDisplayBtn.title = this.t('timeDisplay.title');
+        }
+        
+        const timerBtn = document.getElementById('timer-feature-btn');
+        if (timerBtn) {
+            const span = timerBtn.querySelector('span');
+            if (span) {
+                span.textContent = this.t('features.timer');
+            }
+            timerBtn.title = this.t('timer.title');
+        }
+        
+        // Translate close button titles
+        const closeButtons = [
+            { id: 'feature-close-btn', key: 'common.close' },
+            { id: 'config-close-btn', key: 'common.close' },
+            { id: 'time-display-area-close-btn', key: 'common.close' }
+        ];
+        
+        closeButtons.forEach(({ id, key }) => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                btn.title = this.t(key);
+            }
+        });
     }
     
     translateSettingsModal() {
+        // Translate settings modal title
+        const settingsTitle = document.querySelector('#settings-modal h2');
+        if (settingsTitle) {
+            settingsTitle.textContent = this.t('settings.title');
+        }
+        
         // Settings tab labels
         const tabs = document.querySelectorAll('.settings-tab-icon span');
         const tabNames = ['general', 'display', 'canvas', 'background', 'about', 'announcement', 'more'];
@@ -299,6 +396,155 @@ class I18n {
                 const translation = this.t(key);
                 if (translation !== key) {
                     span.textContent = translation;
+                }
+            }
+        });
+        
+        // Translate settings section headers (h3 tags)
+        const headerMappings = {
+            '通用设置': 'settings.general.title',
+            '显示设置': 'settings.display.title',
+            '画布设置': 'settings.canvas.title',
+            '背景设置': 'settings.background.title',
+            '关于 Aboard': 'settings.about.title',
+            '公告': 'settings.announcement.title',
+            '更多设置': 'settings.more.title'
+        };
+        
+        document.querySelectorAll('.settings-tab-content h3').forEach(h3 => {
+            const text = h3.textContent.trim();
+            if (headerMappings[text]) {
+                const translation = this.t(headerMappings[text]);
+                if (translation !== headerMappings[text]) {
+                    h3.textContent = translation;
+                }
+            }
+        });
+        
+        // Translate settings labels
+        this.translateSettingsLabels();
+    }
+    
+    translateSettingsLabels() {
+        // Map Chinese labels to translation keys
+        const labelMappings = {
+            '语言 / Language': 'settings.general.language',
+            '全局字体': 'settings.general.globalFont',
+            '启用边缘吸附': 'settings.general.edgeSnap',
+            '控制按钮位置': 'settings.general.controlPosition',
+            '显示缩放控件': 'settings.display.showZoomControls',
+            '显示全屏按钮': 'settings.display.showFullscreenBtn',
+            '工具栏大小': 'settings.display.toolbarSize',
+            '属性栏大小': 'settings.display.configScale',
+            '主题色': 'settings.display.themeColor',
+            '画布模式': 'settings.canvas.mode',
+            '画布尺寸': 'settings.canvas.size',
+            '背景透明度': 'settings.background.opacity',
+            '图案透明度': 'settings.background.patternIntensity',
+            '背景图案偏好': 'settings.background.preference',
+            '显示时间和日期': 'settings.more.showTimeDisplay',
+            '显示选项': 'settings.time.displayOptions',
+            '时区': 'settings.time.timezone',
+            '时间格式': 'settings.time.timeFormat',
+            '日期格式': 'settings.time.dateFormat',
+            '颜色设置': 'settings.time.colorSettings',
+            '字体颜色': 'settings.time.textColor',
+            '背景颜色': 'settings.time.bgColor',
+            '字体大小': 'settings.time.fontSize',
+            '透明度': 'settings.time.opacity',
+            '全屏模式': 'settings.time.fullscreenMode',
+            '全屏字体大小': 'settings.time.fullscreenFontSize'
+        };
+        
+        // Translate labels in settings
+        document.querySelectorAll('.settings-tab-content label').forEach(label => {
+            const text = label.childNodes[0]?.textContent?.trim();
+            if (text && labelMappings[text]) {
+                const translation = this.t(labelMappings[text]);
+                if (translation !== labelMappings[text]) {
+                    if (label.childNodes.length === 1) {
+                        label.textContent = translation;
+                    } else {
+                        label.childNodes[0].textContent = translation;
+                    }
+                }
+            }
+        });
+        
+        // Translate checkbox labels
+        document.querySelectorAll('.checkbox-label span').forEach(span => {
+            const text = span.textContent.trim();
+            if (labelMappings[text]) {
+                const translation = this.t(labelMappings[text]);
+                if (translation !== labelMappings[text]) {
+                    span.textContent = translation;
+                }
+            }
+        });
+        
+        // Translate canvas mode buttons
+        const canvasModeButtons = document.querySelectorAll('.canvas-mode-btn');
+        canvasModeButtons.forEach(btn => {
+            const mode = btn.getAttribute('data-mode');
+            if (mode === 'infinite') {
+                btn.textContent = this.t('settings.canvas.infiniteCanvas');
+            } else if (mode === 'paginated') {
+                btn.textContent = this.t('settings.canvas.pagination');
+            }
+        });
+        
+        // Translate position buttons
+        const positionMappings = {
+            'top-left': 'settings.general.positionTopLeft',
+            'top-right': 'settings.general.positionTopRight',
+            'bottom-left': 'settings.general.positionBottomLeft',
+            'bottom-right': 'settings.general.positionBottomRight'
+        };
+        
+        document.querySelectorAll('.position-option-btn').forEach(btn => {
+            const position = btn.getAttribute('data-position');
+            if (position && positionMappings[position]) {
+                btn.textContent = this.t(positionMappings[position]);
+            }
+        });
+        
+        // Translate hints
+        this.translateSettingsHints();
+    }
+    
+    translateSettingsHints() {
+        const hintMappings = {
+            '选择界面语言 / Choose interface language': 'settings.general.languageHint',
+            '选择应用程序使用的字体': 'settings.general.globalFontHint',
+            '拖动控制面板时自动吸附到屏幕边缘': 'settings.general.edgeSnapHint',
+            '选择缩放和分页控件在屏幕上的显示位置': 'settings.general.controlPositionHint',
+            '勾选后，在画布上方显示缩放控件': 'settings.display.showZoomControlsHint',
+            '勾选后，在缩放控件旁显示全屏按钮': 'settings.display.showFullscreenBtnHint',
+            '调整底部工具栏的大小': 'settings.display.toolbarSizeHint',
+            '调整弹出具体属性面板的大小': 'settings.display.configScaleHint',
+            '工具栏被选中时的颜色': 'settings.display.themeColorHint',
+            '选择画布的显示模式': 'settings.canvas.modeHint',
+            '选择预设尺寸或自定义画布比例和大小': 'settings.canvas.sizeHint',
+            '调整背景的透明度,100%为完全不透明': 'settings.background.opacityHint',
+            '调整背景图案线条的明暗程度': 'settings.background.patternIntensityHint',
+            '选择在属性栏中显示的图案': 'settings.background.preferenceHint',
+            '在右上角显示当前时间和日期': 'settings.more.showTimeDisplayHint',
+            '选择要显示的时区': 'settings.time.timezoneHint',
+            '选择时间的显示格式': 'settings.time.timeFormatHint',
+            '选择日期的显示格式': 'settings.time.dateFormatHint',
+            '设置时间显示的字体和背景颜色': 'settings.time.colorSettingsHint',
+            '调整时间显示的字体大小': 'settings.time.fontSizeHint',
+            '调整时间显示的透明度': 'settings.time.opacityHint',
+            '选择如何触发时间全屏显示': 'settings.time.fullscreenModeHint',
+            '调整全屏时间显示的字体大小，范围10%-85%': 'settings.time.fullscreenFontSizeHint'
+        };
+        
+        document.querySelectorAll('.settings-hint').forEach(hint => {
+            const text = hint.textContent.trim();
+            if (hintMappings[text]) {
+                const translation = this.t(hintMappings[text]);
+                if (translation !== hintMappings[text]) {
+                    hint.textContent = translation;
                 }
             }
         });
@@ -324,6 +570,33 @@ class I18n {
         const confirmCancel = document.getElementById('confirm-cancel-btn');
         if (confirmCancel) {
             confirmCancel.textContent = this.t('common.cancel');
+        }
+        
+        // Welcome modal
+        const welcomeTitle = document.querySelector('#welcome-modal h2');
+        if (welcomeTitle) {
+            welcomeTitle.textContent = this.t('welcome.title');
+        }
+        
+        const welcomeContent = document.querySelector('#welcome-modal .modal-content p');
+        if (welcomeContent) {
+            welcomeContent.textContent = this.t('welcome.content');
+        }
+        
+        const welcomeOk = document.getElementById('welcome-ok-btn');
+        if (welcomeOk) {
+            welcomeOk.textContent = this.t('welcome.confirm');
+        }
+        
+        const welcomeNoShow = document.getElementById('welcome-no-show-btn');
+        if (welcomeNoShow) {
+            welcomeNoShow.textContent = this.t('welcome.noShowAgain');
+        }
+        
+        // Announcement modal
+        const announcementTitle = document.getElementById('announcement-title');
+        if (announcementTitle) {
+            announcementTitle.textContent = this.t('settings.announcement.title');
         }
     }
 
