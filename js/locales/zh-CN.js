@@ -262,6 +262,7 @@ window.translations = {
     // Time Display
     timeDisplay: {
         title: '时间显示',
+        settingsTitle: '时间显示设置',
         options: '时间显示选项',
         showDate: '显示日期',
         showTime: '显示时间',
@@ -269,7 +270,20 @@ window.translations = {
         displayOptions: '显示选项',
         dateAndTime: '日期和时间',
         dateOnly: '仅日期',
-        timeOnly: '仅时间'
+        timeOnly: '仅时间',
+        timezone: '时区',
+        timeFormat: '时间格式',
+        dateFormat: '日期格式',
+        colorSettings: '颜色设置',
+        textColor: '字体颜色',
+        bgColor: '背景颜色',
+        fontSize: '字体大小',
+        opacity: '透明度',
+        fullscreenMode: '全屏模式',
+        fullscreenFontSize: '全屏字体大小',
+        fullscreenSliderLabel: '字体大小调节 (10%-85%)',
+        customColor: '自定义颜色',
+        transparent: '透明'
     },
 
     // Timer

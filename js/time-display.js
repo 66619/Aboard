@@ -210,8 +210,10 @@ class TimeDisplayManager {
         const year = date.getFullYear();
         const month = date.getMonth() + 1;
         const day = date.getDate();
-        const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-        const weekday = weekdays[date.getDay()];
+        
+        // Use translated weekday names from i18n
+        const weekdayKeys = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        const weekday = window.i18n ? window.i18n.t(`days.${weekdayKeys[date.getDay()]}`) : ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'][date.getDay()];
         
         switch (this.dateFormat) {
             case 'yyyy-mm-dd':

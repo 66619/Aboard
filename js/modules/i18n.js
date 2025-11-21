@@ -598,6 +598,143 @@ class I18n {
         if (announcementTitle) {
             announcementTitle.textContent = this.t('settings.announcement.title');
         }
+        
+        // Time Display Settings Modal
+        this.translateTimeDisplaySettings();
+        
+        // Timer Settings Modal  
+        this.translateTimerSettings();
+    }
+    
+    translateTimeDisplaySettings() {
+        // Modal title
+        const tdSettingsTitle = document.querySelector('#time-display-settings-modal h2');
+        if (tdSettingsTitle) {
+            tdSettingsTitle.textContent = this.t('timeDisplay.settingsTitle');
+        }
+        
+        // Close button
+        const tdCloseBtn = document.getElementById('time-display-settings-close-btn');
+        if (tdCloseBtn) {
+            tdCloseBtn.title = this.t('common.close');
+        }
+        
+        // Checkbox labels in time display area
+        document.querySelectorAll('#time-display-area .checkbox-label span').forEach(span => {
+            if (span.textContent.trim() === '显示日期') {
+                span.textContent = this.t('timeDisplay.showDate');
+            } else if (span.textContent.trim() === '显示时间') {
+                span.textContent = this.t('timeDisplay.showTime');
+            }
+        });
+        
+        // Settings button
+        const tdSettingsBtn = document.getElementById('time-display-area-settings-btn');
+        if (tdSettingsBtn) {
+            tdSettingsBtn.title = this.t('timeDisplay.settings');
+        }
+        
+        // Label mappings for time display settings
+        const labelMappings = {
+            '显示选项': 'timeDisplay.displayOptions',
+            '时区': 'timeDisplay.timezone',
+            '时间格式': 'timeDisplay.timeFormat',
+            '日期格式': 'timeDisplay.dateFormat',
+            '颜色设置': 'timeDisplay.colorSettings',
+            '字体颜色': 'timeDisplay.textColor',
+            '背景颜色': 'timeDisplay.bgColor',
+            '字体大小': 'timeDisplay.fontSize',
+            '透明度': 'timeDisplay.opacity',
+            '全屏模式': 'timeDisplay.fullscreenMode',
+            '全屏字体大小': 'timeDisplay.fullscreenFontSize',
+            '自定义颜色': 'timeDisplay.customColor'
+        };
+        
+        // Translate labels in time display settings modal
+        document.querySelectorAll('#time-display-settings-modal label').forEach(label => {
+            const text = label.childNodes[0]?.textContent?.trim();
+            if (text && labelMappings[text]) {
+                const translation = this.t(labelMappings[text]);
+                if (translation !== labelMappings[text]) {
+                    if (label.childNodes.length === 1) {
+                        label.textContent = translation;
+                    } else {
+                        label.childNodes[0].textContent = translation + ' ';
+                    }
+                }
+            }
+        });
+        
+        // Translate display option buttons
+        document.querySelectorAll('.display-option-btn').forEach(btn => {
+            const type = btn.getAttribute('data-td-display-type');
+            if (type === 'both') {
+                btn.textContent = this.t('timeDisplay.dateAndTime');
+            } else if (type === 'date-only') {
+                btn.textContent = this.t('timeDisplay.dateOnly');
+            } else if (type === 'time-only') {
+                btn.textContent = this.t('timeDisplay.timeOnly');
+            }
+        });
+        
+        // Translate fullscreen mode buttons
+        document.querySelectorAll('.fullscreen-mode-btn').forEach(btn => {
+            const mode = btn.getAttribute('data-td-mode');
+            if (mode === 'disabled') {
+                btn.textContent = this.t('settings.time.fullscreenDisabled');
+            } else if (mode === 'single') {
+                btn.textContent = this.t('settings.time.fullscreenSingle');
+            } else if (mode === 'double') {
+                btn.textContent = this.t('settings.time.fullscreenDouble');
+            }
+        });
+        
+        // Translate color button titles in time display settings
+        document.querySelectorAll('#time-display-settings-modal .color-btn').forEach(btn => {
+            const colorValue = btn.getAttribute('data-td-time-color') || btn.getAttribute('data-td-time-bg-color');
+            if (colorValue === 'transparent') {
+                btn.title = this.t('timeDisplay.transparent');
+            } else {
+                // Translate color names
+                const colorMap = {
+                    '#000000': 'colors.black',
+                    '#FFFFFF': 'colors.white',
+                    '#007AFF': 'colors.blue',
+                    '#FF0000': 'colors.red',
+                    '#00FF00': 'colors.green',
+                    '#FFFF00': 'colors.yellow',
+                    '#FF8800': 'colors.orange',
+                    '#8800FF': 'colors.purple'
+                };
+                if (colorMap[colorValue]) {
+                    btn.title = this.t(colorMap[colorValue]);
+                }
+            }
+        });
+        
+        // Translate fullscreen slider labels
+        const timeFullscreenLabel = document.querySelector('.time-fullscreen-slider-label');
+        if (timeFullscreenLabel) {
+            timeFullscreenLabel.textContent = this.t('timeDisplay.fullscreenSliderLabel');
+        }
+        
+        const timerFullscreenLabel = document.querySelector('.timer-fullscreen-slider-label');
+        if (timerFullscreenLabel) {
+            timerFullscreenLabel.textContent = this.t('timeDisplay.fullscreenSliderLabel');
+        }
+    }
+    
+    translateTimerSettings() {
+        // Timer fullscreen close button
+        const timerFullscreenClose = document.getElementById('timer-fullscreen-close-btn');
+        if (timerFullscreenClose) {
+            timerFullscreenClose.title = this.t('common.close');
+        }
+        
+        const timeFullscreenClose = document.getElementById('time-fullscreen-close-btn');
+        if (timeFullscreenClose) {
+            timeFullscreenClose.title = this.t('common.close');
+        }
     }
 
     /**

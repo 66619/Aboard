@@ -262,6 +262,7 @@ window.translations = {
     // Time Display
     timeDisplay: {
         title: 'Time Display',
+        settingsTitle: 'Time Display Settings',
         options: 'Time Display Options',
         showDate: 'Show Date',
         showTime: 'Show Time',
@@ -269,7 +270,20 @@ window.translations = {
         displayOptions: 'Display Options',
         dateAndTime: 'Date and Time',
         dateOnly: 'Date Only',
-        timeOnly: 'Time Only'
+        timeOnly: 'Time Only',
+        timezone: 'Timezone',
+        timeFormat: 'Time Format',
+        dateFormat: 'Date Format',
+        colorSettings: 'Color Settings',
+        textColor: 'Text Color',
+        bgColor: 'Background Color',
+        fontSize: 'Font Size',
+        opacity: 'Opacity',
+        fullscreenMode: 'Fullscreen Mode',
+        fullscreenFontSize: 'Fullscreen Font Size',
+        fullscreenSliderLabel: 'Font Size Adjustment (10%-85%)',
+        customColor: 'Custom Color',
+        transparent: 'Transparent'
     },
 
     // Timer
