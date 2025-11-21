@@ -297,24 +297,6 @@ window.translations = {
             fullscreenFontSizeHint: 'Adjust fullscreen time display font size, range 10%-85%',
             customColor: 'Custom Color',
             displayOptions: 'Display Options'
-        },
-        about: {
-            title: 'About Aboard',
-            version: 'Version',
-            description: 'Aboard is a minimalist yet powerful whiteboard application designed for creative work and efficient note-taking.',
-            features: 'Key Features',
-            feature1: 'Smooth drawing experience',
-            feature2: 'Rich pen types',
-            feature3: 'Flexible eraser tool',
-            feature4: 'Rich background patterns (dots, grid, Tianzige, English 4-line, etc.)',
-            feature5: 'Export to PNG images',
-            feature6: 'Undo/Redo functionality',
-            feature7: 'Full touch support',
-            feature8: 'Fullscreen mode',
-            feature9: 'Auto-save',
-            feature10: 'Multi-language support',
-            license: 'Open Source License',
-            github: 'GitHub Repository'
         }
     },
 

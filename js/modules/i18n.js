@@ -991,10 +991,14 @@ class I18n {
     translateAboutContent() {
         // About section
         const aboutTitle = document.querySelector('#about-settings h3');
-        if (aboutTitle && aboutTitle.textContent.trim() === '关于 Aboard') {
-            const translation = this.t('settings.about.title');
-            if (translation !== 'settings.about.title') {
-                aboutTitle.textContent = translation;
+        if (aboutTitle) {
+            const text = aboutTitle.textContent.trim();
+            // Translate if it's Chinese OR if already translated (for refresh)
+            if (text === '关于 Aboard' || text === 'About Aboard') {
+                const translation = this.t('settings.about.title');
+                if (translation !== 'settings.about.title' && translation !== text) {
+                    aboutTitle.textContent = translation;
+                }
             }
         }
         
@@ -1006,9 +1010,10 @@ class I18n {
             const desc1 = aboutSections[0].querySelectorAll('p')[0];
             const desc2 = aboutSections[0].querySelectorAll('p')[1];
             
-            if (projectIntro && projectIntro.textContent.trim() === '项目简介') {
+            if (projectIntro) {
+                const text = projectIntro.textContent.trim();
                 const translation = this.t('settings.about.projectIntro');
-                if (translation !== 'settings.about.projectIntro') {
+                if (translation !== 'settings.about.projectIntro' && translation !== text) {
                     projectIntro.textContent = translation;
                 }
             }
@@ -1027,32 +1032,34 @@ class I18n {
             
             // Main features
             const featuresHeader = aboutSections[1].querySelector('h4');
-            if (featuresHeader && featuresHeader.textContent.trim() === '主要功能') {
+            if (featuresHeader) {
+                const text = featuresHeader.textContent.trim();
                 const translation = this.t('settings.about.mainFeatures');
-                if (translation !== 'settings.about.mainFeatures') {
+                if (translation !== 'settings.about.mainFeatures' && translation !== text) {
                     featuresHeader.textContent = translation;
                 }
             }
             
-            // Translate feature list items
+            // Translate feature list items - they have bullet points in HTML
             const featureItems = aboutSections[1].querySelectorAll('li');
             const featureKeys = [
-                'features.feature1',
-                'features.feature2',
-                'features.feature3',
-                'features.feature4',
-                'features.feature5',
-                'features.feature6',
-                'features.feature7',
-                'features.feature8',
-                'features.feature9'
+                'penTypes',
+                'smartEraser',
+                'richPatterns',
+                'adjustable',
+                'canvasModes',
+                'customSize',
+                'draggable',
+                'undoRedo',
+                'smartZoom',
+                'responsive'
             ];
             
             featureItems.forEach((item, index) => {
                 if (index < featureKeys.length) {
-                    const translation = this.t(`settings.about.${featureKeys[index]}`);
-                    if (translation !== `settings.about.${featureKeys[index]}`) {
-                        item.textContent = translation;
+                    const translation = this.t(`settings.about.features.${featureKeys[index]}`);
+                    if (translation && translation !== `settings.about.features.${featureKeys[index]}`) {
+                        item.textContent = '• ' + translation;
                     }
                 }
             });
@@ -1060,42 +1067,35 @@ class I18n {
             // Tech stack
             const techHeader = aboutSections[2].querySelector('h4');
             const techContent = aboutSections[2].querySelector('p');
-            if (techHeader && techHeader.textContent.trim() === '技术栈') {
+            if (techHeader) {
+                const text = techHeader.textContent.trim();
                 const translation = this.t('settings.about.techStack');
-                if (translation !== 'settings.about.techStack') {
+                if (translation !== 'settings.about.techStack' && translation !== text) {
                     techHeader.textContent = translation;
                 }
             }
-            if (techContent) {
-                const translation = this.t('settings.about.tech');
-                if (translation !== 'settings.about.tech') {
-                    techContent.textContent = translation;
-                }
-            }
+            // Tech content should stay the same in all languages
             
             // License
             const licenseHeader = aboutSections[3].querySelector('h4');
             const licenseContent = aboutSections[3].querySelector('p');
-            if (licenseHeader && licenseHeader.textContent.trim() === '开源协议') {
+            if (licenseHeader) {
+                const text = licenseHeader.textContent.trim();
                 const translation = this.t('settings.about.license');
-                if (translation !== 'settings.about.license') {
+                if (translation !== 'settings.about.license' && translation !== text) {
                     licenseHeader.textContent = translation;
                 }
             }
-            if (licenseContent) {
-                const translation = this.t('settings.about.licenseType');
-                if (translation !== 'settings.about.licenseType') {
-                    licenseContent.textContent = translation;
-                }
-            }
+            // License type should stay the same
             
             // GitHub (keep as is)
             
             // Version header
             const versionHeader = aboutSections[5]?.querySelector('h4');
-            if (versionHeader && versionHeader.textContent.trim() === '版本') {
+            if (versionHeader) {
+                const text = versionHeader.textContent.trim();
                 const translation = this.t('settings.about.version');
-                if (translation !== 'settings.about.version') {
+                if (translation !== 'settings.about.version' && translation !== text) {
                     versionHeader.textContent = translation;
                 }
             }

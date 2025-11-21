@@ -297,24 +297,6 @@ window.translations = {
             fullscreenFontSizeHint: '调整全屏时间显示的字体大小，范围10%-85%',
             customColor: '自定义颜色',
             displayOptions: '显示选项'
-        },
-        about: {
-            title: '关于 Aboard',
-            version: '版本',
-            description: 'Aboard 是一款简约而强大的白板应用，专为创意工作和高效记录而设计。',
-            features: '主要特性',
-            feature1: '流畅的绘图体验',
-            feature2: '丰富的笔触类型',
-            feature3: '灵活的橡皮擦工具',
-            feature4: '丰富的背景图案（点阵、方格、田字格、英语四线格等）',
-            feature5: '支持导出为PNG图片',
-            feature6: '撤销/重做功能',
-            feature7: '完整的触控支持',
-            feature8: '全屏模式',
-            feature9: '自动保存',
-            feature10: '多语言支持',
-            license: '开源协议',
-            github: 'GitHub 仓库'
         }
     },
 
