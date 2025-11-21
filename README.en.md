@@ -2,7 +2,7 @@
 
 <div align="center">
 
-**[中文](README.md)** | **[English](README.en.md)**
+**[简体中文](README.md)** | **[繁體中文](README.zh-TW.md)** | **[English](README.en.md)**
 
 </div>
 
@@ -72,7 +72,7 @@
 - **Clear Canvas**: One-click to clear all content (with confirmation)
 
 ### 🌍 Multi-language Support
-- **Supported Languages**: Chinese (Simplified), English, Japanese, Korean, French, German, Spanish
+- **Supported Languages**: Chinese (Simplified), Chinese (Traditional), English, Japanese, Korean, French, German, Spanish
 - **Auto-detection**: Automatically detects browser language on first visit
 - **Easy Switching**: Change language anytime in Settings > General
 - **Instant Apply**: Language changes take effect immediately after page reload
