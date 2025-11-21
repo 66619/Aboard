@@ -1,6 +1,10 @@
 # Aboard
 
-[中文](README.md) | **English**
+<div align="center">
+
+**[中文](README.md)** | **[English](README.en.md)**
+
+</div>
 
 > A minimalist and elegant web-based whiteboard application, designed for teaching and presentations | 𝓙𝓾𝓼𝓽 𝓪 𝓫𝓸𝓪𝓻𝓭.
 
@@ -69,8 +73,10 @@
 
 ### 🌍 Multi-language Support
 - **Supported Languages**: Chinese (Simplified), English, Japanese, Korean, French, German, Spanish
-- **Auto-detection**: Automatically detects browser language
-- **Easy Switching**: Change language anytime in settings
+- **Auto-detection**: Automatically detects browser language on first visit
+- **Easy Switching**: Change language anytime in Settings > General
+- **Instant Apply**: Language changes take effect immediately after page reload
+- **Persistent**: Language preference is saved locally
 
 ### 📱 Full Touch Support
 - **Touch Drawing**: Optimized for tablets and touch screens

@@ -232,6 +232,9 @@ class SettingsManager {
         // Load global font
         this.applyGlobalFont();
         document.getElementById('global-font-select').value = this.globalFont;
+        
+        // Initialize language selector
+        this.initLanguageSelector();
     }
     
     updateCanvasSizeSettings() {
@@ -331,5 +334,21 @@ class SettingsManager {
                 fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
         }
         document.body.style.fontFamily = fontFamily;
+    }
+    
+    initLanguageSelector() {
+        const languageSelect = document.getElementById('language-select');
+        if (languageSelect && window.i18n) {
+            // Set current language
+            languageSelect.value = window.i18n.getCurrentLocale();
+            
+            // Handle language change
+            languageSelect.addEventListener('change', async (e) => {
+                const newLocale = e.target.value;
+                await window.i18n.changeLocale(newLocale);
+                // Reload the page to apply all translations properly
+                window.location.reload();
+            });
+        }
     }
 }

@@ -169,50 +169,52 @@ class TimeDisplayManager {
     }
     
     formatDate(date) {
-        // Apply timezone conversion for date
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        
+        // Use translated weekday names from i18n
+        const weekdayKeys = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        const weekday = window.i18n ? window.i18n.t(`days.${weekdayKeys[date.getDay()]}`) : ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'][date.getDay()];
+        
+        // Apply timezone conversion for date if needed
         try {
-            const options = {
-                timeZone: this.timezone,
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                weekday: 'long'
-            };
-            const parts = new Intl.DateTimeFormat('zh-CN', options).formatToParts(date);
-            
-            let year, month, day, weekday;
-            parts.forEach(part => {
-                if (part.type === 'year') year = parseInt(part.value);
-                if (part.type === 'month') month = parseInt(part.value);
-                if (part.type === 'day') day = parseInt(part.value);
-                if (part.type === 'weekday') weekday = part.value;
-            });
-            
-            if (year && month && day) {
-                switch (this.dateFormat) {
-                    case 'yyyy-mm-dd':
-                        return `${year}-${this.padZero(month)}-${this.padZero(day)} ${weekday}`;
-                    case 'mm-dd-yyyy':
-                        return `${this.padZero(month)}-${this.padZero(day)}-${year} ${weekday}`;
-                    case 'dd-mm-yyyy':
-                        return `${this.padZero(day)}-${this.padZero(month)}-${year} ${weekday}`;
-                    case 'chinese':
-                        return `${year}年${month}月${day}日 ${weekday}`;
-                    default:
-                        return `${year}-${this.padZero(month)}-${this.padZero(day)} ${weekday}`;
+            if (this.timezone !== Intl.DateTimeFormat().resolvedOptions().timeZone) {
+                const options = {
+                    timeZone: this.timezone,
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                };
+                const parts = new Intl.DateTimeFormat('en-US', options).formatToParts(date);
+                
+                let tzYear, tzMonth, tzDay;
+                parts.forEach(part => {
+                    if (part.type === 'year') tzYear = parseInt(part.value);
+                    if (part.type === 'month') tzMonth = parseInt(part.value);
+                    if (part.type === 'day') tzDay = parseInt(part.value);
+                });
+                
+                if (tzYear && tzMonth && tzDay) {
+                    switch (this.dateFormat) {
+                        case 'yyyy-mm-dd':
+                            return `${tzYear}-${this.padZero(tzMonth)}-${this.padZero(tzDay)} ${weekday}`;
+                        case 'mm-dd-yyyy':
+                            return `${this.padZero(tzMonth)}-${this.padZero(tzDay)}-${tzYear} ${weekday}`;
+                        case 'dd-mm-yyyy':
+                            return `${this.padZero(tzDay)}-${this.padZero(tzMonth)}-${tzYear} ${weekday}`;
+                        case 'chinese':
+                            return `${tzYear}年${tzMonth}月${tzDay}日 ${weekday}`;
+                        default:
+                            return `${tzYear}-${this.padZero(tzMonth)}-${this.padZero(tzDay)} ${weekday}`;
+                    }
                 }
             }
         } catch (e) {
             console.error('Error formatting date with timezone:', e);
         }
         
-        // Fallback to local date
-        const year = date.getFullYear();
-        const month = date.getMonth() + 1;
-        const day = date.getDate();
-        const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-        const weekday = weekdays[date.getDay()];
-        
+        // Use local date
         switch (this.dateFormat) {
             case 'yyyy-mm-dd':
                 return `${year}-${this.padZero(month)}-${this.padZero(day)} ${weekday}`;

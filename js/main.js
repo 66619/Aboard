@@ -2012,7 +2012,7 @@ class DrawingBoard {
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
             `;
-            nextOrAddBtn.title = '新建页面';
+            nextOrAddBtn.title = window.i18n ? window.i18n.t('page.newPage') : '新建页面';
         } else {
             // Show next icon
             nextOrAddBtn.innerHTML = `
@@ -2020,7 +2020,7 @@ class DrawingBoard {
                     <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
             `;
-            nextOrAddBtn.title = '下一页';
+            nextOrAddBtn.title = window.i18n ? window.i18n.t('page.next') : '下一页';
         }
     }
     
@@ -2226,9 +2226,19 @@ class DrawingBoard {
 
 // Initialize the application
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Initialize i18n first
+        if (window.i18n) {
+            await window.i18n.init();
+        }
         new DrawingBoard();
     });
 } else {
-    new DrawingBoard();
+    // If DOM is already loaded, initialize immediately
+    (async () => {
+        if (window.i18n) {
+            await window.i18n.init();
+        }
+        new DrawingBoard();
+    })();
 }

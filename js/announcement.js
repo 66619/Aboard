@@ -3,7 +3,6 @@
 
 class AnnouncementManager {
     constructor() {
-        this.announcementData = null;
         this.modal = document.getElementById('announcement-modal');
         this.titleElement = document.getElementById('announcement-title');
         this.contentElement = document.getElementById('announcement-content');
@@ -11,7 +10,22 @@ class AnnouncementManager {
         this.noShowButton = document.getElementById('announcement-no-show-btn');
         
         this.setupEventListeners();
-        this.loadAnnouncementData();
+        
+        // Wait for i18n to be ready before checking announcement
+        if (window.i18n) {
+            this.checkAndShowAnnouncement();
+            this.updateSettingsContent();
+        } else {
+            window.addEventListener('i18nReady', () => {
+                this.checkAndShowAnnouncement();
+                this.updateSettingsContent();
+            });
+        }
+        
+        // Listen for language changes to update announcement content
+        window.addEventListener('localeChanged', () => {
+            this.updateSettingsContent();
+        });
     }
     
     setupEventListeners() {
@@ -34,33 +48,34 @@ class AnnouncementManager {
         });
     }
     
-    async loadAnnouncementData() {
-        try {
-            const response = await fetch('announcements.json');
-            this.announcementData = await response.json();
-            this.updateSettingsContent();
-            this.checkAndShowAnnouncement();
-        } catch (error) {
-            console.warn('Failed to load announcement data:', error);
-        }
-    }
-    
     checkAndShowAnnouncement() {
         // Check if user has chosen not to show the announcement
         const hideAnnouncement = localStorage.getItem('hideAnnouncement');
         
-        if (!hideAnnouncement && this.announcementData) {
+        if (!hideAnnouncement && window.i18n) {
             // Show announcement on first visit
             this.showModal();
         }
     }
     
     showModal() {
-        if (!this.announcementData) return;
+        if (!window.i18n) return;
         
-        // Set title and content
-        this.titleElement.textContent = this.announcementData.title;
-        this.contentElement.textContent = this.announcementData.content.join('\n');
+        // Set title and content from i18n
+        this.titleElement.textContent = window.i18n.t('settings.announcement.title');
+        
+        // Get content array from i18n and convert links to clickable
+        const content = window.i18n.t('settings.announcement.content');
+        if (Array.isArray(content)) {
+            // Convert links to HTML anchor tags
+            const htmlContent = content.map(line => {
+                // Match URLs in the text
+                return line.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+            }).join('<br>');
+            this.contentElement.innerHTML = htmlContent;
+        } else {
+            this.contentElement.textContent = content;
+        }
         
         // Show modal
         this.modal.classList.add('show');
@@ -71,11 +86,21 @@ class AnnouncementManager {
     }
     
     updateSettingsContent() {
-        if (!this.announcementData) return;
+        if (!window.i18n) return;
         
         const settingsContent = document.getElementById('settings-announcement-content');
         if (settingsContent) {
-            settingsContent.textContent = this.announcementData.content.join('\n');
+            const content = window.i18n.t('settings.announcement.content');
+            if (Array.isArray(content)) {
+                // Convert links to HTML anchor tags
+                const htmlContent = content.map(line => {
+                    // Match URLs in the text
+                    return line.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color: #007AFF; text-decoration: none;">$1</a>');
+                }).join('<br>');
+                settingsContent.innerHTML = htmlContent;
+            } else {
+                settingsContent.textContent = content;
+            }
         }
     }
     
