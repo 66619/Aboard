@@ -801,6 +801,14 @@ class I18n {
                 btn.textContent = this.t('settings.canvas.presets.a4Portrait');
             } else if (preset === 'A4-landscape') {
                 btn.textContent = this.t('settings.canvas.presets.a4Landscape');
+            } else if (preset === 'A3-portrait') {
+                btn.textContent = this.t('settings.canvas.presets.a3Portrait');
+            } else if (preset === 'A3-landscape') {
+                btn.textContent = this.t('settings.canvas.presets.a3Landscape');
+            } else if (preset === 'B5-portrait') {
+                btn.textContent = this.t('settings.canvas.presets.b5Portrait');
+            } else if (preset === 'B5-landscape') {
+                btn.textContent = this.t('settings.canvas.presets.b5Landscape');
             } else if (preset === '16:9') {
                 btn.textContent = this.t('settings.canvas.presets.widescreen');
             } else if (preset === '4:3') {
@@ -809,6 +817,25 @@ class I18n {
                 btn.textContent = this.t('settings.canvas.presets.custom');
             }
         });
+        
+        // Translate canvas ratio dropdown
+        const canvasRatioSelect = document.getElementById('canvas-ratio-select');
+        if (canvasRatioSelect && this.currentLocale === 'en-US') {
+            canvasRatioSelect.options[0].text = 'Custom';
+            canvasRatioSelect.options[1].text = '16:9';
+            canvasRatioSelect.options[2].text = '4:3';
+            canvasRatioSelect.options[3].text = '1:1';
+            canvasRatioSelect.options[4].text = '3:4 (Portrait)';
+            canvasRatioSelect.options[5].text = '9:16 (Portrait)';
+        }
+        
+        // Translate canvas custom size labels
+        const canvasCustomLabels = document.querySelectorAll('.custom-size-row label');
+        if (canvasCustomLabels.length >= 3 && this.currentLocale === 'en-US') {
+            canvasCustomLabels[0].textContent = 'Width';
+            canvasCustomLabels[1].textContent = 'Height';
+            canvasCustomLabels[2].textContent = 'Aspect Ratio';
+        }
         
         // Translate background pattern preference checkboxes
         const patternMappings = {
@@ -973,6 +1000,12 @@ class I18n {
             icon.title = this.t('timer.customColor');
         });
         
+        // Timer start button
+        const timerStartBtn = document.getElementById('timer-start-btn');
+        if (timerStartBtn) {
+            timerStartBtn.textContent = this.t('timer.start');
+        }
+        
         // Timer fullscreen close button
         const timerFullscreenClose = document.getElementById('timer-fullscreen-close-btn');
         if (timerFullscreenClose) {
@@ -1069,6 +1102,56 @@ class I18n {
             if (valueSpan) {
                 const currentValue = valueSpan.textContent;
                 penSizeLabel.innerHTML = this.t('tools.pen.sizeLabel') + ' <span id="pen-size-value">' + currentValue + '</span>px';
+            }
+        }
+        
+        // Update eraser size label
+        const eraserSizeLabel = document.querySelector('label:has(#eraser-size-value)');
+        if (eraserSizeLabel) {
+            const valueSpan = document.getElementById('eraser-size-value');
+            if (valueSpan) {
+                const currentValue = valueSpan.textContent;
+                eraserSizeLabel.innerHTML = this.t('tools.eraser.sizeLabel') + ' <span id="eraser-size-value">' + currentValue + '</span>px';
+            }
+        }
+        
+        // Update pattern density label
+        const densityLabel = document.querySelector('label:has(#pattern-density-value)');
+        if (densityLabel) {
+            const valueSpan = document.getElementById('pattern-density-value');
+            if (valueSpan) {
+                const currentValue = valueSpan.textContent;
+                densityLabel.innerHTML = this.t('background.densityLabel') + ' <span id="pattern-density-value">' + currentValue + '</span>%';
+            }
+        }
+        
+        // Update background image size label
+        const imageSizeLabel = document.querySelector('label:has(#bg-image-size-value)');
+        if (imageSizeLabel) {
+            const valueSpan = document.getElementById('bg-image-size-value');
+            if (valueSpan) {
+                const currentValue = valueSpan.textContent;
+                imageSizeLabel.innerHTML = this.t('background.sizeLabel') + ' <span id="bg-image-size-value">' + currentValue + '</span>%';
+            }
+        }
+        
+        // Update toolbar size label
+        const toolbarSizeLabel = document.querySelector('label:has(#toolbar-size-value)');
+        if (toolbarSizeLabel) {
+            const valueSpan = document.getElementById('toolbar-size-value');
+            if (valueSpan) {
+                const currentValue = valueSpan.textContent;
+                toolbarSizeLabel.innerHTML = this.t('settings.display.toolbarSizeLabel') + ' <span id="toolbar-size-value">' + currentValue + '</span>px';
+            }
+        }
+        
+        // Update config scale label
+        const configScaleLabel = document.querySelector('label:has(#config-scale-value)');
+        if (configScaleLabel) {
+            const valueSpan = document.getElementById('config-scale-value');
+            if (valueSpan) {
+                const currentValue = valueSpan.textContent;
+                configScaleLabel.innerHTML = this.t('settings.display.configScaleLabel') + ' <span id="config-scale-value">' + currentValue + '</span>%';
             }
         }
     }

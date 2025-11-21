@@ -67,7 +67,7 @@ window.translations = {
             normal: 'Normal Eraser',
             pixel: 'Pixel Eraser',
             size: 'Eraser Size',
-            sizeLabel: 'Eraser Size',
+            sizeLabel: 'Eraser Size: Current',
             shape: 'Shape',
             shapeCircle: 'Circle',
             shapeRectangle: 'Rectangle'
@@ -95,7 +95,9 @@ window.translations = {
         coordinate: 'Coordinate',
         image: 'Upload Image',
         density: 'Density',
+        densityLabel: 'Density: Current',
         size: 'Size',
+        sizeLabel: 'Size: Current',
         opacity: 'Background Opacity',
         opacityLabel: 'Background Opacity: Current',
         opacityHint: 'Adjust background transparency, 100% is fully opaque',
@@ -140,8 +142,10 @@ window.translations = {
             showFullscreenBtn: 'Show Fullscreen Button',
             showFullscreenBtnHint: 'Show fullscreen button next to zoom controls',
             toolbarSize: 'Toolbar Size',
+            toolbarSizeLabel: 'Toolbar Size: Current',
             toolbarSizeHint: 'Adjust the size of the bottom toolbar',
             configScale: 'Config Panel Size',
+            configScaleLabel: 'Config Panel Size: Current',
             configScaleHint: 'Adjust the size of popup config panels',
             themeColorHint: 'Color for selected toolbar items',
             colorOptions: {
@@ -168,11 +172,21 @@ window.translations = {
                 sansSerif: 'Sans Serif',
                 monospace: 'Monospace',
                 cursive: 'Cursive',
+                // Chinese fonts
                 yahei: 'Microsoft YaHei',
                 simsun: 'SimSun',
                 simhei: 'SimHei',
                 kaiti: 'KaiTi',
-                fangsong: 'FangSong'
+                fangsong: 'FangSong',
+                // Common English fonts
+                arial: 'Arial',
+                helvetica: 'Helvetica',
+                timesNewRoman: 'Times New Roman',
+                courier: 'Courier New',
+                verdana: 'Verdana',
+                georgia: 'Georgia',
+                trebuchet: 'Trebuchet MS',
+                impact: 'Impact'
             },
             edgeSnap: 'Enable Edge Snapping',
             edgeSnapHint: 'Automatically snap control panels to screen edges when dragging',
@@ -200,16 +214,37 @@ window.translations = {
             presets: {
                 a4Portrait: 'A4 Portrait',
                 a4Landscape: 'A4 Landscape',
+                a3Portrait: 'A3 Portrait',
+                a3Landscape: 'A3 Landscape',
+                b5Portrait: 'B5 Portrait',
+                b5Landscape: 'B5 Landscape',
                 widescreen: '16:9 Widescreen',
                 standard: '4:3 Standard',
                 custom: 'Custom'
+            },
+            customSize: {
+                portrait: 'Portrait',
+                landscape: 'Landscape',
+                width: 'Width',
+                height: 'Height',
+                ratio: 'Aspect Ratio',
+                ratios: {
+                    custom: 'Custom',
+                    '16:9': '16:9',
+                    '4:3': '4:3',
+                    '1:1': '1:1',
+                    '3:4': '3:4 (Portrait)',
+                    '9:16': '9:16 (Portrait)'
+                }
             }
         },
         background: {
             title: 'Background Settings',
             opacity: 'Background Opacity',
+            opacityLabel: 'Background Opacity: Current',
             opacityHint: 'Adjust background transparency, 100% is fully opaque',
             patternIntensity: 'Pattern Intensity',
+            patternIntensityLabel: 'Pattern Transparency: Current',
             patternIntensityHint: 'Adjust the darkness of background pattern lines',
             preference: 'Background Pattern Preference',
             preferenceHint: 'Choose which patterns to display in the config panel'

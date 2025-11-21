@@ -67,7 +67,7 @@ window.translations = {
             normal: '普通橡皮',
             pixel: '像素橡皮',
             size: '橡皮大小',
-            sizeLabel: '橡皮擦大小',
+            sizeLabel: '橡皮擦大小：当前',
             shape: '形状',
             shapeCircle: '圆形',
             shapeRectangle: '方形'
@@ -95,7 +95,9 @@ window.translations = {
         coordinate: '坐标系',
         image: '上传图片',
         density: '密度',
+        densityLabel: '密度：当前',
         size: '大小',
+        sizeLabel: '大小：当前',
         opacity: '背景透明度',
         opacityLabel: '背景透明度：当前',
         opacityHint: '调整背景的透明度,100%为完全不透明',
@@ -140,8 +142,10 @@ window.translations = {
             showFullscreenBtn: '显示全屏按钮',
             showFullscreenBtnHint: '勾选后，在缩放控件旁显示全屏按钮',
             toolbarSize: '工具栏大小',
+            toolbarSizeLabel: '工具栏大小：当前',
             toolbarSizeHint: '调整底部工具栏的大小',
             configScale: '属性栏大小',
+            configScaleLabel: '属性栏大小：当前',
             configScaleHint: '调整弹出具体属性面板的大小',
             themeColorHint: '工具栏被选中时的颜色',
             colorOptions: {
@@ -168,11 +172,21 @@ window.translations = {
                 sansSerif: '黑体（无衬线体）',
                 monospace: '等宽字体',
                 cursive: '手写体',
+                // 中文字体
                 yahei: '微软雅黑',
                 simsun: '宋体',
                 simhei: '黑体',
                 kaiti: '楷体',
-                fangsong: '仿宋'
+                fangsong: '仿宋',
+                // 常见英文字体
+                arial: 'Arial',
+                helvetica: 'Helvetica',
+                timesNewRoman: 'Times New Roman',
+                courier: 'Courier New',
+                verdana: 'Verdana',
+                georgia: 'Georgia',
+                trebuchet: 'Trebuchet MS',
+                impact: 'Impact'
             },
             edgeSnap: '启用边缘吸附',
             edgeSnapHint: '拖动控制面板时自动吸附到屏幕边缘',
@@ -200,16 +214,37 @@ window.translations = {
             presets: {
                 a4Portrait: 'A4 竖向',
                 a4Landscape: 'A4 横向',
+                a3Portrait: 'A3 竖向',
+                a3Landscape: 'A3 横向',
+                b5Portrait: 'B5 竖向',
+                b5Landscape: 'B5 横向',
                 widescreen: '16:9 宽屏',
                 standard: '4:3 标准',
                 custom: '自定义'
+            },
+            customSize: {
+                portrait: '竖向',
+                landscape: '横向',
+                width: '宽度',
+                height: '高度',
+                ratio: '比例',
+                ratios: {
+                    custom: '自定义',
+                    '16:9': '16:9',
+                    '4:3': '4:3',
+                    '1:1': '1:1',
+                    '3:4': '3:4 (竖向)',
+                    '9:16': '9:16 (竖向)'
+                }
             }
         },
         background: {
             title: '背景设置',
             opacity: '背景透明度',
+            opacityLabel: '背景透明度：当前',
             opacityHint: '调整背景的透明度,100%为完全不透明',
             patternIntensity: '图案透明度',
+            patternIntensityLabel: '图案透明度：当前',
             patternIntensityHint: '调整背景图案线条的明暗程度',
             preference: '背景图案偏好',
             preferenceHint: '选择在属性栏中显示的图案'
