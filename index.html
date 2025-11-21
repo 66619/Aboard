@@ -100,7 +100,7 @@
                         <input type="color" id="custom-color-picker" class="custom-color-picker-input" value="#000000">
                     </label>
                     <div class="pen-size-inline">
-                        <label>粗细 <span id="pen-size-value">5</span>px</label>
+                        <label>粗细：当前 <span id="pen-size-value">5</span>px</label>
                         <input type="range" id="pen-size-slider" min="1" max="50" value="5" class="slider slider-compact">
                     </div>
                 </div>
@@ -119,7 +119,7 @@
                 </div>
             </div>
             <div class="config-group">
-                <label>橡皮擦大小 <span id="eraser-size-value">20</span>px</label>
+                <label>橡皮擦大小：当前 <span id="eraser-size-value">20</span>px</label>
                 <input type="range" id="eraser-size-slider" min="10" max="50" value="20" class="slider">
             </div>
         </div>
@@ -172,11 +172,11 @@
                 </div>
                 <div class="compact-sliders">
                     <div class="compact-slider-item" id="pattern-density-group" style="display: none;">
-                        <label>密度 <span id="pattern-density-value">100</span>%</label>
-                        <input type="range" id="pattern-density-slider" min="50" max="200" value="100" class="slider slider-compact">
+                        <label>密度：当前 <span id="pattern-density-value">100</span>%</label>
+                        <input type="range" id="pattern-density-slider" min="20" max="300" value="100" class="slider slider-compact">
                     </div>
                     <div class="compact-slider-item" id="image-size-group" style="display: none;">
-                        <label>大小 <span id="bg-image-size-value">100</span>%</label>
+                        <label>大小：当前 <span id="bg-image-size-value">100</span>%</label>
                         <div style="display: flex; gap: 8px; align-items: center;">
                             <input type="range" id="bg-image-size-slider" min="10" max="200" value="100" class="slider slider-compact" style="flex: 1;">
                             <button id="adjust-bg-image-btn" class="icon-btn" title="调整图片位置和大小">
@@ -426,12 +426,12 @@
                             <p class="settings-hint">勾选后，在缩放控件旁显示全屏按钮</p>
                         </div>
                         <div class="settings-group">
-                            <label>工具栏大小 <span id="toolbar-size-value">40</span>px</label>
+                            <label>工具栏大小：当前 <span id="toolbar-size-value">40</span>px</label>
                             <p class="settings-hint">调整底部工具栏的大小</p>
                             <input type="range" id="toolbar-size-slider" min="40" max="80" value="40" class="slider" step="5">
                         </div>
                         <div class="settings-group">
-                            <label>属性栏大小 <span id="config-scale-value">100</span>%</label>
+                            <label>属性栏大小：当前 <span id="config-scale-value">100</span>%</label>
                             <p class="settings-hint">调整弹出具体属性面板的大小</p>
                             <input type="range" id="config-scale-slider" min="80" max="120" value="100" class="slider" step="10">
                         </div>
@@ -517,12 +517,12 @@
                     <div id="background-settings" class="settings-tab-content">
                         <h3>背景设置</h3>
                         <div class="settings-group">
-                            <label>背景透明度 <span id="bg-opacity-value">100</span>%</label>
+                            <label>背景透明度：当前 <span id="bg-opacity-value">100</span>%</label>
                             <p class="settings-hint">调整背景的透明度,100%为完全不透明</p>
                             <input type="range" id="bg-opacity-slider" min="0" max="100" value="100" class="slider">
                         </div>
                         <div class="settings-group">
-                            <label>图案透明度 <span id="pattern-intensity-value">50</span>%</label>
+                            <label>图案透明度：当前 <span id="pattern-intensity-value">50</span>%</label>
                             <p class="settings-hint">调整背景图案线条的明暗程度</p>
                             <input type="range" id="pattern-intensity-slider" min="10" max="200" value="50" class="slider">
                         </div>
@@ -738,7 +738,7 @@
                             </div>
                         </div>
                         <div class="settings-group" id="time-font-size-settings" style="display: none;">
-                            <label>字体大小 <span id="time-font-size-value">16</span>px</label>
+                            <label>字体大小：当前 <span id="time-font-size-value">16</span>px</label>
                             <p class="settings-hint">调整时间显示的字体大小</p>
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <input type="range" id="time-font-size-slider" min="12" max="48" value="16" class="slider" style="flex: 1;">
@@ -746,7 +746,7 @@
                             </div>
                         </div>
                         <div class="settings-group" id="time-opacity-settings" style="display: none;">
-                            <label>透明度 <span id="time-opacity-value">100</span>%</label>
+                            <label>透明度：当前 <span id="time-opacity-value">100</span>%</label>
                             <p class="settings-hint">调整时间显示的透明度</p>
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <input type="range" id="time-opacity-slider" min="10" max="100" value="100" class="slider" style="flex: 1;">
@@ -763,7 +763,7 @@
                             </div>
                         </div>
                         <div class="settings-group" id="time-fullscreen-font-size-settings" style="display: none;">
-                            <label>全屏字体大小 <span id="time-fullscreen-font-size-value">15</span>%</label>
+                            <label>全屏字体大小：当前 <span id="time-fullscreen-font-size-value">15</span>%</label>
                             <p class="settings-hint">调整全屏时间显示的字体大小，范围10%-85%</p>
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <input type="range" id="time-fullscreen-font-size-slider" min="10" max="85" value="15" class="slider" style="flex: 1;">
@@ -1051,7 +1051,7 @@
                 
                 <!-- Font Size -->
                 <div class="timer-input-group">
-                    <label>字体大小 <span id="td-time-font-size-value">16</span>px</label>
+                    <label>字体大小：当前 <span id="td-time-font-size-value">16</span>px</label>
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <input type="range" id="td-time-font-size-slider" min="12" max="48" value="16" class="slider" style="flex: 1;">
                         <input type="number" id="td-time-font-size-input" min="12" max="48" value="16" class="size-input">
@@ -1060,7 +1060,7 @@
                 
                 <!-- Opacity -->
                 <div class="timer-input-group">
-                    <label>透明度 <span id="td-time-opacity-value">100</span>%</label>
+                    <label>透明度：当前 <span id="td-time-opacity-value">100</span>%</label>
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <input type="range" id="td-time-opacity-slider" min="10" max="100" value="100" class="slider" style="flex: 1;">
                         <input type="number" id="td-time-opacity-input" min="10" max="100" value="100" class="size-input">
@@ -1079,7 +1079,7 @@
                 
                 <!-- Fullscreen Font Size -->
                 <div class="timer-input-group">
-                    <label>全屏字体大小 <span id="td-time-fullscreen-font-size-value">15</span>%</label>
+                    <label>全屏字体大小：当前 <span id="td-time-fullscreen-font-size-value">15</span>%</label>
                     <p class="settings-hint" style="font-size: 11px; color: #999; margin: 4px 0 8px 0;">调整全屏时间显示的字体大小，范围10%-85%</p>
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <input type="range" id="td-time-fullscreen-font-size-slider" min="10" max="85" value="15" class="slider" style="flex: 1;">
@@ -1267,7 +1267,6 @@
                 
                 <!-- Action Buttons -->
                 <div class="timer-action-buttons">
-                    <button class="timer-action-btn timer-cancel-btn" id="timer-cancel-btn">取消</button>
                     <button class="timer-action-btn timer-start-btn" id="timer-start-btn">开始</button>
                 </div>
             </div>

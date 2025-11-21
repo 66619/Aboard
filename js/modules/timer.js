@@ -1026,14 +1026,7 @@ class TimerManager {
             });
         }
         
-        // Action buttons
-        const timerCancelBtn = document.getElementById('timer-cancel-btn');
-        if (timerCancelBtn) {
-            timerCancelBtn.addEventListener('click', () => {
-                this.hideSettingsModal();
-            });
-        }
-        
+        // Action buttons - only start button
         const timerStartBtn = document.getElementById('timer-start-btn');
         if (timerStartBtn) {
             timerStartBtn.addEventListener('click', () => {
