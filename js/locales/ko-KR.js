@@ -56,7 +56,10 @@ window.translations = {
             fountain: '만년필',
             brush: '붓',
             colorAndSize: '색상 및 크기',
-            colorPicker: '색상 선택기'
+            colorPicker: '색상 선택기',
+            size: '크기',
+            sizeLabel: '크기: 현재',
+            sizePx: 'px'
         },
         eraser: {
             title: '지우개',
@@ -64,6 +67,8 @@ window.translations = {
             normal: '일반 지우개',
             pixel: '픽셀 지우개',
             size: '지우개 크기',
+            sizeLabel: '지우개 크기: 현재',
+            shape: '모양',
             shapeCircle: '원형',
             shapeRectangle: '사각형'
         },
@@ -89,11 +94,18 @@ window.translations = {
         musicStaff: '오선보',
         coordinate: '좌표계',
         image: '이미지',
+        density: '밀도',
+        densityLabel: '밀도: 현재',
+        size: '크기',
+        sizeLabel: '크기: 현재',
         opacity: '배경 불투명도',
+        opacityLabel: '배경 불투명도: 현재',
         opacityHint: '배경 투명도를 조정합니다. 100%는 완전 불투명',
         contrast: '대비',
+        contrastLabel: '패턴 투명도: 현재',
         contrastHint: '배경 패턴 선의 명암을 조정합니다',
-        preference: '배경 패턴 기본 설정'
+        preference: '배경 패턴 기본 설정',
+        upload: '업로드'
     },
 
     // Page Navigation
@@ -313,12 +325,15 @@ window.translations = {
     // Feature Area
     features: {
         title: '기능',
+        moreFeatures: '더 많은 기능',
         time: '시간',
         timer: '타이머'
     },
 
     // Time Display
     timeDisplay: {
+        title: '시간 표시',
+        settingsTitle: '시간 표시 설정',
         options: '시간 표시 옵션',
         showDate: '날짜 표시',
         showTime: '시간 표시',
@@ -326,13 +341,36 @@ window.translations = {
         displayOptions: '표시 옵션',
         dateAndTime: '날짜 및 시간',
         dateOnly: '날짜만',
-        timeOnly: '시간만'
+        timeOnly: '시간만',
+        timezone: '시간대',
+        timezoneHint: '표시할 시간대 선택',
+        timeFormat: '시간 형식',
+        timeFormatHint: '시간 표시 형식 선택',
+        dateFormat: '날짜 형식',
+        dateFormatHint: '날짜 표시 형식 선택',
+        colorSettings: '색상 설정',
+        colorSettingsHint: '시간 표시의 글꼴 및 배경색 설정',
+        textColor: '텍스트 색상',
+        bgColor: '배경색',
+        fontSize: '글꼴 크기',
+        fontSizeHint: '시간 표시 글꼴 크기 조정',
+        fontSizeLabel: '글꼴 크기: 현재',
+        opacity: '불투명도',
+        opacityLabel: '불투명도: 현재',
+        fullscreenMode: '전체 화면 모드',
+        fullscreenModeHint: '시간 전체 화면 표시 트리거 선택',
+        fullscreenFontSize: '전체 화면 글꼴 크기',
+        fullscreenFontSizeLabel: '전체 화면 글꼴 크기: 현재',
+        fullscreenSliderLabel: '글꼴 크기 조정 (10%-85%)',
+        customColor: '사용자 정의 색상',
+        transparent: '투명'
     },
 
     // Timer
     timer: {
-        title: '타이머 설정',
+        settingsTitle: '타이머 설정',
         mode: '모드',
+        selectMode: '모드 선택',
         countdown: '카운트다운',
         stopwatch: '스톱워치',
         duration: '기간 (분)',
@@ -341,12 +379,30 @@ window.translations = {
         seconds: '초',
         title: '제목',
         titlePlaceholder: '타이머 제목 입력',
+        setTime: '시간 설정',
+        setStartTime: '시작 시간 설정',
         fontSettings: '글꼴 설정',
         fontSize: '글꼴 크기',
+        fontSizeLabel: '글꼴 크기: 현재',
         adjustColor: '색상 조정',
         colorSettings: '색상 설정',
         textColor: '텍스트 색상',
         bgColor: '배경색',
+        opacity: '불투명도',
+        opacityLabel: '불투명도: 현재',
+        fullscreenFontSize: '전체 화면 글꼴 크기',
+        fullscreenFontSizeLabel: '전체 화면 글꼴 크기: 현재',
+        soundSettings: '사운드 설정',
+        playSound: '카운트다운 종료 시 알림 소리 재생',
+        loopPlayback: '반복 재생',
+        loopCount: '반복 횟수',
+        uploadCustomAudio: '사용자 정의 오디오 업로드',
+        soundPresets: {
+            classBell: '수업 종 (10초)',
+            digitalBeep: '디지털 비프 (3초)',
+            gentle: '부드러운 (5초)',
+            examEnd: '시험 종료 (8초)'
+        },
         colors: {
             black: '검정',
             white: '흰색',
@@ -414,7 +470,15 @@ window.translations = {
         orange: '주황색',
         purple: '보라색',
         white: '흰색',
-        transparent: '투명'
+        transparent: '투명',
+        lightGray: '밝은 회색',
+        darkGray: '어두운 회색',
+        lightBlue: '밝은 파란색',
+        lightRed: '밝은 빨간색',
+        lightGreen: '밝은 녹색',
+        lightYellow: '밝은 노란색',
+        lightOrange: '밝은 주황색',
+        whiteDefault: '흰색 (기본값)'
     },
 
     // Days of week
