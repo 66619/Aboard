@@ -222,6 +222,9 @@ class I18n {
             }
         });
         
+        // Update document title
+        document.title = this.t('app.title');
+        
         // Translate zoom input placeholder
         const zoomInput = document.getElementById('zoom-input');
         if (zoomInput) {
