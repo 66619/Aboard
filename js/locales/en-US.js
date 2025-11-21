@@ -56,7 +56,10 @@ window.translations = {
             fountain: 'Fountain Pen',
             brush: 'Brush',
             colorAndSize: 'Color & Size',
-            colorPicker: 'Color Picker'
+            colorPicker: 'Color Picker',
+            size: 'Size',
+            sizeLabel: 'Size: Current',
+            sizePx: 'px'
         },
         eraser: {
             title: 'Eraser',
@@ -86,18 +89,22 @@ window.translations = {
         dots: 'Dots',
         grid: 'Grid',
         lines: 'Lines',
-        tianzige: 'Tianzige (Chinese)',
+        tianzige: 'Tianzige',
         english4line: 'English 4-Line',
         musicStaff: 'Music Staff',
         coordinate: 'Coordinate',
-        image: 'Image',
+        image: 'Upload Image',
         density: 'Density',
         size: 'Size',
         opacity: 'Background Opacity',
+        opacityLabel: 'Background Opacity: Current',
         opacityHint: 'Adjust background transparency, 100% is fully opaque',
         contrast: 'Contrast',
+        contrastLabel: 'Pattern Transparency: Current',
         contrastHint: 'Adjust the darkness of background pattern lines',
-        preference: 'Background Pattern Preference'
+        preference: 'Background Pattern Preference',
+        preferenceHint: 'Select patterns to display in properties bar',
+        upload: 'Upload'
     },
 
     // Page Navigation
@@ -155,6 +162,18 @@ window.translations = {
             languageHint: 'Choose interface language',
             globalFont: 'Global Font',
             globalFontHint: 'Choose the font used in the application',
+            fonts: {
+                system: 'System Default',
+                serif: 'Serif',
+                sansSerif: 'Sans Serif',
+                monospace: 'Monospace',
+                cursive: 'Cursive',
+                yahei: 'Microsoft YaHei',
+                simsun: 'SimSun',
+                simhei: 'SimHei',
+                kaiti: 'KaiTi',
+                fangsong: 'FangSong'
+            },
             edgeSnap: 'Enable Edge Snapping',
             edgeSnapHint: 'Automatically snap control panels to screen edges when dragging',
             controlPosition: 'Control Button Position',
@@ -177,7 +196,14 @@ window.translations = {
             size: 'Canvas Size',
             sizeHint: 'Choose preset sizes or customize canvas aspect ratio and size',
             infiniteCanvas: 'Infinite Canvas',
-            pagination: 'Pagination Mode'
+            pagination: 'Pagination Mode',
+            presets: {
+                a4Portrait: 'A4 Portrait',
+                a4Landscape: 'A4 Landscape',
+                widescreen: '16:9 Widescreen',
+                standard: '4:3 Standard',
+                custom: 'Custom'
+            }
         },
         background: {
             title: 'Background Settings',
@@ -190,6 +216,31 @@ window.translations = {
         },
         announcement: {
             title: 'Announcement'
+        },
+        about: {
+            title: 'About Aboard',
+            projectIntro: 'Project Introduction',
+            description1: 'Aboard is a minimalist web whiteboard application designed for teaching and presentations.',
+            description2: 'It provides a smooth drawing experience and rich background options to let your creativity shine.',
+            mainFeatures: 'Main Features',
+            features: {
+                penTypes: 'Multiple pen types (Normal Pen, Pencil, Ballpoint, Fountain Pen, Brush)',
+                smartEraser: 'Smart eraser (supports circle and rectangle)',
+                richPatterns: 'Rich background patterns (Dots, Grid, Tianzige, English 4-Line, etc.)',
+                adjustable: 'Adjustable pattern density and transparency',
+                canvasModes: 'Infinite canvas and pagination mode (supports A4, A3, B5 and other preset sizes)',
+                customSize: 'Custom canvas size and aspect ratio',
+                draggable: 'Draggable toolbar and property panels (supports vertical layout)',
+                undoRedo: 'Undo/Redo function (supports up to 50 steps)',
+                smartZoom: 'Smart zoom (Ctrl+Scroll wheel, zoom to mouse position)',
+                responsive: 'Responsive interface, adapts to different screen sizes'
+            },
+            techStack: 'Technology Stack',
+            tech: 'HTML5 Canvas • Vanilla JavaScript • CSS3',
+            license: 'Open Source License',
+            licenseType: 'MIT License',
+            github: 'GitHub',
+            version: 'Version'
         },
         more: {
             title: 'More Settings',
@@ -278,9 +329,12 @@ window.translations = {
         textColor: 'Text Color',
         bgColor: 'Background Color',
         fontSize: 'Font Size',
+        fontSizeLabel: 'Font Size: Current',
         opacity: 'Opacity',
+        opacityLabel: 'Opacity: Current',
         fullscreenMode: 'Fullscreen Mode',
         fullscreenFontSize: 'Fullscreen Font Size',
+        fullscreenFontSizeLabel: 'Fullscreen Font Size: Current',
         fullscreenSliderLabel: 'Font Size Adjustment (10%-85%)',
         customColor: 'Custom Color',
         transparent: 'Transparent'
@@ -288,22 +342,29 @@ window.translations = {
 
     // Timer
     timer: {
-        title: 'Timer Settings',
+        settingsTitle: 'Timer Settings',
         mode: 'Mode',
+        selectMode: 'Select Mode',
         countdown: 'Countdown',
         stopwatch: 'Stopwatch',
         duration: 'Duration (minutes)',
         hours: 'Hours',
         minutes: 'Minutes',
         seconds: 'Seconds',
-        title: 'Title',
-        titlePlaceholder: 'Enter timer title',
+        title: 'Timer Title (Optional)',
+        titlePlaceholder: 'e.g.: Classroom Speech, Exam Time, etc.',
+        setTime: 'Set Time',
         fontSettings: 'Font Settings',
         fontSize: 'Font Size',
+        fontSizeLabel: 'Font Size: Current',
         adjustColor: 'Adjust Color',
         colorSettings: 'Color Settings',
         textColor: 'Text Color',
         bgColor: 'Background Color',
+        opacity: 'Opacity',
+        opacityLabel: 'Opacity: Current',
+        fullscreenFontSize: 'Fullscreen Font Size',
+        fullscreenFontSizeLabel: 'Fullscreen Font Size: Current',
         colors: {
             black: 'Black',
             white: 'White',

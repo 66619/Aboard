@@ -56,7 +56,10 @@ window.translations = {
             fountain: '钢笔',
             brush: '毛笔',
             colorAndSize: '颜色与粗细',
-            colorPicker: '取色器'
+            colorPicker: '取色器',
+            size: '粗细',
+            sizeLabel: '粗细：当前',
+            sizePx: 'px'
         },
         eraser: {
             title: '橡皮',
@@ -85,19 +88,23 @@ window.translations = {
         none: '无',
         dots: '点阵',
         grid: '方格',
-        lines: '横线',
+        lines: '线条',
         tianzige: '田字格',
-        english4line: '四线格',
+        english4line: '英语四线格',
         musicStaff: '五线谱',
         coordinate: '坐标系',
-        image: '图片',
+        image: '上传图片',
         density: '密度',
         size: '大小',
         opacity: '背景透明度',
+        opacityLabel: '背景透明度：当前',
         opacityHint: '调整背景的透明度,100%为完全不透明',
         contrast: '对比度',
+        contrastLabel: '图案透明度：当前',
         contrastHint: '调整背景图案线条的明暗程度',
-        preference: '背景图案偏好'
+        preference: '背景图案偏好',
+        preferenceHint: '选择在属性栏中显示的图案',
+        upload: '上传'
     },
 
     // Page Navigation
@@ -155,6 +162,18 @@ window.translations = {
             languageHint: '选择界面语言 / Choose interface language',
             globalFont: '全局字体',
             globalFontHint: '选择应用程序使用的字体',
+            fonts: {
+                system: '系统默认',
+                serif: '宋体（衬线体）',
+                sansSerif: '黑体（无衬线体）',
+                monospace: '等宽字体',
+                cursive: '手写体',
+                yahei: '微软雅黑',
+                simsun: '宋体',
+                simhei: '黑体',
+                kaiti: '楷体',
+                fangsong: '仿宋'
+            },
             edgeSnap: '启用边缘吸附',
             edgeSnapHint: '拖动控制面板时自动吸附到屏幕边缘',
             controlPosition: '控制按钮位置',
@@ -177,7 +196,14 @@ window.translations = {
             size: '画布尺寸',
             sizeHint: '选择预设尺寸或自定义画布比例和大小',
             infiniteCanvas: '无限画布',
-            pagination: '分页模式'
+            pagination: '分页模式',
+            presets: {
+                a4Portrait: 'A4 竖向',
+                a4Landscape: 'A4 横向',
+                widescreen: '16:9 宽屏',
+                standard: '4:3 标准',
+                custom: '自定义'
+            }
         },
         background: {
             title: '背景设置',
@@ -190,6 +216,31 @@ window.translations = {
         },
         announcement: {
             title: '公告'
+        },
+        about: {
+            title: '关于 Aboard',
+            projectIntro: '项目简介',
+            description1: 'Aboard 是一个简约的网页白板应用，专为教学和演示设计。',
+            description2: '它提供了流畅的绘图体验和丰富的背景选项，让您的创意自由展现。',
+            mainFeatures: '主要功能',
+            features: {
+                penTypes: '多种笔触类型（普通笔、铅笔、圆珠笔、钢笔、毛笔）',
+                smartEraser: '智能橡皮擦（支持圆形和方形）',
+                richPatterns: '丰富的背景图案（点阵、方格、田字格、英语四线格等）',
+                adjustable: '可调节的图案密度和透明度',
+                canvasModes: '无限画布和分页模式（支持A4、A3、B5等预设尺寸）',
+                customSize: '自定义画布尺寸和比例',
+                draggable: '可拖动的工具栏和属性面板（支持垂直布局）',
+                undoRedo: '撤销/重做功能（支持最多50步）',
+                smartZoom: '智能缩放（Ctrl+滚轮，缩放至鼠标位置）',
+                responsive: '响应式界面，适配不同屏幕尺寸'
+            },
+            techStack: '技术栈',
+            tech: 'HTML5 Canvas • Vanilla JavaScript • CSS3',
+            license: '开源协议',
+            licenseType: 'MIT License',
+            github: 'GitHub',
+            version: '版本'
         },
         more: {
             title: '更多设置',
@@ -278,9 +329,12 @@ window.translations = {
         textColor: '字体颜色',
         bgColor: '背景颜色',
         fontSize: '字体大小',
+        fontSizeLabel: '字体大小：当前',
         opacity: '透明度',
+        opacityLabel: '透明度：当前',
         fullscreenMode: '全屏模式',
         fullscreenFontSize: '全屏字体大小',
+        fullscreenFontSizeLabel: '全屏字体大小：当前',
         fullscreenSliderLabel: '字体大小调节 (10%-85%)',
         customColor: '自定义颜色',
         transparent: '透明'
@@ -288,22 +342,29 @@ window.translations = {
 
     // Timer
     timer: {
-        title: '计时器设置',
+        settingsTitle: '计时器设置',
         mode: '模式',
+        selectMode: '选择模式',
         countdown: '倒计时',
         stopwatch: '正计时',
         duration: '计时时长（分钟）',
-        hours: '时',
-        minutes: '分',
+        hours: '小时',
+        minutes: '分钟',
         seconds: '秒',
-        title: '标题',
-        titlePlaceholder: '请输入计时器标题',
+        title: '计时器标题（可选）',
+        titlePlaceholder: '例如：课堂演讲、考试时间等',
+        setTime: '设置时间',
         fontSettings: '字体设置',
         fontSize: '字体大小',
+        fontSizeLabel: '字体大小：当前',
         adjustColor: '调整颜色',
         colorSettings: '颜色设置',
         textColor: '字体颜色',
         bgColor: '背景颜色',
+        opacity: '透明度',
+        opacityLabel: '透明度：当前',
+        fullscreenFontSize: '全屏字体大小',
+        fullscreenFontSizeLabel: '全屏字体大小：当前',
         colors: {
             black: '黑色',
             white: '白色',

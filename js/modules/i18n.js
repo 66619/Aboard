@@ -237,6 +237,10 @@ class I18n {
         // Translate modals
         this.translateModals();
         
+        // Translate About and Announcement content
+        this.translateAboutContent();
+        this.translateAnnouncementContent();
+        
         // Translate pagination and other controls
         this.translatePageControls();
     }
@@ -768,9 +772,119 @@ class I18n {
         document.querySelectorAll('.color-picker-icon-btn[title="自定义颜色"]').forEach(btn => {
             btn.title = this.t('timeDisplay.customColor');
         });
+        
+        // Update label format for font sizes and opacity - "字体大小：当前 16px"
+        this.updateLabelFormats();
+        
+        // Translate global font select options
+        const globalFontSelect = document.getElementById('global-font-select');
+        if (globalFontSelect && this.currentLocale === 'en-US') {
+            globalFontSelect.options[0].text = 'System Default';
+            globalFontSelect.options[1].text = 'Serif';
+            globalFontSelect.options[2].text = 'Sans Serif';
+            globalFontSelect.options[3].text = 'Monospace';
+            globalFontSelect.options[4].text = 'Cursive';
+            globalFontSelect.options[5].text = 'Microsoft YaHei';
+            globalFontSelect.options[6].text = 'SimSun';
+            globalFontSelect.options[7].text = 'SimHei';
+            globalFontSelect.options[8].text = 'KaiTi';
+            globalFontSelect.options[9].text = 'FangSong';
+        }
+        
+        // Translate canvas preset buttons
+        document.querySelectorAll('.canvas-preset-btn').forEach(btn => {
+            const preset = btn.getAttribute('data-preset');
+            if (preset === 'A4-portrait') {
+                btn.textContent = this.t('settings.canvas.presets.a4Portrait');
+            } else if (preset === 'A4-landscape') {
+                btn.textContent = this.t('settings.canvas.presets.a4Landscape');
+            } else if (preset === '16:9') {
+                btn.textContent = this.t('settings.canvas.presets.widescreen');
+            } else if (preset === '4:3') {
+                btn.textContent = this.t('settings.canvas.presets.standard');
+            } else if (preset === 'custom') {
+                btn.textContent = this.t('settings.canvas.presets.custom');
+            }
+        });
+        
+        // Translate background pattern preference checkboxes
+        const patternMappings = {
+            'blank': 'background.blank',
+            'dots': 'background.dots',
+            'grid': 'background.grid',
+            'tianzige': 'background.tianzige',
+            'english-lines': 'background.english4line',
+            'music-staff': 'background.musicStaff',
+            'coordinate': 'background.coordinate',
+            'image': 'background.image'
+        };
+        
+        document.querySelectorAll('.pattern-pref-checkbox').forEach(checkbox => {
+            const pattern = checkbox.getAttribute('data-pattern');
+            if (pattern && patternMappings[pattern]) {
+                const span = checkbox.parentElement.querySelector('span');
+                if (span) {
+                    span.textContent = this.t(patternMappings[pattern]);
+                }
+            }
+        });
     }
     
     translateTimerSettings() {
+        // Timer Settings Modal title
+        const timerTitle = document.querySelector('#timer-settings-modal h2');
+        if (timerTitle) {
+            timerTitle.textContent = this.t('timer.settingsTitle');
+        }
+        
+        // Timer mode labels
+        const selectModeLabel = document.querySelector('.timer-mode-group label');
+        if (selectModeLabel) {
+            selectModeLabel.textContent = this.t('timer.selectMode');
+        }
+        
+        // Timer mode buttons
+        document.querySelectorAll('.timer-mode-btn').forEach(btn => {
+            const mode = btn.getAttribute('data-mode');
+            if (mode === 'stopwatch') {
+                // Keep the SVG, only update the text node
+                const textNodes = Array.from(btn.childNodes).filter(node => node.nodeType === Node.TEXT_NODE);
+                if (textNodes.length > 0) {
+                    textNodes[textNodes.length - 1].textContent = '\n            ' + this.t('timer.stopwatch') + '\n        ';
+                }
+            } else if (mode === 'countdown') {
+                const textNodes = Array.from(btn.childNodes).filter(node => node.nodeType === Node.TEXT_NODE);
+                if (textNodes.length > 0) {
+                    textNodes[textNodes.length - 1].textContent = '\n            ' + this.t('timer.countdown') + '\n        ';
+                }
+            }
+        });
+        
+        // Timer title input
+        const timerTitleLabel = document.querySelector('label[for="timer-title-input"]');
+        if (timerTitleLabel) {
+            timerTitleLabel.textContent = this.t('timer.title');
+        }
+        
+        const timerTitleInput = document.getElementById('timer-title-input');
+        if (timerTitleInput) {
+            timerTitleInput.placeholder = this.t('timer.titlePlaceholder');
+        }
+        
+        // Time label
+        const timerTimeLabel = document.getElementById('timer-time-label');
+        if (timerTimeLabel) {
+            timerTimeLabel.textContent = this.t('timer.setTime');
+        }
+        
+        // Hours, Minutes, Seconds labels
+        const timeInputFields = document.querySelectorAll('.time-input-field label');
+        if (timeInputFields.length >= 3) {
+            timeInputFields[0].textContent = this.t('timer.hours');
+            timeInputFields[1].textContent = this.t('timer.minutes');
+            timeInputFields[2].textContent = this.t('timer.seconds');
+        }
+        
         // Timer fullscreen close button
         const timerFullscreenClose = document.getElementById('timer-fullscreen-close-btn');
         if (timerFullscreenClose) {
@@ -782,6 +896,145 @@ class I18n {
             timeFullscreenClose.title = this.t('common.close');
         }
     }
+    
+    updateLabelFormats() {
+        // Update Time Display Settings labels to format: "Font Size: Current 16px"
+        const tdFontSizeLabel = document.querySelector('label[for="td-time-font-size-slider"], label:has(#td-time-font-size-value)');
+        if (tdFontSizeLabel) {
+            const valueSpan = document.getElementById('td-time-font-size-value');
+            if (valueSpan) {
+                const currentValue = valueSpan.textContent;
+                tdFontSizeLabel.innerHTML = this.t('timeDisplay.fontSizeLabel') + ' <span id="td-time-font-size-value">' + currentValue + '</span>px';
+            }
+        }
+        
+        const tdOpacityLabel = document.querySelector('label[for="td-time-opacity-slider"], label:has(#td-time-opacity-value)');
+        if (tdOpacityLabel) {
+            const valueSpan = document.getElementById('td-time-opacity-value');
+            if (valueSpan) {
+                const currentValue = valueSpan.textContent;
+                tdOpacityLabel.innerHTML = this.t('timeDisplay.opacityLabel') + ' <span id="td-time-opacity-value">' + currentValue + '</span>%';
+            }
+        }
+        
+        const tdFullscreenLabel = document.querySelector('label[for="td-time-fullscreen-font-size-slider"], label:has(#td-time-fullscreen-font-size-value)');
+        if (tdFullscreenLabel) {
+            const valueSpan = document.getElementById('td-time-fullscreen-font-size-value');
+            if (valueSpan) {
+                const currentValue = valueSpan.textContent;
+                tdFullscreenLabel.innerHTML = this.t('timeDisplay.fullscreenFontSizeLabel') + ' <span id="td-time-fullscreen-font-size-value">' + currentValue + '</span>%';
+            }
+        }
+        
+        // Update Settings modal labels
+        const timeFontSizeLabel = document.querySelector('label:has(#time-font-size-value)');
+        if (timeFontSizeLabel) {
+            const valueSpan = document.getElementById('time-font-size-value');
+            if (valueSpan) {
+                const currentValue = valueSpan.textContent;
+                timeFontSizeLabel.innerHTML = this.t('timeDisplay.fontSizeLabel') + ' <span id="time-font-size-value">' + currentValue + '</span>px';
+            }
+        }
+        
+        const timeOpacityLabel = document.querySelector('label:has(#time-opacity-value)');
+        if (timeOpacityLabel) {
+            const valueSpan = document.getElementById('time-opacity-value');
+            if (valueSpan) {
+                const currentValue = valueSpan.textContent;
+                timeOpacityLabel.innerHTML = this.t('timeDisplay.opacityLabel') + ' <span id="time-opacity-value">' + currentValue + '</span>%';
+            }
+        }
+        
+        const timeFullscreenLabel = document.querySelector('label:has(#time-fullscreen-font-size-value)');
+        if (timeFullscreenLabel) {
+            const valueSpan = document.getElementById('time-fullscreen-font-size-value');
+            if (valueSpan) {
+                const currentValue = valueSpan.textContent;
+                timeFullscreenLabel.innerHTML = this.t('timeDisplay.fullscreenFontSizeLabel') + ' <span id="time-fullscreen-font-size-value">' + currentValue + '</span>%';
+            }
+        }
+        
+        // Update background opacity label
+        const bgOpacityLabel = document.querySelector('label:has(#bg-opacity-value)');
+        if (bgOpacityLabel) {
+            const valueSpan = document.getElementById('bg-opacity-value');
+            if (valueSpan) {
+                const currentValue = valueSpan.textContent;
+                bgOpacityLabel.innerHTML = this.t('background.opacityLabel') + ' <span id="bg-opacity-value">' + currentValue + '</span>%';
+            }
+        }
+        
+        // Update pattern intensity label
+        const patternIntensityLabel = document.querySelector('label:has(#pattern-intensity-value)');
+        if (patternIntensityLabel) {
+            const valueSpan = document.getElementById('pattern-intensity-value');
+            if (valueSpan) {
+                const currentValue = valueSpan.textContent;
+                patternIntensityLabel.innerHTML = this.t('background.contrastLabel') + ' <span id="pattern-intensity-value">' + currentValue + '</span>%';
+            }
+        }
+        
+        // Update pen size label
+        const penSizeLabel = document.querySelector('label:has(#pen-size-value)');
+        if (penSizeLabel) {
+            const valueSpan = document.getElementById('pen-size-value');
+            if (valueSpan) {
+                const currentValue = valueSpan.textContent;
+                penSizeLabel.innerHTML = this.t('tools.pen.sizeLabel') + ' <span id="pen-size-value">' + currentValue + '</span>px';
+            }
+        }
+    }
+    
+    translateAboutContent() {
+        // About section
+        const aboutTitle = document.querySelector('#about-settings h3');
+        if (aboutTitle) {
+            aboutTitle.textContent = this.t('settings.about.title');
+        }
+        
+        // Update all about section content
+        const aboutSections = document.querySelectorAll('#about-settings .about-section');
+        if (aboutSections.length >= 5) {
+            // Project intro
+            const projectIntro = aboutSections[0].querySelector('h4');
+            const desc1 = aboutSections[0].querySelectorAll('p')[0];
+            const desc2 = aboutSections[0].querySelectorAll('p')[1];
+            if (projectIntro) projectIntro.textContent = this.t('settings.about.projectIntro');
+            if (desc1) desc1.textContent = this.t('settings.about.description1');
+            if (desc2) desc2.textContent = this.t('settings.about.description2');
+            
+            // Main features
+            const featuresHeader = aboutSections[1].querySelector('h4');
+            if (featuresHeader) featuresHeader.textContent = this.t('settings.about.mainFeatures');
+            
+            // Tech stack
+            const techHeader = aboutSections[2].querySelector('h4');
+            const techContent = aboutSections[2].querySelector('p');
+            if (techHeader) techHeader.textContent = this.t('settings.about.techStack');
+            if (techContent) techContent.textContent = this.t('settings.about.tech');
+            
+            // License
+            const licenseHeader = aboutSections[3].querySelector('h4');
+            const licenseContent = aboutSections[3].querySelector('p');
+            if (licenseHeader) licenseHeader.textContent = this.t('settings.about.license');
+            if (licenseContent) licenseContent.textContent = this.t('settings.about.licenseType');
+            
+            // GitHub (keep as is)
+            
+            // Version header
+            const versionHeader = aboutSections[5]?.querySelector('h4');
+            if (versionHeader) versionHeader.textContent = this.t('settings.about.version');
+        }
+    }
+    
+    translateAnnouncementContent() {
+        // Announcement section
+        const announcementTitle = document.querySelector('#announcement-settings h3');
+        if (announcementTitle) {
+            announcementTitle.textContent = this.t('settings.announcement.title');
+        }
+    }
+    
 
     /**
      * Change language
