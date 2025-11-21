@@ -4,7 +4,7 @@
 
 <div align="center">
 
-**[中文](README.md)** | **[English](README.en.md)**
+**[简体中文](README.md)** | **[繁體中文](README.zh-TW.md)** | **[English](README.en.md)**
 
 </div>
 
@@ -76,7 +76,7 @@
 - **边缘吸附**：拖动面板自动吸附到屏幕边缘，避免画布留痕
 - **背景偏好**：自定义属性栏中显示的背景图案
 - **多语言支持**：
-  - 支持中文简体、English、日本語、한국어、Français、Deutsch、Español
+  - 支持中文简体、中文繁体、English、日本語、한국어、Français、Deutsch、Español
   - 自动检测浏览器语言
   - 在设置-通用中可随时切换语言
   - 切换语言后立即生效

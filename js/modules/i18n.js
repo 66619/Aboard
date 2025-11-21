@@ -21,6 +21,7 @@ class I18n {
         // Available languages
         this.availableLocales = {
             'zh-CN': '中文简体',
+            'zh-TW': '中文繁體',
             'en-US': 'English',
             'ja-JP': '日本語',
             'ko-KR': '한국어',
@@ -336,13 +337,22 @@ class I18n {
             'tianzige': 'background.tianzige',
             'english-lines': 'background.english4line',
             'music-staff': 'background.musicStaff',
-            'coordinate': 'background.coordinate'
+            'coordinate': 'background.coordinate',
+            'image': 'background.upload'
         };
         
         document.querySelectorAll('.pattern-option-btn').forEach(btn => {
             const pattern = btn.getAttribute('data-pattern');
             if (pattern && patterns[pattern]) {
-                btn.textContent = this.t(patterns[pattern]);
+                // For image button, keep the icon and translate the text in span
+                if (pattern === 'image') {
+                    const uploadSpan = btn.querySelector('.upload-text');
+                    if (uploadSpan) {
+                        uploadSpan.textContent = this.t(patterns[pattern]);
+                    }
+                } else {
+                    btn.textContent = this.t(patterns[pattern]);
+                }
             }
         });
         
@@ -674,7 +684,7 @@ class I18n {
         
         // Translate display option buttons
         document.querySelectorAll('.display-option-btn').forEach(btn => {
-            const type = btn.getAttribute('data-td-display-type');
+            const type = btn.getAttribute('data-td-display-type') || btn.getAttribute('data-display-type');
             if (type === 'both') {
                 btn.textContent = this.t('timeDisplay.dateAndTime');
             } else if (type === 'date-only') {
@@ -686,7 +696,7 @@ class I18n {
         
         // Translate fullscreen mode buttons
         document.querySelectorAll('.fullscreen-mode-btn').forEach(btn => {
-            const mode = btn.getAttribute('data-td-mode');
+            const mode = btn.getAttribute('data-td-mode') || btn.getAttribute('data-mode');
             if (mode === 'disabled') {
                 btn.textContent = this.t('settings.time.fullscreenDisabled');
             } else if (mode === 'single') {
@@ -735,45 +745,84 @@ class I18n {
     }
     
     translateSelectOptions() {
-        // Translate time format options
+        // Translate time format options for Time Display Settings modal
         const timeFormatSelect = document.getElementById('td-time-format-select');
-        if (timeFormatSelect && this.currentLocale === 'en-US') {
-            timeFormatSelect.options[0].text = '12-hour (AM/PM)';
-            timeFormatSelect.options[1].text = '24-hour';
+        if (timeFormatSelect) {
+            timeFormatSelect.options[0].text = this.t('settings.time.timeFormat12');
+            timeFormatSelect.options[1].text = this.t('settings.time.timeFormat24');
         }
         
-        // Translate date format options
+        // Also translate time format in More Settings section
+        const timeFormatSelectMore = document.getElementById('time-format-select');
+        if (timeFormatSelectMore) {
+            timeFormatSelectMore.options[0].text = this.t('settings.time.timeFormat12');
+            timeFormatSelectMore.options[1].text = this.t('settings.time.timeFormat24');
+        }
+        
+        // Translate date format options for Time Display Settings modal
         const dateFormatSelect = document.getElementById('td-date-format-select');
-        if (dateFormatSelect && this.currentLocale === 'en-US') {
-            dateFormatSelect.options[0].text = 'Year-Month-Day (2024-01-01)';
-            dateFormatSelect.options[1].text = 'Month-Day-Year (01-01-2024)';
-            dateFormatSelect.options[2].text = 'Day-Month-Year (01-01-2024)';
-            dateFormatSelect.options[3].text = 'Chinese (2024年1月1日)';
+        if (dateFormatSelect) {
+            dateFormatSelect.options[0].text = this.t('settings.time.dateFormatYMD');
+            dateFormatSelect.options[1].text = this.t('settings.time.dateFormatMDY');
+            dateFormatSelect.options[2].text = this.t('settings.time.dateFormatDMY');
+            dateFormatSelect.options[3].text = this.t('settings.time.dateFormatChinese');
         }
         
-        // Translate timezone options
+        // Also translate date format in More Settings section
+        const dateFormatSelectMore = document.getElementById('date-format-select');
+        if (dateFormatSelectMore) {
+            dateFormatSelectMore.options[0].text = this.t('settings.time.dateFormatYMD');
+            dateFormatSelectMore.options[1].text = this.t('settings.time.dateFormatMDY');
+            dateFormatSelectMore.options[2].text = this.t('settings.time.dateFormatDMY');
+            dateFormatSelectMore.options[3].text = this.t('settings.time.dateFormatChinese');
+        }
+        
+        // Translate timezone options for Time Display Settings modal
         const timezoneSelect = document.getElementById('td-timezone-select');
-        if (timezoneSelect && this.currentLocale === 'en-US') {
-            timezoneSelect.options[0].text = 'China (UTC+8)';
-            timezoneSelect.options[1].text = 'New York (UTC-5/-4)';
-            timezoneSelect.options[2].text = 'Los Angeles (UTC-8/-7)';
-            timezoneSelect.options[3].text = 'Chicago (UTC-6/-5)';
-            timezoneSelect.options[4].text = 'London (UTC+0/+1)';
-            timezoneSelect.options[5].text = 'Paris (UTC+1/+2)';
-            timezoneSelect.options[6].text = 'Berlin (UTC+1/+2)';
-            timezoneSelect.options[7].text = 'Tokyo (UTC+9)';
-            timezoneSelect.options[8].text = 'Seoul (UTC+9)';
-            timezoneSelect.options[9].text = 'Hong Kong (UTC+8)';
-            timezoneSelect.options[10].text = 'Singapore (UTC+8)';
-            timezoneSelect.options[11].text = 'Dubai (UTC+4)';
-            timezoneSelect.options[12].text = 'Sydney (UTC+10/+11)';
-            timezoneSelect.options[13].text = 'Auckland (UTC+12/+13)';
-            timezoneSelect.options[14].text = 'UTC (Coordinated Universal Time)';
+        if (timezoneSelect) {
+            timezoneSelect.options[0].text = this.t('timezones.china');
+            timezoneSelect.options[1].text = this.t('timezones.newyork');
+            timezoneSelect.options[2].text = this.t('timezones.losangeles');
+            timezoneSelect.options[3].text = this.t('timezones.chicago');
+            timezoneSelect.options[4].text = this.t('timezones.london');
+            timezoneSelect.options[5].text = this.t('timezones.paris');
+            timezoneSelect.options[6].text = this.t('timezones.berlin');
+            timezoneSelect.options[7].text = this.t('timezones.tokyo');
+            timezoneSelect.options[8].text = this.t('timezones.seoul');
+            timezoneSelect.options[9].text = this.t('timezones.hongkong');
+            timezoneSelect.options[10].text = this.t('timezones.singapore');
+            timezoneSelect.options[11].text = this.t('timezones.dubai');
+            timezoneSelect.options[12].text = this.t('timezones.sydney');
+            timezoneSelect.options[13].text = this.t('timezones.auckland');
+            timezoneSelect.options[14].text = this.t('timezones.utc');
         }
         
-        // Translate "Custom Color" labels
-        document.querySelectorAll('.color-picker-icon-btn[title="自定义颜色"]').forEach(btn => {
-            btn.title = this.t('timeDisplay.customColor');
+        // Also translate timezone in More Settings section
+        const timezoneSelectMore = document.getElementById('timezone-select');
+        if (timezoneSelectMore) {
+            timezoneSelectMore.options[0].text = this.t('timezones.china');
+            timezoneSelectMore.options[1].text = this.t('timezones.newyork');
+            timezoneSelectMore.options[2].text = this.t('timezones.losangeles');
+            timezoneSelectMore.options[3].text = this.t('timezones.chicago');
+            timezoneSelectMore.options[4].text = this.t('timezones.london');
+            timezoneSelectMore.options[5].text = this.t('timezones.paris');
+            timezoneSelectMore.options[6].text = this.t('timezones.berlin');
+            timezoneSelectMore.options[7].text = this.t('timezones.tokyo');
+            timezoneSelectMore.options[8].text = this.t('timezones.seoul');
+            timezoneSelectMore.options[9].text = this.t('timezones.hongkong');
+            timezoneSelectMore.options[10].text = this.t('timezones.singapore');
+            timezoneSelectMore.options[11].text = this.t('timezones.dubai');
+            timezoneSelectMore.options[12].text = this.t('timezones.sydney');
+            timezoneSelectMore.options[13].text = this.t('timezones.auckland');
+            timezoneSelectMore.options[14].text = this.t('timezones.utc');
+        }
+        
+        // Translate "Custom Color" labels for all color picker icon buttons
+        document.querySelectorAll('.color-picker-icon-btn').forEach(btn => {
+            // Only update if it's actually a color picker button with a title attribute
+            if (btn.hasAttribute('title')) {
+                btn.title = this.t('timeDisplay.customColor');
+            }
         });
         
         // Update label format for font sizes and opacity - "字体大小：当前 16px"
@@ -781,17 +830,17 @@ class I18n {
         
         // Translate global font select options
         const globalFontSelect = document.getElementById('global-font-select');
-        if (globalFontSelect && this.currentLocale === 'en-US') {
-            globalFontSelect.options[0].text = 'System Default';
-            globalFontSelect.options[1].text = 'Serif';
-            globalFontSelect.options[2].text = 'Sans Serif';
-            globalFontSelect.options[3].text = 'Monospace';
-            globalFontSelect.options[4].text = 'Cursive';
-            globalFontSelect.options[5].text = 'Microsoft YaHei';
-            globalFontSelect.options[6].text = 'SimSun';
-            globalFontSelect.options[7].text = 'SimHei';
-            globalFontSelect.options[8].text = 'KaiTi';
-            globalFontSelect.options[9].text = 'FangSong';
+        if (globalFontSelect) {
+            globalFontSelect.options[0].text = this.t('settings.general.fonts.system');
+            globalFontSelect.options[1].text = this.t('settings.general.fonts.serif');
+            globalFontSelect.options[2].text = this.t('settings.general.fonts.sansSerif');
+            globalFontSelect.options[3].text = this.t('settings.general.fonts.monospace');
+            globalFontSelect.options[4].text = this.t('settings.general.fonts.cursive');
+            globalFontSelect.options[5].text = this.t('settings.general.fonts.yahei');
+            globalFontSelect.options[6].text = this.t('settings.general.fonts.simsun');
+            globalFontSelect.options[7].text = this.t('settings.general.fonts.simhei');
+            globalFontSelect.options[8].text = this.t('settings.general.fonts.kaiti');
+            globalFontSelect.options[9].text = this.t('settings.general.fonts.fangsong');
         }
         
         // Translate canvas preset buttons
@@ -820,21 +869,21 @@ class I18n {
         
         // Translate canvas ratio dropdown
         const canvasRatioSelect = document.getElementById('canvas-ratio-select');
-        if (canvasRatioSelect && this.currentLocale === 'en-US') {
-            canvasRatioSelect.options[0].text = 'Custom';
-            canvasRatioSelect.options[1].text = '16:9';
-            canvasRatioSelect.options[2].text = '4:3';
-            canvasRatioSelect.options[3].text = '1:1';
-            canvasRatioSelect.options[4].text = '3:4 (Portrait)';
-            canvasRatioSelect.options[5].text = '9:16 (Portrait)';
+        if (canvasRatioSelect) {
+            canvasRatioSelect.options[0].text = this.t('settings.canvas.customSize.ratios.custom');
+            canvasRatioSelect.options[1].text = this.t('settings.canvas.customSize.ratios.16:9');
+            canvasRatioSelect.options[2].text = this.t('settings.canvas.customSize.ratios.4:3');
+            canvasRatioSelect.options[3].text = this.t('settings.canvas.customSize.ratios.1:1');
+            canvasRatioSelect.options[4].text = this.t('settings.canvas.customSize.ratios.3:4');
+            canvasRatioSelect.options[5].text = this.t('settings.canvas.customSize.ratios.9:16');
         }
         
         // Translate canvas custom size labels
         const canvasCustomLabels = document.querySelectorAll('.custom-size-row label');
-        if (canvasCustomLabels.length >= 3 && this.currentLocale === 'en-US') {
-            canvasCustomLabels[0].textContent = 'Width';
-            canvasCustomLabels[1].textContent = 'Height';
-            canvasCustomLabels[2].textContent = 'Aspect Ratio';
+        if (canvasCustomLabels.length >= 3) {
+            canvasCustomLabels[0].textContent = this.t('settings.canvas.customSize.width');
+            canvasCustomLabels[1].textContent = this.t('settings.canvas.customSize.height');
+            canvasCustomLabels[2].textContent = this.t('settings.canvas.customSize.ratio');
         }
         
         // Translate background pattern preference checkboxes
