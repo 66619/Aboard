@@ -429,12 +429,18 @@
                         <div class="settings-group">
                             <label>工具栏大小：当前 <span id="toolbar-size-value">40</span>px</label>
                             <p class="settings-hint">调整底部工具栏的大小</p>
-                            <input type="range" id="toolbar-size-slider" min="40" max="80" value="40" class="slider" step="5">
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="range" id="toolbar-size-slider" min="40" max="80" value="40" class="slider" step="5" style="flex: 1;">
+                                <input type="number" id="toolbar-size-input" min="40" max="80" value="40" step="5" style="width: 60px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; text-align: center;">
+                            </div>
                         </div>
                         <div class="settings-group">
                             <label>属性栏大小：当前 <span id="config-scale-value">100</span>%</label>
                             <p class="settings-hint">调整弹出具体属性面板的大小</p>
-                            <input type="range" id="config-scale-slider" min="80" max="120" value="100" class="slider" step="10">
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="range" id="config-scale-slider" min="80" max="120" value="100" class="slider" step="10" style="flex: 1;">
+                                <input type="number" id="config-scale-input" min="80" max="120" value="100" step="10" style="width: 60px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; text-align: center;">
+                            </div>
                         </div>
                         <div class="settings-group">
                             <label>主题色</label>
@@ -466,15 +472,7 @@
                     <!-- Canvas settings -->
                     <div id="canvas-settings" class="settings-tab-content">
                         <h3>画布设置</h3>
-                        <div class="settings-group">
-                            <label>画布模式</label>
-                            <p class="settings-hint">选择画布的显示模式</p>
-                            <div class="button-size-options button-size-options-2">
-                                <button class="canvas-mode-btn active" data-mode="infinite">无限画布</button>
-                                <button class="canvas-mode-btn" data-mode="paginated">分页模式</button>
-                            </div>
-                        </div>
-                        <div class="settings-group" id="canvas-size-settings" style="display: none;">
+                        <div class="settings-group" id="canvas-size-settings">
                             <label>画布尺寸</label>
                             <p class="settings-hint">选择预设尺寸或自定义画布比例和大小</p>
                             <div class="canvas-presets">
@@ -520,12 +518,18 @@
                         <div class="settings-group">
                             <label>背景透明度：当前 <span id="bg-opacity-value">100</span>%</label>
                             <p class="settings-hint">调整背景的透明度,100%为完全不透明</p>
-                            <input type="range" id="bg-opacity-slider" min="0" max="100" value="100" class="slider">
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="range" id="bg-opacity-slider" min="0" max="100" value="100" class="slider" style="flex: 1;">
+                                <input type="number" id="bg-opacity-input" min="0" max="100" value="100" step="1" style="width: 60px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; text-align: center;">
+                            </div>
                         </div>
                         <div class="settings-group">
                             <label>图案透明度：当前 <span id="pattern-intensity-value">50</span>%</label>
                             <p class="settings-hint">调整背景图案线条的明暗程度</p>
-                            <input type="range" id="pattern-intensity-slider" min="10" max="200" value="50" class="slider">
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="range" id="pattern-intensity-slider" min="10" max="200" value="50" class="slider" style="flex: 1;">
+                                <input type="number" id="pattern-intensity-input" min="10" max="200" value="50" step="1" style="width: 60px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; text-align: center;">
+                            </div>
                         </div>
                         <div class="settings-group">
                             <label>背景图案偏好</label>
