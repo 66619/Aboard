@@ -30,6 +30,9 @@ class DrawingBoard {
         this.announcementManager = new AnnouncementManager();
         this.exportManager = new ExportManager(this.canvas, this.bgCanvas, this);
         
+        // Canvas fit scale - calculated once on init and window resize
+        this.canvasFitScale = 1.0;
+        
         // Pagination
         this.currentPage = 1;
         this.pages = [];
@@ -102,8 +105,15 @@ class DrawingBoard {
             localStorage.setItem('canvasScale', 0.7);
         }
         
-        // Center the canvas on startup
-        this.centerCanvas();
+        // Calculate initial fit scale
+        this.canvasFitScale = this.calculateCanvasFitScale();
+        
+        // Center the canvas on startup only if no saved pan offset
+        const savedPanX = localStorage.getItem('panOffsetX');
+        const savedPanY = localStorage.getItem('panOffsetY');
+        if (!savedPanX || !savedPanY) {
+            this.centerCanvas();
+        }
     }
     
     centerCanvas() {
@@ -382,8 +392,9 @@ class DrawingBoard {
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
-                // In pagination mode, recalculate the canvas fit to maintain centering
-                this.applyZoom(false); // Recalculate fit scale based on new viewport size
+                // Recalculate canvas fit scale for new viewport size
+                this.canvasFitScale = this.calculateCanvasFitScale();
+                this.applyZoom(false); // Apply new fit scale without updating config-area
                 // Update toolbar text visibility on resize
                 this.settingsManager.updateToolbarTextVisibility();
                 // Reposition toolbars to ensure they stay within viewport
@@ -1069,16 +1080,27 @@ class DrawingBoard {
             const computedStyle = window.getComputedStyle(panel);
             
             // Get current position
-            let left = parseFloat(computedStyle.left) || 0;
-            let top = parseFloat(computedStyle.top) || 0;
-            let right = computedStyle.right !== 'auto' ? parseFloat(computedStyle.right) : null;
-            let bottom = computedStyle.bottom !== 'auto' ? parseFloat(computedStyle.bottom) : null;
+            let left = computedStyle.left;
+            let top = computedStyle.top;
+            let right = computedStyle.right;
+            let bottom = computedStyle.bottom;
             
-            // Check if panel is positioned and might overflow
-            const hasCustomPosition = computedStyle.left !== 'auto' || computedStyle.top !== 'auto' || 
-                                     computedStyle.right !== 'auto' || computedStyle.bottom !== 'auto';
+            // Check if panel has been dragged (has explicit positioning)
+            const hasCenteredPosition = left === '50%' || computedStyle.transform.includes('translateX');
+            const hasExplicitPosition = !hasCenteredPosition && (left !== 'auto' || top !== 'auto' || right !== 'auto' || bottom !== 'auto');
             
-            if (!hasCustomPosition) return;
+            // Skip panels that are centered and haven't been dragged
+            if (hasCenteredPosition && !hasExplicitPosition) {
+                return;
+            }
+            
+            if (!hasExplicitPosition) return;
+            
+            // Convert to numbers
+            left = parseFloat(left) || 0;
+            top = parseFloat(top) || 0;
+            right = right !== 'auto' ? parseFloat(right) : null;
+            bottom = bottom !== 'auto' ? parseFloat(bottom) : null;
             
             // Adjust position if overflowing
             if (right !== null) {
@@ -1108,10 +1130,10 @@ class DrawingBoard {
             }
             
             // Also ensure panel doesn't overflow left or top edges
-            if (left < EDGE_SPACING) {
+            if (left < EDGE_SPACING && left !== 0) {
                 panel.style.left = `${EDGE_SPACING}px`;
             }
-            if (top < EDGE_SPACING) {
+            if (top < EDGE_SPACING && top !== 0) {
                 panel.style.top = `${EDGE_SPACING}px`;
             }
         });
@@ -1521,11 +1543,11 @@ class DrawingBoard {
         this.bgCanvas.style.width = width + 'px';
         this.bgCanvas.style.height = height + 'px';
         
-        // Calculate proper scale to fit canvas within viewport
-        const fitScale = this.calculateCanvasFitScale();
+        // Recalculate fit scale since canvas size changed
+        this.canvasFitScale = this.calculateCanvasFitScale();
         
         // Apply the current zoom level on top of the fit scale
-        const finalScale = fitScale * this.drawingEngine.canvasScale;
+        const finalScale = this.canvasFitScale * this.drawingEngine.canvasScale;
         
         // Center the canvas on the screen with proper scaling
         this.canvas.style.position = 'absolute';
@@ -1584,11 +1606,8 @@ class DrawingBoard {
     }
     
     applyZoom(updateConfigScale = true) {
-        // Calculate proper scale to fit canvas within viewport
-        const fitScale = this.calculateCanvasFitScale();
-        
-        // Apply the current zoom level on top of the fit scale
-        const finalScale = fitScale * this.drawingEngine.canvasScale;
+        // Use stored fit scale instead of recalculating to preserve user's pan/zoom state
+        const finalScale = this.canvasFitScale * this.drawingEngine.canvasScale;
         
         // Apply zoom using CSS transform for better performance
         const panX = this.drawingEngine.panOffset.x;
