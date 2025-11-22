@@ -83,7 +83,7 @@ class DrawingBoard {
             this.updatePaginationUI();
         }
         
-        this.initializeCanvasView(); // Initialize canvas view (70% scale, centered)
+        this.initializeCanvasView(); // Initialize canvas view (75% scale, centered)
         this.updateZoomUI();
         this.applyZoom(false); // Don't update config-area scale on refresh
         this.updateZoomControlsVisibility();
@@ -135,6 +135,13 @@ class DrawingBoard {
         this.applyPanTransform();
     }
     
+    recalculateAndRecenterCanvas() {
+        // Recalculate fit scale for current viewport size
+        this.canvasFitScale = this.calculateCanvasFitScale();
+        // Re-center the canvas
+        this.centerCanvas();
+    }
+    
     resizeCanvas() {
         // Get window dimensions to ensure canvas always fills viewport
         const windowWidth = window.innerWidth;
@@ -166,11 +173,8 @@ class DrawingBoard {
         
         this.backgroundManager.drawBackground();
         
-        // Recalculate fit scale for new window size
-        this.canvasFitScale = this.calculateCanvasFitScale();
-        
-        // Re-center the canvas after resize
-        this.centerCanvas();
+        // Recalculate fit scale and re-center the canvas
+        this.recalculateAndRecenterCanvas();
     }
     
     setupEventListeners() {
@@ -298,7 +302,7 @@ class DrawingBoard {
                     this.drawingEngine.lastPoint = null;
                     // Restore the previous state to remove any partial stroke
                     if (this.historyManager.historyStep >= 0) {
-                        this.historyManager.restoreState(this.historyManager.historyStep);
+                        this.historyManager.restoreState();
                     }
                 }
                 this.handlePinchStart(e);
@@ -397,10 +401,8 @@ class DrawingBoard {
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
-                // Recalculate canvas fit scale for new viewport size
-                this.canvasFitScale = this.calculateCanvasFitScale();
-                // Re-center the canvas for new window size
-                this.centerCanvas();
+                // Recalculate fit scale and re-center canvas for new viewport size
+                this.recalculateAndRecenterCanvas();
                 this.applyZoom(false); // Apply new fit scale without updating config-area
                 // Update toolbar text visibility on resize
                 this.settingsManager.updateToolbarTextVisibility();
