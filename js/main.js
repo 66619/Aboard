@@ -145,7 +145,7 @@ class DrawingBoard {
     }
     
     resizeCanvas() {
-        // Get window dimensions to ensure canvas always fills viewport
+        // Get window dimensions for canvas sizing
         const windowWidth = window.innerWidth;
         const windowHeight = window.innerHeight;
         const dpr = window.devicePixelRatio || 1;
@@ -1401,7 +1401,8 @@ class DrawingBoard {
         this.drawingEngine.isDrawing = false;
         this.drawingEngine.points = [];
         this.drawingEngine.lastPoint = null;
-        // Restore the previous canvas state to remove any partial stroke
+        // Restore canvas to the last saved state, removing any partial stroke
+        // Note: This only redraws from current history position, doesn't affect undo/redo
         if (this.historyManager.historyStep >= 0) {
             this.historyManager.restoreState();
         }
