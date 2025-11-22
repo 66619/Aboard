@@ -16,7 +16,7 @@ class CollapsibleManager {
                 console.warn('Failed to load collapsed state:', e);
             }
         }
-        return { default: true }; // All sections collapsed by default
+        return { default: true }; // All sections collapsed by default to save space
     }
     
     saveCollapsedState() {
@@ -118,7 +118,7 @@ class CollapsibleManager {
         group.appendChild(content);
         
         // Restore collapsed state: default to collapsed unless explicitly saved as expanded (false)
-        // This ensures new groups start collapsed, and user preferences are preserved
+        // This ensures groups start collapsed to save space, and user preferences are preserved
         if (this.collapsedState[groupId] !== false) {
             group.classList.add('collapsed');
         }

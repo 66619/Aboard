@@ -7,7 +7,7 @@ class SettingsManager {
         this.configScale = parseFloat(localStorage.getItem('configScale')) || 1.0;
         this.controlPosition = localStorage.getItem('controlPosition') || 'top-right';
         this.edgeSnapEnabled = localStorage.getItem('edgeSnapEnabled') !== 'false';
-        this.infiniteCanvas = localStorage.getItem('canvasMode') === 'infinite';
+        this.infiniteCanvas = false; // Always use pagination mode
         this.showZoomControls = localStorage.getItem('showZoomControls') !== 'false';
         this.showFullscreenBtn = localStorage.getItem('showFullscreenBtn') !== 'false';
         this.patternPreferences = this.loadPatternPreferences();
@@ -192,10 +192,12 @@ class SettingsManager {
     loadSettings() {
         document.getElementById('toolbar-size-slider').value = this.toolbarSize;
         document.getElementById('toolbar-size-value').textContent = this.toolbarSize;
+        document.getElementById('toolbar-size-input').value = this.toolbarSize;
         this.updateToolbarSize();
         
         document.getElementById('config-scale-slider').value = Math.round(this.configScale * 100);
         document.getElementById('config-scale-value').textContent = Math.round(this.configScale * 100);
+        document.getElementById('config-scale-input').value = Math.round(this.configScale * 100);
         this.updateConfigScale();
         
         this.setControlPosition(this.controlPosition);
@@ -203,12 +205,7 @@ class SettingsManager {
         document.getElementById('edge-snap-checkbox').checked = this.edgeSnapEnabled;
         document.getElementById('show-zoom-controls-checkbox').checked = this.showZoomControls;
         
-        // Load canvas mode
-        const canvasMode = this.infiniteCanvas ? 'infinite' : 'paginated';
-        document.querySelectorAll('.canvas-mode-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.mode === canvasMode);
-        });
-        this.updateCanvasSizeSettings();
+        // Canvas is always in pagination mode now
         
         // Load canvas size settings
         document.getElementById('canvas-width-input').value = this.canvasWidth;
@@ -232,18 +229,12 @@ class SettingsManager {
         // Load global font
         this.applyGlobalFont();
         document.getElementById('global-font-select').value = this.globalFont;
+        
+        // Initialize language selector
+        this.initLanguageSelector();
     }
     
-    updateCanvasSizeSettings() {
-        const canvasSizeSettings = document.getElementById('canvas-size-settings');
-        canvasSizeSettings.style.display = this.infiniteCanvas ? 'none' : 'flex';
-    }
-    
-    setCanvasMode(mode) {
-        this.infiniteCanvas = mode === 'infinite';
-        localStorage.setItem('canvasMode', mode);
-        this.updateCanvasSizeSettings();
-    }
+    // Canvas mode is removed - always use pagination
     
     setCanvasPreset(preset) {
         this.canvasPreset = preset;
@@ -331,5 +322,21 @@ class SettingsManager {
                 fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
         }
         document.body.style.fontFamily = fontFamily;
+    }
+    
+    initLanguageSelector() {
+        const languageSelect = document.getElementById('language-select');
+        if (languageSelect && window.i18n) {
+            // Set current language
+            languageSelect.value = window.i18n.getCurrentLocale();
+            
+            // Handle language change
+            languageSelect.addEventListener('change', async (e) => {
+                const newLocale = e.target.value;
+                await window.i18n.changeLocale(newLocale);
+                // Reload the page to apply all translations properly
+                window.location.reload();
+            });
+        }
     }
 }

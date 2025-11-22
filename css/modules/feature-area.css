@@ -20,6 +20,10 @@
     min-width: 165px;
     display: none;
     cursor: move;
+    /* Improved touch device support */
+    touch-action: none;
+    /* Performance optimization */
+    will-change: transform, left, top;
 }
 
 #feature-area.show {

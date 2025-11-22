@@ -3,11 +3,15 @@
 
 // Single Timer Instance Class
 class TimerInstance {
-    constructor(id, mode, duration, playSound, selectedSound, customSoundUrl, loopSound, loopCount, manager, title = '') {
+    constructor(id, mode, duration, playSound, selectedSound, customSoundUrl, loopSound, loopCount, manager, title = '', textColor = '#333333', bgColor = '#FFFFFF') {
         this.id = id;
         this.mode = mode; // 'stopwatch' or 'countdown'
         this.manager = manager;
         this.title = title; // Timer title
+        
+        // Color settings
+        this.textColor = textColor;
+        this.bgColor = bgColor;
         
         // Timer state
         this.isRunning = false;
@@ -169,6 +173,18 @@ class TimerInstance {
         document.body.appendChild(display);
         this.displayElement = display;
         
+        // Apply custom colors
+        display.style.backgroundColor = this.bgColor;
+        display.style.color = this.textColor;
+        
+        // Also apply to specific elements that have their own color
+        const timeDisplay = display.querySelector('.timer-display-time');
+        const titleDisplay = display.querySelector('.timer-display-title');
+        const modeDisplay = display.querySelector('.timer-display-mode');
+        if (timeDisplay) timeDisplay.style.color = this.textColor;
+        if (titleDisplay) titleDisplay.style.color = this.textColor;
+        if (modeDisplay) modeDisplay.style.color = this.textColor;
+        
         // Position the timer (stagger based on id)
         const offset = (this.id % 5) * 30;
         display.style.top = `${180 + offset}px`;
@@ -229,7 +245,8 @@ class TimerInstance {
         const header = this.displayElement.querySelector('.timer-display-header');
         const timeDisplay = this.displayElement.querySelector('.timer-display-time');
         
-        const handleMouseDown = (e) => {
+        // Unified handler for mouse and touch start
+        const handleStart = (e) => {
             // Don't start dragging if clicking on close button
             if (e.target.closest('.timer-close-btn')) return;
             
@@ -237,25 +254,35 @@ class TimerInstance {
             this.displayElement.classList.add('dragging');
             
             const rect = this.displayElement.getBoundingClientRect();
-            this.dragOffset.x = e.clientX - rect.left;
-            this.dragOffset.y = e.clientY - rect.top;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            this.dragOffset.x = clientX - rect.left;
+            this.dragOffset.y = clientY - rect.top;
             
             e.preventDefault();
         };
         
         // Allow dragging from header or time display (when compact)
-        header.addEventListener('mousedown', handleMouseDown);
-        timeDisplay.addEventListener('mousedown', handleMouseDown);
+        // Add both mouse and touch event listeners for better touch device support
+        header.addEventListener('mousedown', handleStart);
+        header.addEventListener('touchstart', handleStart, { passive: false });
+        timeDisplay.addEventListener('mousedown', handleStart);
+        timeDisplay.addEventListener('touchstart', handleStart, { passive: false });
         
-        const handleMouseMove = (e) => {
+        // Unified handler for mouse and touch move
+        const handleMove = (e) => {
             if (!this.isDragging) return;
+            
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             
             // Use requestAnimationFrame for smooth dragging performance
             requestAnimationFrame(() => {
                 if (!this.isDragging) return; // Double check inside RAF
                 
-                const x = e.clientX - this.dragOffset.x;
-                const y = e.clientY - this.dragOffset.y;
+                const x = clientX - this.dragOffset.x;
+                const y = clientY - this.dragOffset.y;
                 
                 // Apply edge snapping
                 const edgeSnapDistance = 30;
@@ -290,20 +317,24 @@ class TimerInstance {
             });
         };
         
-        const handleMouseUp = () => {
+        // Unified handler for mouse and touch end
+        const handleEnd = () => {
             if (this.isDragging) {
                 this.isDragging = false;
                 this.displayElement.classList.remove('dragging');
             }
         };
         
-        // Keep listeners attached permanently to document
-        document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', handleMouseUp);
+        // Keep listeners attached permanently to document for better touch support
+        this.mouseMoveHandler = handleMove;
+        this.mouseUpHandler = handleEnd;
         
-        // Store references for cleanup when timer is closed
-        this.mouseMoveHandler = handleMouseMove;
-        this.mouseUpHandler = handleMouseUp;
+        // Add both mouse and touch event listeners
+        document.addEventListener('mousemove', this.mouseMoveHandler);
+        document.addEventListener('mouseup', this.mouseUpHandler);
+        document.addEventListener('touchmove', this.mouseMoveHandler, { passive: false });
+        document.addEventListener('touchend', this.mouseUpHandler);
+        document.addEventListener('touchcancel', this.mouseUpHandler);
     }
     
     startTimerLoop() {
@@ -581,21 +612,26 @@ class TimerInstance {
         const seconds = totalSeconds % 60;
         const timeString = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         
-        // Calculate font size based on slider value
+        // Calculate font size based on slider value - only for time, not title
         const vmin = Math.min(window.innerWidth, window.innerHeight);
         const timeFontSize = Math.floor(vmin * (this.fullscreenFontSizePercent / 100));
         const modeFontSize = Math.floor(vmin * 0.02);
-        const titleFontSize = Math.floor(vmin * 0.03);
+        // Title font size is fixed at 3vmin (defined in CSS), not affected by slider
         
-        // Update content with title if available
+        // Update content with title if available, applying custom colors
         const modeText = this.mode === 'stopwatch' ? '正计时' : '倒计时';
-        const titleHTML = this.title ? `<div class="timer-fullscreen-title" style="font-size: ${titleFontSize}px;">${this.title}</div>` : '';
+        const titleHTML = this.title ? `<div class="timer-fullscreen-title" style="color: ${this.textColor};">${this.title}</div>` : '';
         
         this.fullscreenContent.innerHTML = `
-            <div class="timer-fullscreen-mode" style="font-size: ${modeFontSize}px;">${modeText}</div>
+            <div class="timer-fullscreen-mode" style="font-size: ${modeFontSize}px; color: ${this.textColor};">${modeText}</div>
             ${titleHTML}
-            <div class="timer-fullscreen-time" style="font-size: ${timeFontSize}px;">${timeString}</div>
+            <div class="timer-fullscreen-time" style="font-size: ${timeFontSize}px; color: ${this.textColor};">${timeString}</div>
         `;
+        
+        // Apply background color to fullscreen modal
+        if (this.fullscreenModal) {
+            this.fullscreenModal.style.backgroundColor = this.bgColor;
+        }
     }
     
     updateFontSize(size) {
@@ -627,9 +663,12 @@ class TimerInstance {
         // Remove event listeners
         if (this.mouseMoveHandler) {
             document.removeEventListener('mousemove', this.mouseMoveHandler);
+            document.removeEventListener('touchmove', this.mouseMoveHandler);
         }
         if (this.mouseUpHandler) {
             document.removeEventListener('mouseup', this.mouseUpHandler);
+            document.removeEventListener('touchend', this.mouseUpHandler);
+            document.removeEventListener('touchcancel', this.mouseUpHandler);
         }
         
         // Remove from DOM
@@ -641,7 +680,7 @@ class TimerInstance {
         this.manager.removeTimer(this.id);
     }
     
-    updateSettings(duration, playSound, selectedSound, customSoundUrl, loopSound, loopCount, title = '') {
+    updateSettings(duration, playSound, selectedSound, customSoundUrl, loopSound, loopCount, title = '', textColor = null, bgColor = null) {
         this.countdownDuration = duration;
         
         if (this.mode === 'stopwatch') {
@@ -656,6 +695,23 @@ class TimerInstance {
         this.loopSound = loopSound;
         this.loopCount = loopCount;
         this.title = title;
+        
+        // Update colors if provided
+        if (textColor) this.textColor = textColor;
+        if (bgColor) this.bgColor = bgColor;
+        
+        // Apply colors to display element
+        if (this.displayElement) {
+            this.displayElement.style.backgroundColor = this.bgColor;
+            this.displayElement.style.color = this.textColor;
+            
+            const timeDisplay = this.displayElement.querySelector('.timer-display-time');
+            const titleDisplay = this.displayElement.querySelector('.timer-display-title');
+            const modeDisplay = this.displayElement.querySelector('.timer-display-mode');
+            if (timeDisplay) timeDisplay.style.color = this.textColor;
+            if (titleDisplay) titleDisplay.style.color = this.textColor;
+            if (modeDisplay) modeDisplay.style.color = this.textColor;
+        }
         
         // Update title in display if changed
         const oldTitleElement = this.displayElement.querySelector('.timer-display-title');
@@ -915,14 +971,62 @@ class TimerManager {
             });
         }
         
-        // Action buttons
-        const timerCancelBtn = document.getElementById('timer-cancel-btn');
-        if (timerCancelBtn) {
-            timerCancelBtn.addEventListener('click', () => {
-                this.hideSettingsModal();
+        // Timer color picker buttons
+        document.querySelectorAll('.color-btn[data-timer-text-color]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.color-btn[data-timer-text-color]').forEach(b => b.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+            });
+        });
+        
+        document.querySelectorAll('.color-btn[data-timer-bg-color]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.color-btn[data-timer-bg-color]').forEach(b => b.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+            });
+        });
+        
+        // Timer color settings checkbox toggle
+        const timerColorCheckbox = document.getElementById('timer-color-checkbox');
+        const timerColorSettings = document.getElementById('timer-color-settings');
+        if (timerColorCheckbox && timerColorSettings) {
+            timerColorCheckbox.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    timerColorSettings.style.display = 'block';
+                } else {
+                    timerColorSettings.style.display = 'none';
+                }
             });
         }
         
+        // Custom color pickers
+        const customTextColorPicker = document.getElementById('custom-timer-text-color-picker');
+        if (customTextColorPicker) {
+            customTextColorPicker.addEventListener('input', (e) => {
+                // Deselect all preset buttons
+                document.querySelectorAll('.color-btn[data-timer-text-color]').forEach(b => b.classList.remove('active'));
+                // Update the custom picker parent button as active
+                const parentBtn = e.target.closest('.color-picker-icon-btn');
+                if (parentBtn) {
+                    parentBtn.classList.add('active-custom');
+                }
+            });
+        }
+        
+        const customBgColorPicker = document.getElementById('custom-timer-bg-color-picker');
+        if (customBgColorPicker) {
+            customBgColorPicker.addEventListener('input', (e) => {
+                // Deselect all preset buttons
+                document.querySelectorAll('.color-btn[data-timer-bg-color]').forEach(b => b.classList.remove('active'));
+                // Update the custom picker parent button as active
+                const parentBtn = e.target.closest('.color-picker-icon-btn');
+                if (parentBtn) {
+                    parentBtn.classList.add('active-custom');
+                }
+            });
+        }
+        
+        // Action buttons - only start button
         const timerStartBtn = document.getElementById('timer-start-btn');
         if (timerStartBtn) {
             timerStartBtn.addEventListener('click', () => {
@@ -1138,6 +1242,30 @@ class TimerManager {
         const loopSound = document.getElementById('timer-loop-checkbox').checked;
         const loopCount = parseInt(document.getElementById('timer-loop-count').value) || 3;
         
+        // Get color settings - check custom pickers first, then preset buttons
+        let textColor = '#333333';
+        let bgColor = '#FFFFFF';
+        
+        const activeTextColorBtn = document.querySelector('.color-btn.active[data-timer-text-color]');
+        const customTextColorPicker = document.getElementById('custom-timer-text-color-picker');
+        const customTextPickerParent = customTextColorPicker?.closest('.color-picker-icon-btn');
+        
+        if (customTextPickerParent && customTextPickerParent.classList.contains('active-custom')) {
+            textColor = customTextColorPicker.value;
+        } else if (activeTextColorBtn) {
+            textColor = activeTextColorBtn.dataset.timerTextColor;
+        }
+        
+        const activeBgColorBtn = document.querySelector('.color-btn.active[data-timer-bg-color]');
+        const customBgColorPicker = document.getElementById('custom-timer-bg-color-picker');
+        const customBgPickerParent = customBgColorPicker?.closest('.color-picker-icon-btn');
+        
+        if (customBgPickerParent && customBgPickerParent.classList.contains('active-custom')) {
+            bgColor = customBgColorPicker.value;
+        } else if (activeBgColorBtn) {
+            bgColor = activeBgColorBtn.dataset.timerBgColor;
+        }
+        
         const duration = (hours * 3600 + minutes * 60 + seconds) * 1000;
         
         // Use custom modal instead of browser alert
@@ -1148,12 +1276,12 @@ class TimerManager {
         
         if (this.adjustingTimer) {
             // Update existing timer
-            this.adjustingTimer.updateSettings(duration, playSound, selectedSound, customSoundUrl, loopSound, loopCount, title);
+            this.adjustingTimer.updateSettings(duration, playSound, selectedSound, customSoundUrl, loopSound, loopCount, title, textColor, bgColor);
             this.adjustingTimer = null;
         } else {
             // Create new timer
             const id = this.nextTimerId++;
-            const timer = new TimerInstance(id, mode, duration, playSound, selectedSound, customSoundUrl, loopSound, loopCount, this, title);
+            const timer = new TimerInstance(id, mode, duration, playSound, selectedSound, customSoundUrl, loopSound, loopCount, this, title, textColor, bgColor);
             this.timers.set(id, timer);
         }
         

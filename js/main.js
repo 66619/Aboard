@@ -24,10 +24,14 @@ class DrawingBoard {
         this.strokeControls = new StrokeControls(this.drawingEngine, this.canvas, this.ctx, this.historyManager);
         this.timeDisplayManager = new TimeDisplayManager(this.settingsManager);
         this.timeDisplayControls = new TimeDisplayControls(this.timeDisplayManager);
+        this.timeDisplaySettingsModal = new TimeDisplaySettingsModal(this.timeDisplayManager);
         this.timerManager = new TimerManager();
         this.collapsibleManager = new CollapsibleManager();
         this.announcementManager = new AnnouncementManager();
         this.exportManager = new ExportManager(this.canvas, this.bgCanvas, this);
+        
+        // Canvas fit scale - calculated once on init and window resize
+        this.canvasFitScale = 1.0;
         
         // Pagination
         this.currentPage = 1;
@@ -72,8 +76,8 @@ class DrawingBoard {
         this.updateUI();
         this.historyManager.saveState();
         
-        // Initialize pages array for pagination mode
-        if (!this.settingsManager.infiniteCanvas && this.pages.length === 0) {
+        // Initialize pages array for pagination mode (always on)
+        if (this.pages.length === 0) {
             this.pages.push(this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height));
             this.currentPage = 1;
             this.updatePaginationUI();
@@ -101,8 +105,15 @@ class DrawingBoard {
             localStorage.setItem('canvasScale', 0.7);
         }
         
-        // Center the canvas on startup
-        this.centerCanvas();
+        // Calculate initial fit scale
+        this.canvasFitScale = this.calculateCanvasFitScale();
+        
+        // Center the canvas on startup only if no saved pan offset
+        const savedPanX = localStorage.getItem('panOffsetX');
+        const savedPanY = localStorage.getItem('panOffsetY');
+        if (!savedPanX || !savedPanY) {
+            this.centerCanvas();
+        }
     }
     
     centerCanvas() {
@@ -381,13 +392,15 @@ class DrawingBoard {
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
-                this.resizeCanvas();
+                // Recalculate canvas fit scale for new viewport size
+                this.canvasFitScale = this.calculateCanvasFitScale();
+                this.applyZoom(false); // Apply new fit scale without updating config-area
                 // Update toolbar text visibility on resize
                 this.settingsManager.updateToolbarTextVisibility();
                 // Reposition toolbars to ensure they stay within viewport
                 this.repositionToolbarsOnResize();
-                // Don't update config-area scale on window resize (fix #2)
-                // this.updateConfigAreaScale();
+                // Reposition modals to ensure they stay within viewport
+                this.repositionModalsOnResize();
             }, 150); // 150ms debounce delay
         });
         
@@ -656,33 +669,71 @@ class DrawingBoard {
         
         const toolbarSizeSlider = document.getElementById('toolbar-size-slider');
         const toolbarSizeValue = document.getElementById('toolbar-size-value');
+        const toolbarSizeInput = document.getElementById('toolbar-size-input');
         toolbarSizeSlider.addEventListener('input', (e) => {
             this.settingsManager.toolbarSize = parseInt(e.target.value);
             toolbarSizeValue.textContent = e.target.value;
+            toolbarSizeInput.value = e.target.value;
+            this.settingsManager.updateToolbarSize();
+        });
+        toolbarSizeInput.addEventListener('input', (e) => {
+            const value = Math.max(40, Math.min(80, parseInt(e.target.value) || 40));
+            e.target.value = value;
+            toolbarSizeSlider.value = value;
+            this.settingsManager.toolbarSize = value;
+            toolbarSizeValue.textContent = value;
             this.settingsManager.updateToolbarSize();
         });
         
         const configScaleSlider = document.getElementById('config-scale-slider');
         const configScaleValue = document.getElementById('config-scale-value');
+        const configScaleInput = document.getElementById('config-scale-input');
         configScaleSlider.addEventListener('input', (e) => {
             this.settingsManager.configScale = parseInt(e.target.value) / 100;
             configScaleValue.textContent = Math.round(this.settingsManager.configScale * 100);
+            configScaleInput.value = e.target.value;
+            this.settingsManager.updateConfigScale();
+        });
+        configScaleInput.addEventListener('input', (e) => {
+            const value = Math.max(80, Math.min(120, parseInt(e.target.value) || 100));
+            e.target.value = value;
+            configScaleSlider.value = value;
+            this.settingsManager.configScale = value / 100;
+            configScaleValue.textContent = value;
             this.settingsManager.updateConfigScale();
         });
         
         // Background opacity and pattern intensity from settings
         const bgOpacitySlider = document.getElementById('bg-opacity-slider');
         const bgOpacityValue = document.getElementById('bg-opacity-value');
+        const bgOpacityInput = document.getElementById('bg-opacity-input');
         bgOpacitySlider.addEventListener('input', (e) => {
             this.backgroundManager.setOpacity(parseInt(e.target.value) / 100);
             bgOpacityValue.textContent = e.target.value;
+            bgOpacityInput.value = e.target.value;
+        });
+        bgOpacityInput.addEventListener('input', (e) => {
+            const value = Math.max(0, Math.min(100, parseInt(e.target.value) || 100));
+            e.target.value = value;
+            bgOpacitySlider.value = value;
+            this.backgroundManager.setOpacity(value / 100);
+            bgOpacityValue.textContent = value;
         });
         
         const patternIntensitySlider = document.getElementById('pattern-intensity-slider');
         const patternIntensityValue = document.getElementById('pattern-intensity-value');
+        const patternIntensityInput = document.getElementById('pattern-intensity-input');
         patternIntensitySlider.addEventListener('input', (e) => {
             this.backgroundManager.setPatternIntensity(parseInt(e.target.value) / 100);
             patternIntensityValue.textContent = e.target.value;
+            patternIntensityInput.value = e.target.value;
+        });
+        patternIntensityInput.addEventListener('input', (e) => {
+            const value = Math.max(10, Math.min(200, parseInt(e.target.value) || 50));
+            e.target.value = value;
+            patternIntensitySlider.value = value;
+            this.backgroundManager.setPatternIntensity(value / 100);
+            patternIntensityValue.textContent = value;
         });
         
         document.querySelectorAll('.position-option-btn').forEach(btn => {
@@ -701,16 +752,7 @@ class DrawingBoard {
             this.settingsManager.setGlobalFont(e.target.value);
         });
         
-        // Canvas mode buttons
-        document.querySelectorAll('.canvas-mode-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const mode = e.target.dataset.mode;
-                this.settingsManager.setCanvasMode(mode);
-                document.querySelectorAll('.canvas-mode-btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                this.updateCanvasMode();
-            });
-        });
+        // Canvas mode buttons removed - pagination is always active
         
         // Canvas preset buttons
         document.querySelectorAll('.canvas-preset-btn').forEach(btn => {
@@ -1076,16 +1118,27 @@ class DrawingBoard {
             const computedStyle = window.getComputedStyle(panel);
             
             // Get current position
-            let left = parseFloat(computedStyle.left) || 0;
-            let top = parseFloat(computedStyle.top) || 0;
-            let right = computedStyle.right !== 'auto' ? parseFloat(computedStyle.right) : null;
-            let bottom = computedStyle.bottom !== 'auto' ? parseFloat(computedStyle.bottom) : null;
+            let left = computedStyle.left;
+            let top = computedStyle.top;
+            let right = computedStyle.right;
+            let bottom = computedStyle.bottom;
             
-            // Check if panel is positioned and might overflow
-            const hasCustomPosition = computedStyle.left !== 'auto' || computedStyle.top !== 'auto' || 
-                                     computedStyle.right !== 'auto' || computedStyle.bottom !== 'auto';
+            // Check if panel has been dragged (has explicit positioning)
+            const hasCenteredPosition = left === '50%' || computedStyle.transform.includes('translateX');
+            const hasExplicitPosition = !hasCenteredPosition && (left !== 'auto' || top !== 'auto' || right !== 'auto' || bottom !== 'auto');
             
-            if (!hasCustomPosition) return;
+            // Skip panels that are centered and haven't been dragged
+            if (hasCenteredPosition && !hasExplicitPosition) {
+                return;
+            }
+            
+            if (!hasExplicitPosition) return;
+            
+            // Convert to numbers
+            left = parseFloat(left) || 0;
+            top = parseFloat(top) || 0;
+            right = right !== 'auto' ? parseFloat(right) : null;
+            bottom = bottom !== 'auto' ? parseFloat(bottom) : null;
             
             // Adjust position if overflowing
             if (right !== null) {
@@ -1115,11 +1168,47 @@ class DrawingBoard {
             }
             
             // Also ensure panel doesn't overflow left or top edges
-            if (left < EDGE_SPACING) {
+            if (left < EDGE_SPACING && left !== 0) {
                 panel.style.left = `${EDGE_SPACING}px`;
             }
-            if (top < EDGE_SPACING) {
+            if (top < EDGE_SPACING && top !== 0) {
                 panel.style.top = `${EDGE_SPACING}px`;
+            }
+        });
+    }
+    
+    repositionModalsOnResize() {
+        // Reposition modal content to stay within viewport on window resize
+        const modals = [
+            document.querySelector('#settings-modal .settings-modal-content'),
+            document.querySelector('#timer-settings-modal .timer-modal-content'),
+            document.querySelector('#time-display-settings-modal .timer-modal-content')
+        ];
+        
+        modals.forEach(modalContent => {
+            if (!modalContent) return;
+            
+            // Only reposition if modal is currently visible
+            const modal = modalContent.closest('.show, [style*="display: flex"]');
+            if (!modal) return;
+            
+            const rect = modalContent.getBoundingClientRect();
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            
+            // Check if modal content exceeds viewport
+            const EDGE_SPACING = 20;
+            
+            // Reset any transforms or positions first
+            modalContent.style.transform = '';
+            modalContent.style.position = '';
+            
+            // If modal is larger than viewport, it will be scrollable via parent
+            // Just ensure it's centered
+            if (rect.width > windowWidth - 2 * EDGE_SPACING || 
+                rect.height > windowHeight - 2 * EDGE_SPACING) {
+                // Modal is too large - parent modal should handle scrolling
+                // No specific positioning needed
             }
         });
     }
@@ -1131,32 +1220,45 @@ class DrawingBoard {
         const featureArea = document.getElementById('feature-area');
         const toolbar = document.getElementById('toolbar');
         
+        // Unified start handler for mouse and touch events
+        const handleDragStart = (e, element) => {
+            if (e.target.closest('button') || e.target.closest('input')) return;
+            
+            this.isDraggingPanel = true;
+            this.draggedElement = element;
+            
+            const rect = element.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            this.dragOffset.x = clientX - rect.left;
+            this.dragOffset.y = clientY - rect.top;
+            
+            this.draggedElementWidth = rect.width;
+            this.draggedElementHeight = rect.height;
+            
+            element.classList.add('dragging');
+            element.style.transition = 'none';
+            
+            e.preventDefault();
+        };
+        
         [historyControls, configArea, timeDisplayArea, featureArea, toolbar].forEach(element => {
-            element.addEventListener('mousedown', (e) => {
-                if (e.target.closest('button') || e.target.closest('input')) return;
-                
-                this.isDraggingPanel = true;
-                this.draggedElement = element;
-                
-                const rect = element.getBoundingClientRect();
-                this.dragOffset.x = e.clientX - rect.left;
-                this.dragOffset.y = e.clientY - rect.top;
-                
-                this.draggedElementWidth = rect.width;
-                this.draggedElementHeight = rect.height;
-                
-                element.classList.add('dragging');
-                element.style.transition = 'none';
-                
-                e.preventDefault();
-            });
+            // Mouse events
+            element.addEventListener('mousedown', (e) => handleDragStart(e, element));
+            // Touch events - improve compatibility with large-screen touch devices
+            element.addEventListener('touchstart', (e) => handleDragStart(e, element), { passive: false });
         });
         
-        document.addEventListener('mousemove', (e) => {
+        // Unified move handler for mouse and touch events
+        const handleDragMove = (e) => {
             if (!this.isDraggingPanel || !this.draggedElement) return;
             
-            let x = e.clientX - this.dragOffset.x;
-            let y = e.clientY - this.dragOffset.y;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            let x = clientX - this.dragOffset.x;
+            let y = clientY - this.dragOffset.y;
             
             const edgeSnapDistance = 30;
             const windowWidth = window.innerWidth;
@@ -1228,16 +1330,24 @@ class DrawingBoard {
             this.draggedElement.style.transform = 'none';
             this.draggedElement.style.right = 'auto';
             this.draggedElement.style.bottom = 'auto';
-        });
+        };
         
-        document.addEventListener('mouseup', () => {
+        // Unified end handler for mouse and touch events
+        const handleDragEnd = () => {
             if (this.isDraggingPanel && this.draggedElement) {
                 this.draggedElement.classList.remove('dragging');
                 this.draggedElement.style.transition = '';
                 this.isDraggingPanel = false;
                 this.draggedElement = null;
             }
-        });
+        };
+        
+        // Add both mouse and touch event listeners for better touch device support
+        document.addEventListener('mousemove', handleDragMove);
+        document.addEventListener('mouseup', handleDragEnd);
+        document.addEventListener('touchmove', handleDragMove, { passive: false });
+        document.addEventListener('touchend', handleDragEnd);
+        document.addEventListener('touchcancel', handleDragEnd);
     }
     
     setTool(tool, showConfig = true) {
@@ -1425,88 +1535,79 @@ class DrawingBoard {
         document.getElementById('undo-btn').disabled = !this.historyManager.canUndo();
         document.getElementById('redo-btn').disabled = !this.historyManager.canRedo();
         
+        // Always show pagination controls since we're always in pagination mode
         const paginationControls = document.getElementById('pagination-controls');
-        if (!this.settingsManager.infiniteCanvas) {
-            paginationControls.classList.add('show');
-        } else {
-            paginationControls.classList.remove('show');
-        }
+        paginationControls.classList.add('show');
     }
     
-    updateCanvasMode() {
-        this.updateUI();
-        this.applyCanvasSize();
-        // Initialize pages array if needed
-        if (!this.settingsManager.infiniteCanvas && this.pages.length === 0) {
-            this.pages.push(this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height));
-            this.currentPage = 1;
-            this.updatePaginationUI();
-        }
+    // Calculate the scale needed to fit canvas within viewport with margins
+    calculateCanvasFitScale() {
+        const width = this.settingsManager.canvasWidth;
+        const height = this.settingsManager.canvasHeight;
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const margin = 40; // Margin around canvas in pixels
+        
+        // Available space for canvas (accounting for margins)
+        const availableWidth = viewportWidth - (2 * margin);
+        const availableHeight = viewportHeight - (2 * margin);
+        
+        // Calculate scale to fit canvas within available space
+        const scaleX = availableWidth / width;
+        const scaleY = availableHeight / height;
+        return Math.min(scaleX, scaleY, 1); // Don't scale up beyond 100%
     }
     
     applyCanvasSize() {
-        if (!this.settingsManager.infiniteCanvas) {
-            // In paginated mode, apply custom canvas size
-            const width = this.settingsManager.canvasWidth;
-            const height = this.settingsManager.canvasHeight;
-            const dpr = window.devicePixelRatio || 1;
-            
-            // Save current content
-            const oldWidth = this.canvas.width;
-            const oldHeight = this.canvas.height;
-            const imageData = this.historyManager.historyStep >= 0 ? 
-                this.ctx.getImageData(0, 0, oldWidth, oldHeight) : null;
-            
-            // Set canvas size and CSS size
-            this.canvas.width = width * dpr;
-            this.canvas.height = height * dpr;
-            this.canvas.style.width = width + 'px';
-            this.canvas.style.height = height + 'px';
-            
-            this.bgCanvas.width = width * dpr;
-            this.bgCanvas.height = height * dpr;
-            this.bgCanvas.style.width = width + 'px';
-            this.bgCanvas.style.height = height + 'px';
-            
-            // Center the canvas on the screen
-            this.canvas.style.position = 'absolute';
-            this.canvas.style.left = '50%';
-            this.canvas.style.top = '50%';
-            this.canvas.style.transform = `translate(-50%, -50%) scale(${this.drawingEngine.canvasScale})`;
-            
-            this.bgCanvas.style.position = 'absolute';
-            this.bgCanvas.style.left = '50%';
-            this.bgCanvas.style.top = '50%';
-            this.bgCanvas.style.transform = `translate(-50%, -50%) scale(${this.drawingEngine.canvasScale})`;
-            
-            // Re-apply DPR scaling to context
-            this.ctx.scale(dpr, dpr);
-            this.bgCtx.scale(dpr, dpr);
-            
-            // Restore content
-            if (imageData) {
-                this.ctx.putImageData(imageData, 0, 0);
-            }
-            
-            this.backgroundManager.drawBackground();
-        } else {
-            // In infinite canvas mode, canvas fills the viewport and is centered
-            this.canvas.style.position = 'absolute';
-            this.canvas.style.left = '50%';
-            this.canvas.style.top = '50%';
-            this.canvas.style.width = '100%';
-            this.canvas.style.height = '100%';
-            this.canvas.style.transform = `translate(-50%, -50%) scale(${this.drawingEngine.canvasScale})`;
-            
-            this.bgCanvas.style.position = 'absolute';
-            this.bgCanvas.style.left = '50%';
-            this.bgCanvas.style.top = '50%';
-            this.bgCanvas.style.width = '100%';
-            this.bgCanvas.style.height = '100%';
-            this.bgCanvas.style.transform = `translate(-50%, -50%) scale(${this.drawingEngine.canvasScale})`;
-            
-            this.resizeCanvas();
+        // Always use pagination mode now
+        const width = this.settingsManager.canvasWidth;
+        const height = this.settingsManager.canvasHeight;
+        const dpr = window.devicePixelRatio || 1;
+        
+        // Save current content
+        const oldWidth = this.canvas.width;
+        const oldHeight = this.canvas.height;
+        const imageData = this.historyManager.historyStep >= 0 ? 
+            this.ctx.getImageData(0, 0, oldWidth, oldHeight) : null;
+        
+        // Set canvas size and CSS size
+        this.canvas.width = width * dpr;
+        this.canvas.height = height * dpr;
+        this.canvas.style.width = width + 'px';
+        this.canvas.style.height = height + 'px';
+        
+        this.bgCanvas.width = width * dpr;
+        this.bgCanvas.height = height * dpr;
+        this.bgCanvas.style.width = width + 'px';
+        this.bgCanvas.style.height = height + 'px';
+        
+        // Recalculate fit scale since canvas size changed
+        this.canvasFitScale = this.calculateCanvasFitScale();
+        
+        // Apply the current zoom level on top of the fit scale
+        const finalScale = this.canvasFitScale * this.drawingEngine.canvasScale;
+        
+        // Center the canvas on the screen with proper scaling
+        this.canvas.style.position = 'absolute';
+        this.canvas.style.left = '50%';
+        this.canvas.style.top = '50%';
+        this.canvas.style.transform = `translate(-50%, -50%) scale(${finalScale})`;
+        
+        this.bgCanvas.style.position = 'absolute';
+        this.bgCanvas.style.left = '50%';
+        this.bgCanvas.style.top = '50%';
+        this.bgCanvas.style.transform = `translate(-50%, -50%) scale(${finalScale})`;
+        
+        // Re-apply DPR scaling to context
+        this.ctx.scale(dpr, dpr);
+        this.bgCtx.scale(dpr, dpr);
+        
+        // Restore content
+        if (imageData) {
+            this.ctx.putImageData(imageData, 0, 0);
         }
+        
+        this.backgroundManager.drawBackground();
     }
     
     // Zoom methods
@@ -1543,26 +1644,18 @@ class DrawingBoard {
     }
     
     applyZoom(updateConfigScale = true) {
+        // Use stored fit scale instead of recalculating to preserve user's pan/zoom state
+        const finalScale = this.canvasFitScale * this.drawingEngine.canvasScale;
+        
         // Apply zoom using CSS transform for better performance
         const panX = this.drawingEngine.panOffset.x;
         const panY = this.drawingEngine.panOffset.y;
-        const scale = this.drawingEngine.canvasScale;
         
-        if (!this.settingsManager.infiniteCanvas) {
-            // In paginated mode, keep centering and add pan
-            const transform = `translate(-50%, -50%) translate(${panX}px, ${panY}px) scale(${scale})`;
-            this.canvas.style.transform = transform;
-            this.bgCanvas.style.transform = transform;
-        } else {
-            // In infinite mode, center the canvas and apply scale with pan
-            this.canvas.style.left = '50%';
-            this.canvas.style.top = '50%';
-            this.bgCanvas.style.left = '50%';
-            this.bgCanvas.style.top = '50%';
-            const transform = `translate(-50%, -50%) translate(${panX}px, ${panY}px) scale(${scale})`;
-            this.canvas.style.transform = transform;
-            this.bgCanvas.style.transform = transform;
-        }
+        // Keep canvas centered and apply pan offset
+        const transform = `translate(-50%, -50%) translate(${panX}px, ${panY}px) scale(${finalScale})`;
+        this.canvas.style.transform = transform;
+        this.bgCanvas.style.transform = transform;
+        
         this.canvas.style.transformOrigin = 'center center';
         this.bgCanvas.style.transformOrigin = 'center center';
         
@@ -1749,7 +1842,7 @@ class DrawingBoard {
     
     // Pagination methods
     addPage() {
-        if (this.settingsManager.infiniteCanvas) return;
+        // Always in pagination mode, no need to check
         
         // Save current page
         this.pages[this.currentPage - 1] = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
@@ -1765,13 +1858,11 @@ class DrawingBoard {
         this.updatePaginationUI();
     }
     prevPage() {
-        if (this.settingsManager.infiniteCanvas || this.currentPage <= 1) return;
+        if (this.currentPage <= 1) return;
         
         // Save current page and background
         this.pages[this.currentPage - 1] = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
-        if (!this.settingsManager.infiniteCanvas) {
-            this.savePageBackground(this.currentPage);
-        }
+        this.savePageBackground(this.currentPage);
         
         // Go to previous page
         this.currentPage--;
@@ -1780,13 +1871,9 @@ class DrawingBoard {
     }
     
     nextPage() {
-        if (this.settingsManager.infiniteCanvas) return;
-        
         // Save current page and background
         this.pages[this.currentPage - 1] = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
-        if (!this.settingsManager.infiniteCanvas) {
-            this.savePageBackground(this.currentPage);
-        }
+        this.savePageBackground(this.currentPage);
         
         // Go to next page (create new if needed)
         this.currentPage++;
@@ -1801,13 +1888,9 @@ class DrawingBoard {
     }
     
     nextOrAddPage() {
-        if (this.settingsManager.infiniteCanvas) return;
-        
         // Save current page and background
         this.pages[this.currentPage - 1] = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
-        if (!this.settingsManager.infiniteCanvas) {
-            this.savePageBackground(this.currentPage);
-        }
+        this.savePageBackground(this.currentPage);
         
         // Check if we're on the last page
         if (this.currentPage >= this.pages.length) {
@@ -1826,16 +1909,14 @@ class DrawingBoard {
     }
     
     goToPage(pageNumber) {
-        if (this.settingsManager.infiniteCanvas || pageNumber < 1 || pageNumber === this.currentPage) {
+        if (pageNumber < 1 || pageNumber === this.currentPage) {
             this.updatePaginationUI();
             return;
         }
         
         // Save current page and background
         this.pages[this.currentPage - 1] = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
-        if (!this.settingsManager.infiniteCanvas) {
-            this.savePageBackground(this.currentPage);
-        }
+        this.savePageBackground(this.currentPage);
         
         // Create new pages if needed
         while (pageNumber > this.pages.length) {
@@ -1952,7 +2033,7 @@ class DrawingBoard {
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
             `;
-            nextOrAddBtn.title = '新建页面';
+            nextOrAddBtn.title = window.i18n ? window.i18n.t('page.newPage') : '新建页面';
         } else {
             // Show next icon
             nextOrAddBtn.innerHTML = `
@@ -1960,7 +2041,7 @@ class DrawingBoard {
                     <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
             `;
-            nextOrAddBtn.title = '下一页';
+            nextOrAddBtn.title = window.i18n ? window.i18n.t('page.next') : '下一页';
         }
     }
     
@@ -2166,9 +2247,19 @@ class DrawingBoard {
 
 // Initialize the application
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Initialize i18n first
+        if (window.i18n) {
+            await window.i18n.init();
+        }
         new DrawingBoard();
     });
 } else {
-    new DrawingBoard();
+    // If DOM is already loaded, initialize immediately
+    (async () => {
+        if (window.i18n) {
+            await window.i18n.init();
+        }
+        new DrawingBoard();
+    })();
 }
