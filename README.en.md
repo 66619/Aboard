@@ -23,11 +23,11 @@
 - **Custom Background**: Support uploading images as backgrounds with adjustable size and position
 - **Background Styles**: 8 preset background colors + custom colors, adjustable transparency and pattern intensity
 
-### 📄 Flexible Canvas Modes
-- **Infinite Canvas Mode**: Draw freely without restrictions
-- **Pagination Mode**: Multi-page management, perfect for classroom presentations
+### 📄 Pagination Canvas Mode
+- **Pagination Mode**: Multi-page management, perfect for classroom presentations and teaching
   - Preset sizes: A4, A3, B5 (landscape/portrait), 16:9, 4:3 widescreen
   - Custom sizes: Freely set canvas width, height, and aspect ratio
+  - Auto-centered canvas: Ensures canvas is centered in browser window with equal margins on all sides
 
 ### 🎯 Smart Interactive Experience
 - **Selection Tool**: Select and manipulate strokes and images on canvas, supports copy and delete
@@ -70,6 +70,14 @@
 - **PNG Export**: Export canvas as high-quality PNG image
 - **Auto-save**: Automatically save drawings to browser local storage
 - **Clear Canvas**: One-click to clear all content (with confirmation)
+
+### ⚙️ Personalization Settings
+- **Interface Customization**: Adjustable toolbar size, config panel scale, theme color
+- **Control Layout**: Control button position selectable (four corners), toolbar auto-keeps within window bounds
+- **Edge Snapping**: Dragged panels automatically snap to screen edges, avoiding canvas marks
+- **Background Preferences**: Customize background patterns shown in config panel
+- **Collapsible Settings Groups**: Default expanded state, click to view detailed options
+- **Multi-language Support**: 8 languages supported with instant switching
 
 ### 🌍 Multi-language Support
 - **Supported Languages**: Chinese (Simplified), Chinese (Traditional), English, Japanese, Korean, French, German, Spanish
