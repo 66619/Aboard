@@ -382,15 +382,14 @@ class DrawingBoard {
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
-                this.resizeCanvas();
+                // In pagination mode, recalculate the canvas fit to maintain centering
+                this.applyZoom(false); // Recalculate fit scale based on new viewport size
                 // Update toolbar text visibility on resize
                 this.settingsManager.updateToolbarTextVisibility();
                 // Reposition toolbars to ensure they stay within viewport
                 this.repositionToolbarsOnResize();
                 // Reposition modals to ensure they stay within viewport
                 this.repositionModalsOnResize();
-                // Don't update config-area scale on window resize (fix #2)
-                // this.updateConfigAreaScale();
             }, 150); // 150ms debounce delay
         });
         
@@ -1504,16 +1503,33 @@ class DrawingBoard {
         this.bgCanvas.style.width = width + 'px';
         this.bgCanvas.style.height = height + 'px';
         
-        // Center the canvas on the screen - ensures equal margins on all sides
+        // Calculate scale to fit canvas within viewport with margin
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const margin = 40; // Margin around canvas in pixels
+        
+        // Available space for canvas (accounting for margins)
+        const availableWidth = viewportWidth - (2 * margin);
+        const availableHeight = viewportHeight - (2 * margin);
+        
+        // Calculate scale to fit canvas within available space
+        const scaleX = availableWidth / width;
+        const scaleY = availableHeight / height;
+        const fitScale = Math.min(scaleX, scaleY, 1); // Don't scale up beyond 100%
+        
+        // Apply the current zoom level on top of the fit scale
+        const finalScale = fitScale * this.drawingEngine.canvasScale;
+        
+        // Center the canvas on the screen with proper scaling
         this.canvas.style.position = 'absolute';
         this.canvas.style.left = '50%';
         this.canvas.style.top = '50%';
-        this.canvas.style.transform = `translate(-50%, -50%) scale(${this.drawingEngine.canvasScale})`;
+        this.canvas.style.transform = `translate(-50%, -50%) scale(${finalScale})`;
         
         this.bgCanvas.style.position = 'absolute';
         this.bgCanvas.style.left = '50%';
         this.bgCanvas.style.top = '50%';
-        this.bgCanvas.style.transform = `translate(-50%, -50%) scale(${this.drawingEngine.canvasScale})`;
+        this.bgCanvas.style.transform = `translate(-50%, -50%) scale(${finalScale})`;
         
         // Re-apply DPR scaling to context
         this.ctx.scale(dpr, dpr);
@@ -1561,26 +1577,34 @@ class DrawingBoard {
     }
     
     applyZoom(updateConfigScale = true) {
+        // Calculate proper scale to fit canvas within viewport
+        const width = this.settingsManager.canvasWidth;
+        const height = this.settingsManager.canvasHeight;
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const margin = 40; // Margin around canvas in pixels
+        
+        // Available space for canvas (accounting for margins)
+        const availableWidth = viewportWidth - (2 * margin);
+        const availableHeight = viewportHeight - (2 * margin);
+        
+        // Calculate scale to fit canvas within available space
+        const scaleX = availableWidth / width;
+        const scaleY = availableHeight / height;
+        const fitScale = Math.min(scaleX, scaleY, 1); // Don't scale up beyond 100%
+        
+        // Apply the current zoom level on top of the fit scale
+        const finalScale = fitScale * this.drawingEngine.canvasScale;
+        
         // Apply zoom using CSS transform for better performance
         const panX = this.drawingEngine.panOffset.x;
         const panY = this.drawingEngine.panOffset.y;
-        const scale = this.drawingEngine.canvasScale;
         
-        if (!this.settingsManager.infiniteCanvas) {
-            // In paginated mode, keep centering and add pan
-            const transform = `translate(-50%, -50%) translate(${panX}px, ${panY}px) scale(${scale})`;
-            this.canvas.style.transform = transform;
-            this.bgCanvas.style.transform = transform;
-        } else {
-            // In infinite mode, center the canvas and apply scale with pan
-            this.canvas.style.left = '50%';
-            this.canvas.style.top = '50%';
-            this.bgCanvas.style.left = '50%';
-            this.bgCanvas.style.top = '50%';
-            const transform = `translate(-50%, -50%) translate(${panX}px, ${panY}px) scale(${scale})`;
-            this.canvas.style.transform = transform;
-            this.bgCanvas.style.transform = transform;
-        }
+        // In paginated mode, keep centering and add pan
+        const transform = `translate(-50%, -50%) translate(${panX}px, ${panY}px) scale(${finalScale})`;
+        this.canvas.style.transform = transform;
+        this.bgCanvas.style.transform = transform;
+        
         this.canvas.style.transformOrigin = 'center center';
         this.bgCanvas.style.transformOrigin = 'center center';
         
