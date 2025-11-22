@@ -97,23 +97,19 @@ class DrawingBoard {
     
     
     initializeCanvasView() {
-        // On startup or refresh, set canvas to 70% of fullscreen size and center it
+        // On startup or refresh, set canvas to 75% of fullscreen size and center it
         // Only apply if no saved scale exists
         const savedScale = localStorage.getItem('canvasScale');
         if (!savedScale) {
-            this.drawingEngine.canvasScale = 0.7;
-            localStorage.setItem('canvasScale', 0.7);
+            this.drawingEngine.canvasScale = 0.75;
+            localStorage.setItem('canvasScale', 0.75);
         }
         
         // Calculate initial fit scale
         this.canvasFitScale = this.calculateCanvasFitScale();
         
-        // Center the canvas on startup only if no saved pan offset
-        const savedPanX = localStorage.getItem('panOffsetX');
-        const savedPanY = localStorage.getItem('panOffsetY');
-        if (!savedPanX || !savedPanY) {
-            this.centerCanvas();
-        }
+        // Always center the canvas on startup/refresh
+        this.centerCanvas();
     }
     
     centerCanvas() {
@@ -140,7 +136,7 @@ class DrawingBoard {
     }
     
     resizeCanvas() {
-        // 获取窗口尺寸而不是当前canvas的尺寸，避免缩放导致canvas消失
+        // Get window dimensions to ensure canvas always fills viewport
         const windowWidth = window.innerWidth;
         const windowHeight = window.innerHeight;
         const dpr = window.devicePixelRatio || 1;
@@ -150,7 +146,7 @@ class DrawingBoard {
         const imageData = this.historyManager.historyStep >= 0 ? 
             this.ctx.getImageData(0, 0, oldWidth, oldHeight) : null;
         
-        // 使用窗口尺寸设置canvas大小，确保canvas始终占据整个窗口
+        // Set canvas size to fill entire window
         this.canvas.width = windowWidth * dpr;
         this.canvas.height = windowHeight * dpr;
         this.canvas.style.width = windowWidth + 'px';
@@ -169,6 +165,9 @@ class DrawingBoard {
         }
         
         this.backgroundManager.drawBackground();
+        
+        // Recalculate fit scale for new window size
+        this.canvasFitScale = this.calculateCanvasFitScale();
         
         // Re-center the canvas after resize
         this.centerCanvas();
@@ -293,8 +292,14 @@ class DrawingBoard {
                 // Two-finger gesture - prevent drawing
                 this.hasTwoFingers = true;
                 if (this.drawingEngine.isDrawing) {
-                    // Stop any ongoing drawing
+                    // Stop any ongoing drawing and discard the stroke
                     this.drawingEngine.isDrawing = false;
+                    this.drawingEngine.points = [];
+                    this.drawingEngine.lastPoint = null;
+                    // Restore the previous state to remove any partial stroke
+                    if (this.historyManager.historyStep >= 0) {
+                        this.historyManager.restoreState(this.historyManager.historyStep);
+                    }
                 }
                 this.handlePinchStart(e);
             } else if (e.touches.length === 1 && !this.hasTwoFingers) {
@@ -394,6 +399,8 @@ class DrawingBoard {
             resizeTimeout = setTimeout(() => {
                 // Recalculate canvas fit scale for new viewport size
                 this.canvasFitScale = this.calculateCanvasFitScale();
+                // Re-center the canvas for new window size
+                this.centerCanvas();
                 this.applyZoom(false); // Apply new fit scale without updating config-area
                 // Update toolbar text visibility on resize
                 this.settingsManager.updateToolbarTextVisibility();
