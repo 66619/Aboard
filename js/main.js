@@ -109,6 +109,8 @@ class DrawingBoard {
         this.canvasFitScale = this.calculateCanvasFitScale();
         
         // Always center the canvas on startup/refresh
+        // Note: This ensures the canvas is properly centered after each page load,
+        // regardless of previously saved pan offset values
         this.centerCanvas();
     }
     
@@ -296,14 +298,8 @@ class DrawingBoard {
                 // Two-finger gesture - prevent drawing
                 this.hasTwoFingers = true;
                 if (this.drawingEngine.isDrawing) {
-                    // Stop any ongoing drawing and discard the stroke
-                    this.drawingEngine.isDrawing = false;
-                    this.drawingEngine.points = [];
-                    this.drawingEngine.lastPoint = null;
-                    // Restore the previous state to remove any partial stroke
-                    if (this.historyManager.historyStep >= 0) {
-                        this.historyManager.restoreState();
-                    }
+                    // Discard any partial stroke from the first touch
+                    this.discardCurrentStroke();
                 }
                 this.handlePinchStart(e);
             } else if (e.touches.length === 1 && !this.hasTwoFingers) {
@@ -1397,6 +1393,17 @@ class DrawingBoard {
             this.historyManager.saveState();
             this.closeConfigPanel();
             this.closeFeaturePanel();
+        }
+    }
+    
+    discardCurrentStroke() {
+        // Stop any ongoing drawing and clear the stroke buffer
+        this.drawingEngine.isDrawing = false;
+        this.drawingEngine.points = [];
+        this.drawingEngine.lastPoint = null;
+        // Restore the previous canvas state to remove any partial stroke
+        if (this.historyManager.historyStep >= 0) {
+            this.historyManager.restoreState();
         }
     }
     
