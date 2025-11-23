@@ -15,9 +15,38 @@ The **AI-Agent** project by a developing freshman, a first-year college student,
 
 Due to my limited practical development experience, this project heavily utilizes AI-Agent technology (i.e., leveraging GitHub's Agent functionality to assist in development and efficiently advance feature implementation). As a result, the code may lack a **"human touch"** and could contain **numerous unreasonable bugs** or **development approaches**. I kindly ask for your understanding and gentle feedback.
 
-You can quickly experience this project through the Demo link below, or visit my blog to learn more about the background and motivation behind it.
+You can quickly experience this project through the **Demo link** below, or visit my blog to learn more about the background and motivation behind it.
 
-If you find this project valuable, please give it a star🌟—--college students would greatly appreciate it!
+**If you find this project valuable, please give it a star🌟—--college students would greatly appreciate it!**
+
+```mermaid
+graph LR
+    A[Aboard Project]
+    A --> D[Live Demo]
+    A --> E[Blog Post]
+    
+    click D "https://aboard.pp.ua" "Live Demo"
+    click E "https://blog.example.com" "Technical Article"
+```
+
+## Current branches and versions
+
+```mermaid
+graph LR
+    A[Aboard Project]
+    A --> B[main branch]
+    A --> C[dev/preview branch]
+    A --> D[dev/stable branch]
+    A --> E[copilot/xxx branch]
+    B --> F[branch Demo/Primary Version]
+    C --> G[branch Demo/Latest Beta]
+    D --> H[branch Demo/Stable Beta]
+    E --> I[Temporary link provided by Vercel in PR]
+
+    click F "https://aboard.pp.ua" "Primary"
+    click G "https://dev-aboard.619.pp.ua" "Latest Beta"
+    click H "https://dev.aboard.pp.ua" "Stable Beta"
+```
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
