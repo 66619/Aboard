@@ -97,8 +97,8 @@ class DrawingBoard {
         // Add refresh warning to prevent accidental content loss
         window.addEventListener('beforeunload', (e) => {
             // Show warning message when user tries to refresh or close the page
-            // Use i18n translation if available, otherwise fallback to Chinese
-            const message = window.i18n ? window.i18n.t('tools.refresh.warning') : '刷新后画布内容将清空且无法恢复，确定要刷新吗？';
+            // Use i18n translation if available, otherwise fallback to English
+            const message = window.i18n ? window.i18n.t('tools.refresh.warning') : 'Refreshing will clear all canvas content and cannot be recovered. Are you sure you want to refresh?';
             e.preventDefault();
             e.returnValue = message;
             return message;

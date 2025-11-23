@@ -73,7 +73,7 @@ window.translations = {
             message: 'Êtes-vous sûr de vouloir effacer le canevas ? Cette action ne peut pas être annulée.'
         },
         refresh: {
-            warning: 'L\'actualisation effacera tout le contenu du canevas et ne pourra pas être récupérée. Êtes-vous sûr de vouloir actualiser ?'
+            warning: 'L\'actualisation effacera tout le contenu du canevas et ne pourra pas être récupéré. Êtes-vous sûr de vouloir actualiser ?'
         }
     },
 
