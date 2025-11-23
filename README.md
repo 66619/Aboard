@@ -28,7 +28,7 @@ graph LR
     A --> E[博客文章]
     
     click D "https://aboard.pp.ua" "在线演示"
-    click E "https://blog.example.com" "技术文章"
+    click E "https://66619.eu.org/article/aboard" "技术文章"
 ```
 ## 当前分支和部署版本
 
