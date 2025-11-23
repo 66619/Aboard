@@ -130,6 +130,61 @@ That's it! No build process or dependencies required.
 - **Performance**: RequestAnimationFrame for smooth animations
 - **Compatibility**: Supports modern browsers (Chrome, Firefox, Safari, Edge)
 
+## 📁 Project Structure
+
+```
+Aboard/
+├── index.html              # Main HTML file
+├── LICENSE                 # MIT License file
+├── announcements.json      # Announcement configuration
+├── css/
+│   ├── style.css          # Main stylesheet
+│   └── modules/           # Modular styles
+│       ├── timer.css      # Timer styles
+│       ├── time-display.css # Time display styles
+│       ├── export.css     # Export function styles
+│       └── feature-area.css # Feature area styles
+├── js/
+│   ├── drawing.js         # Drawing engine module
+│   ├── history.js         # History management module
+│   ├── background.js      # Background management module
+│   ├── image-controls.js  # Image control module
+│   ├── stroke-controls.js # Stroke control module
+│   ├── selection.js       # Selection tool module
+│   ├── settings.js        # Settings management module
+│   ├── announcement.js    # Announcement management module
+│   ├── export.js          # Export function module
+│   ├── time-display.js    # Time display module
+│   ├── collapsible.js     # Collapsible panel module
+│   ├── shape-insertion.js # Shape insertion module
+│   ├── text-insertion.js  # Text insertion module
+│   ├── locales/           # Internationalization language files
+│   │   ├── zh-CN.js       # Simplified Chinese
+│   │   ├── zh-TW.js       # Traditional Chinese
+│   │   ├── en-US.js       # English
+│   │   ├── ja-JP.js       # Japanese
+│   │   ├── ko-KR.js       # Korean
+│   │   ├── fr-FR.js       # French
+│   │   ├── de-DE.js       # German
+│   │   └── es-ES.js       # Spanish
+│   ├── modules/
+│   │   ├── timer.js       # Timer module
+│   │   ├── time-display-controls.js # Time display controls
+│   │   ├── time-display-settings.js # Time display settings
+│   │   └── i18n.js        # Internationalization core module
+│   └── main.js            # Main application entry point
+├── public/                 # Public documentation directory
+│   ├── README.en.md       # English README
+│   └── README.zh-TW.md    # Traditional Chinese README
+├── sounds/                 # Sound files directory
+│   ├── class-bell.MP3     # Class bell sound
+│   ├── exam-end.MP3       # Exam end sound
+│   ├── gentle-alarm.MP3   # Gentle alarm sound
+│   ├── digital-beep.MP3   # Digital beep sound
+│   └── README.md          # Sound files description
+└── README.md              # Project documentation (Simplified Chinese)
+```
+
 ## 📋 Browser Compatibility
 
 | Browser | Minimum Version |
