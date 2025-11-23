@@ -30,6 +30,24 @@ graph LR
     click D "https://aboard.pp.ua" "在线演示"
     click E "https://blog.example.com" "技术文章"
 ```
+## 当前分支和部署版本
+
+```mermaid
+graph LR
+    A[Aboard Project]
+    A --> B[main分支]
+    A --> C[dev/preview分支]
+    A --> D[dev/stable分支]
+    A --> E[copilot/xxx分支]
+    B --> F[branch Demo/主版本]
+    C --> G[branch Demo/最新测试版]
+    D --> H[branch Demo/稳定测试版]
+    E --> I[PR中Vercel提供临时链接]
+
+    click F "https://aboard.pp.ua" "主"
+    click G "https://dev-aboard.619.pp.ua" "最新测试"
+    click H "https://dev.aboard.pp.ua" "最新测试"
+```
 
 <details>
   <summary>这里面是AI写的功能介绍，挺详细的，可以打开看看啦</summary>
