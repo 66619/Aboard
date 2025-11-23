@@ -83,7 +83,7 @@ class DrawingBoard {
             this.updatePaginationUI();
         }
         
-        this.initializeCanvasView(); // Initialize canvas view (75% scale, centered)
+        this.initializeCanvasView(); // Initialize canvas view (80% scale, centered)
         this.updateZoomUI();
         this.applyZoom(false); // Don't update config-area scale on refresh
         this.updateZoomControlsVisibility();
@@ -93,16 +93,25 @@ class DrawingBoard {
         
         // Listen for fullscreen changes
         document.addEventListener('fullscreenchange', () => this.handleFullscreenChange());
+        
+        // Add refresh warning to prevent accidental content loss
+        window.addEventListener('beforeunload', (e) => {
+            // Show warning message when user tries to refresh or close the page
+            const message = '刷新后画布内容将清空且无法恢复，确定要刷新吗？';
+            e.preventDefault();
+            e.returnValue = message;
+            return message;
+        });
     }
     
     
     initializeCanvasView() {
-        // On startup or refresh, set canvas to 75% of fullscreen size and center it
+        // On startup or refresh, set canvas to 80% of browser window size and center it
         // Only apply if no saved scale exists
         const savedScale = localStorage.getItem('canvasScale');
         if (!savedScale) {
-            this.drawingEngine.canvasScale = 0.75;
-            localStorage.setItem('canvasScale', 0.75);
+            this.drawingEngine.canvasScale = 0.80;
+            localStorage.setItem('canvasScale', 0.80);
         }
         
         // Calculate initial fit scale
@@ -1630,7 +1639,7 @@ class DrawingBoard {
     // Zoom methods
     zoomIn() {
         const currentScale = this.drawingEngine.canvasScale;
-        const newScale = Math.min(currentScale + 0.1, 3.0);
+        const newScale = Math.min(currentScale + 0.1, 5.0);
         this.drawingEngine.canvasScale = newScale;
         this.updateZoomUI();
         this.applyZoom(false); // Don't update config-area scale on zoom
@@ -1652,7 +1661,7 @@ class DrawingBoard {
             this.updateZoomUI();
             return;
         }
-        percent = Math.max(50, Math.min(300, percent));
+        percent = Math.max(50, Math.min(500, percent));
         const newScale = percent / 100;
         this.drawingEngine.canvasScale = newScale;
         this.updateZoomUI();
