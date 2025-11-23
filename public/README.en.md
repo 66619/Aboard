@@ -1,12 +1,52 @@
+![Aboard](https://socialify.git.ci/lifeafter619/Aboard/image?custom_description=%E4%B8%80%E4%B8%AA%E7%AE%80%E7%BA%A6%E7%9A%84web%E7%99%BD%E6%9D%BF%EF%BC%8C%E6%9B%B4%E9%80%82%E5%90%88%E8%80%81%E5%B8%88%E4%BD%93%E8%B4%A8+%0A%F0%9D%93%99%F0%9D%93%BE%F0%9D%93%BC%F0%9D%93%BD+%F0%9D%93%AA+%F0%9D%93%AB%F0%9D%93%B8%F0%9D%93%AA%F0%9D%93%BB%F0%9D%93%AD+%F0%9D%93%AF%F0%9D%93%B8%F0%9D%93%BB+%F0%9D%93%BD%F0%9D%93%AE%F0%9D%93%AA%F0%9D%93%AC%F0%9D%93%B1%F0%9D%93%AE%F0%9D%93%BB%F0%9D%93%BC.&description=1&font=Bitter&forks=1&issues=1&language=1&name=1&owner=1&pattern=Brick+Wall&pulls=1&stargazers=1&theme=Auto)
 # Aboard
 
 <div align="center">
 
-**[简体中文](README.md)** | **[繁體中文](README.zh-TW.md)** | **[English](README.en.md)**
+**[简体中文](../README.md)** | **[繁體中文](README.zh-TW.md)** | **[English](README.en.md)**
 
 </div>
 
 > A minimalist and elegant web-based whiteboard application, designed for teaching and presentations | 𝓙𝓾𝓼𝓽 𝓪 𝓫𝓸𝓪𝓻𝓭.
+
+# Abstract
+
+The **AI-Agent** project by a developing freshman, a first-year college student, aims to create a whiteboard with **simple functionality, easy deployment, and an extremely intuitive user experience**, primarily designed for **interactive whiteboard teaching in domestic middle and high schools**.
+
+Due to my limited practical development experience, this project heavily utilizes AI-Agent technology (i.e., leveraging GitHub's Agent functionality to assist in development and efficiently advance feature implementation). As a result, the code may lack a **"human touch"** and could contain **numerous unreasonable bugs** or **development approaches**. I kindly ask for your understanding and gentle feedback.
+
+You can quickly experience this project through the **Demo link** below, or visit my blog to learn more about the background and motivation behind it.
+
+**If you find this project valuable, please give it a star🌟—--college students would greatly appreciate it!**
+
+```mermaid
+graph LR
+    A[Aboard Project]
+    A --> D[Live Demo]
+    A --> E[Blog Post]
+    
+    click D "https://aboard.pp.ua" "Live Demo"
+    click E "https://66619.eu.org/article/aboard" "Technical Article"
+```
+
+## Current branches and versions
+
+```mermaid
+graph LR
+    A[Aboard Project]
+    A --> B[main branch]
+    A --> C[dev/preview branch]
+    A --> D[dev/stable branch]
+    A --> E[copilot/xxx branch]
+    B --> F[branch Demo/Primary Version]
+    C --> G[branch Demo/Latest Beta]
+    D --> H[branch Demo/Stable Beta]
+    E --> I[Temporary link provided by Vercel in PR]
+
+    click F "https://aboard.pp.ua" "Primary"
+    click G "https://dev-aboard.619.pp.ua" "Latest Beta"
+    click H "https://dev.aboard.pp.ua" "Stable Beta"
+```
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -32,9 +72,11 @@
 ### 🎯 Smart Interactive Experience
 - **Selection Tool**: Select and manipulate strokes and images on canvas, supports copy and delete
 - **Move Canvas**: Drag tool or hold Shift key to drag canvas
-- **Smart Zoom**: Ctrl+scroll to zoom canvas, zoom center follows mouse position
+- **Smart Zoom**: Ctrl+scroll to zoom canvas, zoom center follows mouse position, supports 50%-500% zoom range
+- **Initial Canvas Size**: On first load or refresh, canvas automatically adjusts to 80% of browser window size
 - **Undo/Redo**: Supports up to 50 history steps (Ctrl+Z / Ctrl+Y)
 - **Fullscreen Mode**: Focus on creation with immersive experience (F11)
+- **Refresh Protection**: Warning prompt when refreshing page to prevent accidental content loss
 
 ### ⏱️ Timer Function
 - **Stopwatch Mode**: Set start time and count up from specified time
@@ -112,7 +154,7 @@ That's it! No build process or dependencies required.
 - **Select Tool**: Click corresponding icon in bottom toolbar
 - **Draw**: Click and drag on canvas
 - **Erase**: Use eraser tool, adjust size as needed
-- **Zoom**: Use zoom buttons or Ctrl+scroll wheel
+- **Zoom**: Use zoom buttons or Ctrl+scroll wheel (50%-500%)
 - **Undo/Redo**: Ctrl+Z / Ctrl+Y or click toolbar buttons
 - **Fullscreen**: Press F11 or click fullscreen button
 
@@ -129,6 +171,61 @@ That's it! No build process or dependencies required.
 - **Storage**: localStorage for data persistence
 - **Performance**: RequestAnimationFrame for smooth animations
 - **Compatibility**: Supports modern browsers (Chrome, Firefox, Safari, Edge)
+
+## 📁 Project Structure
+
+```
+Aboard/
+├── index.html              # Main HTML file
+├── LICENSE                 # MIT License file
+├── announcements.json      # Announcement configuration
+├── css/
+│   ├── style.css          # Main stylesheet
+│   └── modules/           # Modular styles
+│       ├── timer.css      # Timer styles
+│       ├── time-display.css # Time display styles
+│       ├── export.css     # Export function styles
+│       └── feature-area.css # Feature area styles
+├── js/
+│   ├── drawing.js         # Drawing engine module
+│   ├── history.js         # History management module
+│   ├── background.js      # Background management module
+│   ├── image-controls.js  # Image control module
+│   ├── stroke-controls.js # Stroke control module
+│   ├── selection.js       # Selection tool module
+│   ├── settings.js        # Settings management module
+│   ├── announcement.js    # Announcement management module
+│   ├── export.js          # Export function module
+│   ├── time-display.js    # Time display module
+│   ├── collapsible.js     # Collapsible panel module
+│   ├── shape-insertion.js # Shape insertion module
+│   ├── text-insertion.js  # Text insertion module
+│   ├── locales/           # Internationalization language files
+│   │   ├── zh-CN.js       # Simplified Chinese
+│   │   ├── zh-TW.js       # Traditional Chinese
+│   │   ├── en-US.js       # English
+│   │   ├── ja-JP.js       # Japanese
+│   │   ├── ko-KR.js       # Korean
+│   │   ├── fr-FR.js       # French
+│   │   ├── de-DE.js       # German
+│   │   └── es-ES.js       # Spanish
+│   ├── modules/
+│   │   ├── timer.js       # Timer module
+│   │   ├── time-display-controls.js # Time display controls
+│   │   ├── time-display-settings.js # Time display settings
+│   │   └── i18n.js        # Internationalization core module
+│   └── main.js            # Main application entry point
+├── public/                 # Public documentation directory
+│   ├── README.en.md       # English README
+│   └── README.zh-TW.md    # Traditional Chinese README
+├── sounds/                 # Sound files directory
+│   ├── class-bell.MP3     # Class bell sound
+│   ├── exam-end.MP3       # Exam end sound
+│   ├── gentle-alarm.MP3   # Gentle alarm sound
+│   ├── digital-beep.MP3   # Digital beep sound
+│   └── README.md          # Sound files description
+└── README.md              # Project documentation (Simplified Chinese)
+```
 
 ## 📋 Browser Compatibility
 

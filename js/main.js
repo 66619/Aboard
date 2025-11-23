@@ -83,7 +83,7 @@ class DrawingBoard {
             this.updatePaginationUI();
         }
         
-        this.initializeCanvasView(); // Initialize canvas view (70% scale, centered)
+        this.initializeCanvasView(); // Initialize canvas view (80% scale, centered)
         this.updateZoomUI();
         this.applyZoom(false); // Don't update config-area scale on refresh
         this.updateZoomControlsVisibility();
@@ -93,27 +93,35 @@ class DrawingBoard {
         
         // Listen for fullscreen changes
         document.addEventListener('fullscreenchange', () => this.handleFullscreenChange());
+        
+        // Add refresh warning to prevent accidental content loss
+        window.addEventListener('beforeunload', (e) => {
+            // Show warning message when user tries to refresh or close the page
+            // Use i18n translation if available, otherwise fallback to English
+            const message = window.i18n ? window.i18n.t('tools.refresh.warning') : 'Refreshing will clear all canvas content and cannot be recovered. Are you sure you want to refresh?';
+            e.preventDefault();
+            e.returnValue = message;
+            return message;
+        });
     }
     
     
     initializeCanvasView() {
-        // On startup or refresh, set canvas to 70% of fullscreen size and center it
+        // On startup or refresh, set canvas to 80% of browser window size and center it
         // Only apply if no saved scale exists
         const savedScale = localStorage.getItem('canvasScale');
         if (!savedScale) {
-            this.drawingEngine.canvasScale = 0.7;
-            localStorage.setItem('canvasScale', 0.7);
+            this.drawingEngine.canvasScale = 0.80;
+            localStorage.setItem('canvasScale', 0.80);
         }
         
         // Calculate initial fit scale
         this.canvasFitScale = this.calculateCanvasFitScale();
         
-        // Center the canvas on startup only if no saved pan offset
-        const savedPanX = localStorage.getItem('panOffsetX');
-        const savedPanY = localStorage.getItem('panOffsetY');
-        if (!savedPanX || !savedPanY) {
-            this.centerCanvas();
-        }
+        // Always center the canvas on startup/refresh
+        // Note: This ensures the canvas is properly centered after each page load,
+        // regardless of previously saved pan offset values
+        this.centerCanvas();
     }
     
     centerCanvas() {
@@ -139,8 +147,15 @@ class DrawingBoard {
         this.applyPanTransform();
     }
     
+    recalculateAndRecenterCanvas() {
+        // Recalculate fit scale for current viewport size
+        this.canvasFitScale = this.calculateCanvasFitScale();
+        // Re-center the canvas
+        this.centerCanvas();
+    }
+    
     resizeCanvas() {
-        // 获取窗口尺寸而不是当前canvas的尺寸，避免缩放导致canvas消失
+        // Get window dimensions for canvas sizing
         const windowWidth = window.innerWidth;
         const windowHeight = window.innerHeight;
         const dpr = window.devicePixelRatio || 1;
@@ -150,7 +165,7 @@ class DrawingBoard {
         const imageData = this.historyManager.historyStep >= 0 ? 
             this.ctx.getImageData(0, 0, oldWidth, oldHeight) : null;
         
-        // 使用窗口尺寸设置canvas大小，确保canvas始终占据整个窗口
+        // Set canvas size to fill entire window
         this.canvas.width = windowWidth * dpr;
         this.canvas.height = windowHeight * dpr;
         this.canvas.style.width = windowWidth + 'px';
@@ -170,8 +185,8 @@ class DrawingBoard {
         
         this.backgroundManager.drawBackground();
         
-        // Re-center the canvas after resize
-        this.centerCanvas();
+        // Recalculate fit scale and re-center the canvas
+        this.recalculateAndRecenterCanvas();
     }
     
     setupEventListeners() {
@@ -293,8 +308,8 @@ class DrawingBoard {
                 // Two-finger gesture - prevent drawing
                 this.hasTwoFingers = true;
                 if (this.drawingEngine.isDrawing) {
-                    // Stop any ongoing drawing
-                    this.drawingEngine.isDrawing = false;
+                    // Discard any partial stroke from the first touch
+                    this.discardCurrentStroke();
                 }
                 this.handlePinchStart(e);
             } else if (e.touches.length === 1 && !this.hasTwoFingers) {
@@ -392,8 +407,8 @@ class DrawingBoard {
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
-                // Recalculate canvas fit scale for new viewport size
-                this.canvasFitScale = this.calculateCanvasFitScale();
+                // Recalculate fit scale and re-center canvas for new viewport size
+                this.recalculateAndRecenterCanvas();
                 this.applyZoom(false); // Apply new fit scale without updating config-area
                 // Update toolbar text visibility on resize
                 this.settingsManager.updateToolbarTextVisibility();
@@ -1391,6 +1406,18 @@ class DrawingBoard {
         }
     }
     
+    discardCurrentStroke() {
+        // Stop any ongoing drawing and clear the stroke buffer
+        this.drawingEngine.isDrawing = false;
+        this.drawingEngine.points = [];
+        this.drawingEngine.lastPoint = null;
+        // Restore canvas to the last saved state, removing any partial stroke
+        // Note: This only redraws from current history position, doesn't affect undo/redo
+        if (this.historyManager.historyStep >= 0) {
+            this.historyManager.restoreState();
+        }
+    }
+    
     closeConfigPanel() {
         document.getElementById('config-area').classList.remove('show');
     }
@@ -1613,7 +1640,7 @@ class DrawingBoard {
     // Zoom methods
     zoomIn() {
         const currentScale = this.drawingEngine.canvasScale;
-        const newScale = Math.min(currentScale + 0.1, 3.0);
+        const newScale = Math.min(currentScale + 0.1, 5.0);
         this.drawingEngine.canvasScale = newScale;
         this.updateZoomUI();
         this.applyZoom(false); // Don't update config-area scale on zoom
@@ -1635,7 +1662,7 @@ class DrawingBoard {
             this.updateZoomUI();
             return;
         }
-        percent = Math.max(50, Math.min(300, percent));
+        percent = Math.max(50, Math.min(500, percent));
         const newScale = percent / 100;
         this.drawingEngine.canvasScale = newScale;
         this.updateZoomUI();
@@ -1799,7 +1826,7 @@ class DrawingBoard {
                 const delta = e.deltaY;
                 let newScale;
                 if (delta < 0) {
-                    newScale = Math.min(oldScale + 0.1, 3.0);
+                    newScale = Math.min(oldScale + 0.1, 5.0);
                 } else {
                     newScale = Math.max(oldScale - 0.1, 0.5);
                 }
@@ -2095,7 +2122,7 @@ class DrawingBoard {
         if (this.lastPinchDistance > 0 && this.lastPinchCenter) {
             // Calculate zoom based on pinch distance
             const scale = currentDistance / this.lastPinchDistance;
-            const newScale = Math.max(0.5, Math.min(3.0, this.drawingEngine.canvasScale * scale));
+            const newScale = Math.max(0.5, Math.min(5.0, this.drawingEngine.canvasScale * scale));
             
             this.drawingEngine.canvasScale = newScale;
             this.applyZoom(false); // Don't update config-area scale on zoom

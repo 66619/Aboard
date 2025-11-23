@@ -4,11 +4,21 @@
 
 <div align="center">
 
-**[简体中文](README.md)** | **[繁體中文](README.zh-TW.md)** | **[English](README.en.md)**
+**[简体中文](../README.md)** | **[繁體中文](README.zh-TW.md)** | **[English](README.en.md)**
 
 </div>
 
 > 一个簡約优雅的网頁白板套用，专为教学和演示設計 | 𝓙𝓾𝓼𝓽 𝓪 𝓫𝓸𝓪𝓻𝓭.
+
+# 摘要
+
+大一學生的**AI-Agent**項目，目標是創建一個**功能簡單、部署簡便，且使用極其符合直覺**的電子白板，主要為**中國大陸初高中一體機教學場景設計**。
+
+由於本人實際開發能力有限，本項目大量運用AI-Agent技術（即通過調用GitHub的Agent功能來協助開發與推進功能實現），因此程式碼可能缺乏「人味」，也可能存在**不少不合理的设计缺陷與開發方式**，**還請各位前輩輕噴**。
+
+您可透過下方演示連結快速體驗本項目，也可前往我的部落格了解項目背後的故事。
+
+**若您覺得這個項目有價值，請給我一個星星🌟——大學生真的很需要這個鼓勵！**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -34,9 +44,11 @@
 ### 🎯 智能交互体验
 - **選擇工具**：可選擇和操作畫布上的筆迹和圖片，支持複製和刪除
 - **移动畫布**：拖动工具或按住Shift键拖动畫布
-- **智能縮放**：Ctrl+滚轮縮放畫布，縮放中心跟随鼠标位置
+- **智能縮放**：Ctrl+滚轮縮放畫布，縮放中心跟随鼠标位置，支持50%-500%縮放範圍
+- **初始畫布大小**：首次打開或刷新後，畫布自動調整為瀏覽器窗口的80%大小
 - **撤銷/重做**：支持最多50步历史记录（Ctrl+Z / Ctrl+Y）
 - **全屏模式**：专注创作，沉浸体验（F11）
+- **刷新保護**：刷新頁面時會彈出警告提示，防止誤操作導致畫布內容丟失
 
 ### ⏱️ 計時器功能
 - **正計時模式**：支持設置起始時間，从指定時間开始計時
@@ -143,7 +155,7 @@ php -S localhost:8080
 | 選擇工具 | 点击底部工具栏相应按钮 |
 | 改变顏色/粗细 | 点击工具按钮，在弹出的属性面板中調節 |
 | 撤銷/重做 | Ctrl+Z / Ctrl+Y 或点击右上角按钮 |
-| 縮放畫布 | Ctrl+滚轮 或点击右上角縮放按钮 |
+| 縮放畫布 | Ctrl+滚轮 或点击右上角縮放按钮（50%-500%） |
 | 移动畫布 | 点击"移动"工具或按住Shift键拖动 |
 | 全屏 | F11 或点击全屏按钮 |
 | 清空畫布 | 点击"清空"按钮（有确认提示） |
@@ -196,6 +208,7 @@ php -S localhost:8080
 ```
 Aboard/
 ├── index.html              # 主HTML檔案
+├── LICENSE                 # MIT許可證檔案
 ├── announcements.json      # 公告内容配置
 ├── css/
 │   ├── style.css          # 主样式表
@@ -215,16 +228,34 @@ Aboard/
 │   ├── announcement.js    # 公告管理模块
 │   ├── export.js          # 匯出功能模块
 │   ├── time-display.js    # 時間顯示模块
+│   ├── collapsible.js     # 可折疊面板模块
+│   ├── shape-insertion.js # 形狀插入模块
+│   ├── text-insertion.js  # 文字插入模块
+│   ├── locales/           # 國際化語言檔案
+│   │   ├── zh-CN.js       # 簡體中文
+│   │   ├── zh-TW.js       # 繁體中文
+│   │   ├── en-US.js       # 英文
+│   │   ├── ja-JP.js       # 日語
+│   │   ├── ko-KR.js       # 韓語
+│   │   ├── fr-FR.js       # 法語
+│   │   ├── de-DE.js       # 德語
+│   │   └── es-ES.js       # 西班牙語
 │   ├── modules/
 │   │   ├── timer.js       # 計時器模块
-│   │   └── time-display-controls.js # 時間顯示控制
+│   │   ├── time-display-controls.js # 時間顯示控制
+│   │   ├── time-display-settings.js # 時間顯示設置
+│   │   └── i18n.js        # 國際化核心模块
 │   └── main.js            # 主套用入口
+├── public/                 # 公開文檔目錄
+│   ├── README.en.md       # 英文版README
+│   └── README.zh-TW.md    # 繁體中文版README
 ├── sounds/                 # 提示音檔案夹
 │   ├── class-bell.MP3     # 上课铃声
 │   ├── exam-end.MP3       # 考试结束音
 │   ├── gentle-alarm.MP3   # 柔和提示音
-│   └── digital-beep.MP3   # 數位提示音
-└── README.md              # 项目文檔
+│   ├── digital-beep.MP3   # 數位提示音
+│   └── README.md          # 音頻檔案說明
+└── README.md              # 项目文檔（簡體中文）
 ```
 
 ## 🏗️ 架构設計
