@@ -26,7 +26,7 @@ graph LR
     A --> E[Blog Post]
     
     click D "https://aboard.pp.ua" "Live Demo"
-    click E "https://blog.example.com" "Technical Article"
+    click E "https://66619.eu.org/article/aboard" "Technical Article"
 ```
 
 ## Current branches and versions
