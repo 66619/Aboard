@@ -1826,7 +1826,7 @@ class DrawingBoard {
                 const delta = e.deltaY;
                 let newScale;
                 if (delta < 0) {
-                    newScale = Math.min(oldScale + 0.1, 3.0);
+                    newScale = Math.min(oldScale + 0.1, 5.0);
                 } else {
                     newScale = Math.max(oldScale - 0.1, 0.5);
                 }
@@ -2122,7 +2122,7 @@ class DrawingBoard {
         if (this.lastPinchDistance > 0 && this.lastPinchCenter) {
             // Calculate zoom based on pinch distance
             const scale = currentDistance / this.lastPinchDistance;
-            const newScale = Math.max(0.5, Math.min(3.0, this.drawingEngine.canvasScale * scale));
+            const newScale = Math.max(0.5, Math.min(5.0, this.drawingEngine.canvasScale * scale));
             
             this.drawingEngine.canvasScale = newScale;
             this.applyZoom(false); // Don't update config-area scale on zoom
