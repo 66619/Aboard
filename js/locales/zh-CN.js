@@ -76,6 +76,9 @@ window.translations = {
             title: '清空画布',
             confirm: '确认清空',
             message: '确定要清空画布吗？此操作无法撤销。'
+        },
+        refresh: {
+            warning: '刷新后画布内容将清空且无法恢复，确定要刷新吗？'
         }
     },
 

@@ -71,6 +71,9 @@ window.translations = {
             title: 'Borrar lienzo',
             confirm: 'Confirmar borrado',
             message: '¿Está seguro de que desea borrar el lienzo? Esta acción no se puede deshacer.'
+        },
+        refresh: {
+            warning: 'Al actualizar se borrará todo el contenido del lienzo y no se podrá recuperar. ¿Está seguro de que desea actualizar?'
         }
     },
 
