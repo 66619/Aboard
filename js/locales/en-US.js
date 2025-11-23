@@ -76,6 +76,9 @@ window.translations = {
             title: 'Clear Canvas',
             confirm: 'Confirm Clear',
             message: 'Are you sure you want to clear the canvas? This action cannot be undone.'
+        },
+        refresh: {
+            warning: 'Refreshing will clear all canvas content and cannot be recovered. Are you sure you want to refresh?'
         }
     },
 

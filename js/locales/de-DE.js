@@ -76,6 +76,9 @@ window.translations = {
             title: 'Leinwand löschen',
             confirm: 'Löschen bestätigen',
             message: 'Möchten Sie die Leinwand wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.'
+        },
+        refresh: {
+            warning: 'Beim Aktualisieren wird der gesamte Inhalt der Leinwand gelöscht und kann nicht wiederhergestellt werden. Möchten Sie wirklich aktualisieren?'
         }
     },
 

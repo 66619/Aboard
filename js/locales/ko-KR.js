@@ -76,6 +76,9 @@ window.translations = {
             title: '캔버스 지우기',
             confirm: '지우기 확인',
             message: '캔버스를 지우시겠습니까? 이 작업은 취소할 수 없습니다.'
+        },
+        refresh: {
+            warning: '새로 고침하면 캔버스 내용이 모두 지워지며 복구할 수 없습니다. 새로 고침하시겠습니까?'
         }
     },
 
