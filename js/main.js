@@ -1710,6 +1710,10 @@ class DrawingBoard {
         this.canvas.style.transformOrigin = 'center center';
         this.bgCanvas.style.transformOrigin = 'center center';
         
+        // Update teaching tools scale factor
+        this.teachingToolsManager.canvasScaleFactor = finalScale;
+        this.teachingToolsManager.redrawTools();
+        
         // Update config-area scale proportionally only when requested (on resize, not on refresh)
         if (updateConfigScale) {
             this.updateConfigAreaScale();
