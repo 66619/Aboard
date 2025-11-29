@@ -177,11 +177,24 @@ class EdgeDrawingManager {
         const ly = localPoint.y;
         
         // For set square: only the top and left edges support edge drawing.
-        // The bottom edge and hypotenuse should allow normal drawing through them.
+        // The bottom-right area (below the diagonal from top-right to bottom-left) 
+        // should allow normal drawing without blocking.
         
         // Check if point is within the image bounds
         if (lx < tx || lx > tx + width || ly < ty || ly > ty + height) {
             return false; // Outside bounds, allow drawing
+        }
+        
+        // Check if point is in the bottom-right area (below the hypotenuse diagonal)
+        // The diagonal goes from top-right (tx + width, ty) to bottom-left (tx, ty + height)
+        // The equation of this line: (lx - tx) / width + (ly - ty) / height = 1
+        // Points below/right of this line satisfy: (lx - tx) / width + (ly - ty) / height > 1
+        const normalizedX = (lx - tx) / width;
+        const normalizedY = (ly - ty) / height;
+        if (normalizedX + normalizedY > 1) {
+            // Point is in the bottom-right area (below the hypotenuse)
+            // Allow free drawing here - don't block
+            return false;
         }
         
         // Check distance from top edge - will snap to edge
@@ -196,23 +209,19 @@ class EdgeDrawingManager {
             return false; // Near left edge, don't block
         }
         
-        // Check distance from bottom edge - allow normal drawing through
-        const distToBottom = Math.abs(ly - (ty + height));
-        if (distToBottom < this.edgeTolerance) {
-            return false; // Near bottom edge, allow drawing
-        }
-        
-        // Check distance from right edge (hypotenuse area) - allow normal drawing through
-        const distToRight = Math.abs(lx - (tx + width));
-        if (distToRight < this.edgeTolerance) {
-            return false; // Near right edge, allow drawing
-        }
-        
-        // Point is inside the set square area and not near any edge
-        // Only block if the point is truly in the interior
+        // Point is inside the set square area (upper-left triangle) and not near any edge
+        // Only block if the point is truly in the interior of the upper-left triangle
         const interiorMargin = this.edgeTolerance * 2;
-        return lx > tx + interiorMargin && lx < tx + width - interiorMargin &&
-               ly > ty + interiorMargin && ly < ty + height - interiorMargin;
+        if (lx > tx + interiorMargin && ly > ty + interiorMargin) {
+            // Check if still within the upper-left triangle (accounting for margin)
+            const marginNormalizedX = (lx - tx - interiorMargin) / (width - interiorMargin * 2);
+            const marginNormalizedY = (ly - ty - interiorMargin) / (height - interiorMargin * 2);
+            if (marginNormalizedX + marginNormalizedY < 0.8) {
+                return true; // Block drawing in the interior
+            }
+        }
+        
+        return false;
     }
     
     /**

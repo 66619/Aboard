@@ -115,17 +115,17 @@ class TeachingToolsManager {
                 <div class="teaching-tools-body">
                     <div class="teaching-tools-current-count-section">
                         <div class="teaching-tools-section-label" data-i18n="teachingTools.currentOnCanvas">画布上当前数量</div>
-                        <div class="teaching-tools-current-row">
+                        <div class="teaching-tools-current-row teaching-tools-current-row-4">
                             <div class="teaching-tool-current-item">
-                                <span data-i18n="teachingTools.ruler">直尺</span>
+                                <span data-i18n="teachingTools.rulerStyle1">直尺 1</span>
                                 <div class="teaching-tool-counter">
-                                    <button class="counter-btn minus-btn" data-tool="currentRuler" data-action="minus">
+                                    <button class="counter-btn minus-btn" data-tool="currentRuler1" data-action="minus">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <line x1="5" y1="12" x2="19" y2="12"></line>
                                         </svg>
                                     </button>
-                                    <input type="number" id="current-ruler-count" class="counter-input" value="0" min="0" max="10" readonly>
-                                    <button class="counter-btn plus-btn" data-tool="currentRuler" data-action="plus">
+                                    <input type="number" id="current-ruler1-count" class="counter-input" value="0" min="0" max="10" readonly>
+                                    <button class="counter-btn plus-btn" data-tool="currentRuler1" data-action="plus">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <line x1="12" y1="5" x2="12" y2="19"></line>
                                             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -134,15 +134,49 @@ class TeachingToolsManager {
                                 </div>
                             </div>
                             <div class="teaching-tool-current-item">
-                                <span data-i18n="teachingTools.setSquare">三角板</span>
+                                <span data-i18n="teachingTools.rulerStyle2">直尺 2</span>
                                 <div class="teaching-tool-counter">
-                                    <button class="counter-btn minus-btn" data-tool="currentSetSquare" data-action="minus">
+                                    <button class="counter-btn minus-btn" data-tool="currentRuler2" data-action="minus">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <line x1="5" y1="12" x2="19" y2="12"></line>
                                         </svg>
                                     </button>
-                                    <input type="number" id="current-set-square-count" class="counter-input" value="0" min="0" max="10" readonly>
-                                    <button class="counter-btn plus-btn" data-tool="currentSetSquare" data-action="plus">
+                                    <input type="number" id="current-ruler2-count" class="counter-input" value="0" min="0" max="10" readonly>
+                                    <button class="counter-btn plus-btn" data-tool="currentRuler2" data-action="plus">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="teaching-tool-current-item">
+                                <span data-i18n="teachingTools.setSquare60">三角板 60°</span>
+                                <div class="teaching-tool-counter">
+                                    <button class="counter-btn minus-btn" data-tool="currentSetSquare60" data-action="minus">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                    <input type="number" id="current-set-square-60-count" class="counter-input" value="0" min="0" max="10" readonly>
+                                    <button class="counter-btn plus-btn" data-tool="currentSetSquare60" data-action="plus">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="teaching-tool-current-item">
+                                <span data-i18n="teachingTools.setSquare45">三角板 45°</span>
+                                <div class="teaching-tool-counter">
+                                    <button class="counter-btn minus-btn" data-tool="currentSetSquare45" data-action="minus">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                    <input type="number" id="current-set-square-45-count" class="counter-input" value="0" min="0" max="10" readonly>
+                                    <button class="counter-btn plus-btn" data-tool="currentSetSquare45" data-action="plus">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <line x1="12" y1="5" x2="12" y2="19"></line>
                                             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -259,126 +293,190 @@ class TeachingToolsManager {
         this.setupModalListeners();
     }
     
-    // Get counts of tools currently on canvas
+    // Get counts of tools currently on canvas, separated by variant
     getToolCounts() {
-        const rulerCount = this.tools.filter(t => t.type === 'ruler').length;
-        const setSquareCount = this.tools.filter(t => t.type === 'setSquare').length;
-        return { rulerCount, setSquareCount };
+        const ruler1Count = this.tools.filter(t => t.type === 'ruler' && t.variant === 1).length;
+        const ruler2Count = this.tools.filter(t => t.type === 'ruler' && t.variant === 2).length;
+        const setSquare60Count = this.tools.filter(t => t.type === 'setSquare' && t.variant === 60).length;
+        const setSquare45Count = this.tools.filter(t => t.type === 'setSquare' && t.variant === 45).length;
+        // Also provide totals for backward compatibility
+        const rulerCount = ruler1Count + ruler2Count;
+        const setSquareCount = setSquare60Count + setSquare45Count;
+        return { ruler1Count, ruler2Count, setSquare60Count, setSquare45Count, rulerCount, setSquareCount };
     }
     
     // Update the current count display in modal
     updateCurrentCountDisplay() {
         const counts = this.getToolCounts();
-        const rulerEl = document.getElementById('current-ruler-count');
-        const setSquareEl = document.getElementById('current-set-square-count');
-        if (rulerEl) rulerEl.value = counts.rulerCount;
-        if (setSquareEl) setSquareEl.value = counts.setSquareCount;
         
-        // Disable/enable minus and plus buttons based on count
-        // When count is 0, both minus and plus should be disabled
-        // User must use "Add New" section to add tools
-        const rulerMinusBtn = document.querySelector('[data-tool="currentRuler"][data-action="minus"]');
-        const rulerPlusBtn = document.querySelector('[data-tool="currentRuler"][data-action="plus"]');
-        const setSquareMinusBtn = document.querySelector('[data-tool="currentSetSquare"][data-action="minus"]');
-        const setSquarePlusBtn = document.querySelector('[data-tool="currentSetSquare"][data-action="plus"]');
+        // Update individual count displays
+        const ruler1El = document.getElementById('current-ruler1-count');
+        const ruler2El = document.getElementById('current-ruler2-count');
+        const setSquare60El = document.getElementById('current-set-square-60-count');
+        const setSquare45El = document.getElementById('current-set-square-45-count');
         
-        // Ruler controls
-        if (rulerMinusBtn) {
-            if (counts.rulerCount <= 0) {
-                rulerMinusBtn.classList.add('disabled');
-                rulerMinusBtn.disabled = true;
-            } else {
-                rulerMinusBtn.classList.remove('disabled');
-                rulerMinusBtn.disabled = false;
+        if (ruler1El) ruler1El.value = counts.ruler1Count;
+        if (ruler2El) ruler2El.value = counts.ruler2Count;
+        if (setSquare60El) setSquare60El.value = counts.setSquare60Count;
+        if (setSquare45El) setSquare45El.value = counts.setSquare45Count;
+        
+        // Helper function to update button states
+        const updateButtonState = (toolName, count) => {
+            const minusBtn = document.querySelector(`[data-tool="${toolName}"][data-action="minus"]`);
+            const plusBtn = document.querySelector(`[data-tool="${toolName}"][data-action="plus"]`);
+            
+            if (minusBtn) {
+                if (count <= 0) {
+                    minusBtn.classList.add('disabled');
+                    minusBtn.disabled = true;
+                } else {
+                    minusBtn.classList.remove('disabled');
+                    minusBtn.disabled = false;
+                }
             }
-        }
-        
-        if (rulerPlusBtn) {
-            if (counts.rulerCount <= 0) {
-                rulerPlusBtn.classList.add('disabled');
-                rulerPlusBtn.disabled = true;
-            } else {
-                rulerPlusBtn.classList.remove('disabled');
-                rulerPlusBtn.disabled = false;
+            
+            // Plus button is only disabled if count is 0 (for "current" controls)
+            if (plusBtn && toolName.startsWith('current')) {
+                if (count <= 0) {
+                    plusBtn.classList.add('disabled');
+                    plusBtn.disabled = true;
+                } else {
+                    plusBtn.classList.remove('disabled');
+                    plusBtn.disabled = false;
+                }
             }
-        }
+        };
         
-        // Set square controls
-        if (setSquareMinusBtn) {
-            if (counts.setSquareCount <= 0) {
-                setSquareMinusBtn.classList.add('disabled');
-                setSquareMinusBtn.disabled = true;
-            } else {
-                setSquareMinusBtn.classList.remove('disabled');
-                setSquareMinusBtn.disabled = false;
-            }
-        }
-        
-        if (setSquarePlusBtn) {
-            if (counts.setSquareCount <= 0) {
-                setSquarePlusBtn.classList.add('disabled');
-                setSquarePlusBtn.disabled = true;
-            } else {
-                setSquarePlusBtn.classList.remove('disabled');
-                setSquarePlusBtn.disabled = false;
-            }
-        }
+        // Update button states for each variant
+        updateButtonState('currentRuler1', counts.ruler1Count);
+        updateButtonState('currentRuler2', counts.ruler2Count);
+        updateButtonState('currentSetSquare60', counts.setSquare60Count);
+        updateButtonState('currentSetSquare45', counts.setSquare45Count);
     }
     
-    // Remove the last tool of a specific type
-    removeLastToolOfType(type) {
-        // Find all tools of this type and remove the last one (LIFO)
-        const toolsOfType = this.tools.filter(t => t.type === type);
+    // Remove the last tool of a specific type and variant
+    removeLastToolOfType(type, variant = null) {
+        // Find all tools of this type and variant, then remove the last one (LIFO)
+        let toolsOfType;
+        if (variant !== null) {
+            toolsOfType = this.tools.filter(t => t.type === type && t.variant === variant);
+        } else {
+            toolsOfType = this.tools.filter(t => t.type === type);
+        }
         if (toolsOfType.length > 0) {
             const lastTool = toolsOfType[toolsOfType.length - 1];
             this.removeTool(lastTool);
         }
     }
     
+    /**
+     * Calculate the tool size based on original image aspect ratio, 
+     * scaled to approximately 20% of canvas area
+     * @param {HTMLImageElement} image - The image element
+     * @param {number} canvasWidth - Canvas width
+     * @param {number} canvasHeight - Canvas height
+     * @returns {Object} - {width, height} of the tool
+     */
+    calculateToolSize(image, canvasWidth, canvasHeight) {
+        // Use actual image dimensions to preserve original aspect ratio
+        const imgWidth = image.naturalWidth || image.width;
+        const imgHeight = image.naturalHeight || image.height;
+        
+        if (!imgWidth || !imgHeight) {
+            // Fallback to default size if image not loaded
+            return { width: 200, height: 100 };
+        }
+        
+        const aspectRatio = imgWidth / imgHeight;
+        
+        // Target approximately 20% of canvas area
+        // Area = width * height, so we target sqrt(0.2) ≈ 0.447 of both dimensions
+        // But we need to adjust based on aspect ratio
+        const canvasArea = canvasWidth * canvasHeight;
+        const targetArea = canvasArea * 0.20;
+        
+        // Calculate dimensions that preserve aspect ratio and approximate target area
+        // targetArea = width * height = width * (width / aspectRatio)
+        // targetArea = width² / aspectRatio
+        // width = sqrt(targetArea * aspectRatio)
+        let toolWidth = Math.sqrt(targetArea * aspectRatio);
+        let toolHeight = toolWidth / aspectRatio;
+        
+        // Ensure the tool doesn't exceed 50% of canvas width or height
+        const maxWidth = canvasWidth * 0.5;
+        const maxHeight = canvasHeight * 0.5;
+        
+        if (toolWidth > maxWidth) {
+            toolWidth = maxWidth;
+            toolHeight = toolWidth / aspectRatio;
+        }
+        if (toolHeight > maxHeight) {
+            toolHeight = maxHeight;
+            toolWidth = toolHeight * aspectRatio;
+        }
+        
+        // Minimum size constraint
+        const minSize = 50;
+        if (toolWidth < minSize) {
+            toolWidth = minSize;
+            toolHeight = toolWidth / aspectRatio;
+        }
+        if (toolHeight < minSize) {
+            toolHeight = minSize;
+            toolWidth = toolHeight * aspectRatio;
+        }
+        
+        return { 
+            width: Math.round(toolWidth), 
+            height: Math.round(toolHeight) 
+        };
+    }
+    
     // Add a new tool of a specific type
     addToolOfType(type, variant = 1) {
         const rect = this.canvas.getBoundingClientRect();
         const scaleFactor = this.canvasScaleFactor;
+        // Get canvas dimensions in unscaled coordinates
+        const canvasWidth = rect.width / scaleFactor;
+        const canvasHeight = rect.height / scaleFactor;
         // Get center in canvas coordinates
-        const centerX = rect.width / scaleFactor / 2;
-        const centerY = rect.height / scaleFactor / 2;
+        const centerX = canvasWidth / 2;
+        const centerY = canvasHeight / 2;
         
         if (type === 'ruler') {
             const image = variant === 2 ? this.rulerImage2 : this.rulerImage1;
+            const size = this.calculateToolSize(image, canvasWidth, canvasHeight);
             this.addTool({
                 type: 'ruler',
                 variant: variant,
-                x: centerX - 150 + Math.random() * 50,
-                y: centerY - 15 + Math.random() * 50,
-                width: 300,
-                height: 30,
+                x: centerX - size.width / 2 + Math.random() * 50,
+                y: centerY - size.height / 2 + Math.random() * 50,
+                width: size.width,
+                height: size.height,
                 rotation: 0,
                 image: image
             });
         } else if (type === 'setSquare60') {
-            // 60° set square: aspect ratio is √3:1 (width:height)
-            const setSquareHeight = 100;
-            const setSquareWidth = Math.round(setSquareHeight * Math.sqrt(3));
+            const size = this.calculateToolSize(this.setSquareImage1, canvasWidth, canvasHeight);
             this.addTool({
                 type: 'setSquare',
                 variant: 60,
-                x: centerX - setSquareWidth / 2 + Math.random() * 50,
-                y: centerY - setSquareHeight / 2 + Math.random() * 50,
-                width: setSquareWidth,
-                height: setSquareHeight,
+                x: centerX - size.width / 2 + Math.random() * 50,
+                y: centerY - size.height / 2 + Math.random() * 50,
+                width: size.width,
+                height: size.height,
                 rotation: 0,
                 image: this.setSquareImage1
             });
         } else if (type === 'setSquare45') {
-            // 45° set square: aspect ratio is 1:1
-            const setSquareSize = 100;
+            const size = this.calculateToolSize(this.setSquareImage2, canvasWidth, canvasHeight);
             this.addTool({
                 type: 'setSquare',
                 variant: 45,
-                x: centerX - setSquareSize / 2 + Math.random() * 50,
-                y: centerY - setSquareSize / 2 + Math.random() * 50,
-                width: setSquareSize,
-                height: setSquareSize,
+                x: centerX - size.width / 2 + Math.random() * 50,
+                y: centerY - size.height / 2 + Math.random() * 50,
+                width: size.width,
+                height: size.height,
                 rotation: 0,
                 image: this.setSquareImage2
             });
@@ -404,22 +502,42 @@ class TeachingToolsManager {
                 const tool = btn.dataset.tool;
                 const action = btn.dataset.action;
                 
-                // Handle current count adjustments (directly modify canvas)
-                if (tool === 'currentRuler') {
+                // Handle current count adjustments for individual variants (directly modify canvas)
+                if (tool === 'currentRuler1') {
                     if (action === 'plus') {
                         this.addToolOfType('ruler', 1);
                     } else if (action === 'minus') {
-                        this.removeLastToolOfType('ruler');
+                        this.removeLastToolOfType('ruler', 1);
                     }
                     this.updateCurrentCountDisplay();
                     return;
                 }
                 
-                if (tool === 'currentSetSquare') {
+                if (tool === 'currentRuler2') {
+                    if (action === 'plus') {
+                        this.addToolOfType('ruler', 2);
+                    } else if (action === 'minus') {
+                        this.removeLastToolOfType('ruler', 2);
+                    }
+                    this.updateCurrentCountDisplay();
+                    return;
+                }
+                
+                if (tool === 'currentSetSquare60') {
                     if (action === 'plus') {
                         this.addToolOfType('setSquare60');
                     } else if (action === 'minus') {
-                        this.removeLastToolOfType('setSquare');
+                        this.removeLastToolOfType('setSquare', 60);
+                    }
+                    this.updateCurrentCountDisplay();
+                    return;
+                }
+                
+                if (tool === 'currentSetSquare45') {
+                    if (action === 'plus') {
+                        this.addToolOfType('setSquare45');
+                    } else if (action === 'minus') {
+                        this.removeLastToolOfType('setSquare', 45);
                     }
                     this.updateCurrentCountDisplay();
                     return;
@@ -710,9 +828,18 @@ class TeachingToolsManager {
     insertTools() {
         const canvasRect = this.canvas.getBoundingClientRect();
         const scaleFactor = this.canvasScaleFactor;
+        // Get canvas dimensions in unscaled coordinates
+        const canvasWidth = (canvasRect.right - canvasRect.left) / scaleFactor;
+        const canvasHeight = (canvasRect.bottom - canvasRect.top) / scaleFactor;
         // Get center in canvas coordinates
-        const centerX = (canvasRect.right - canvasRect.left) / scaleFactor / 2;
-        const centerY = (canvasRect.bottom - canvasRect.top) / scaleFactor / 2;
+        const centerX = canvasWidth / 2;
+        const centerY = canvasHeight / 2;
+        
+        // Calculate tool sizes based on original image aspect ratios and ~20% canvas area
+        const ruler1Size = this.calculateToolSize(this.rulerImage1, canvasWidth, canvasHeight);
+        const ruler2Size = this.calculateToolSize(this.rulerImage2, canvasWidth, canvasHeight);
+        const setSquare60Size = this.calculateToolSize(this.setSquareImage1, canvasWidth, canvasHeight);
+        const setSquare45Size = this.calculateToolSize(this.setSquareImage2, canvasWidth, canvasHeight);
         
         // Insert ruler style 1
         for (let i = 0; i < this.ruler1Count; i++) {
@@ -721,10 +848,10 @@ class TeachingToolsManager {
             this.addTool({
                 type: 'ruler',
                 variant: 1,
-                x: centerX - 150 + offsetX,
-                y: centerY - 100 + offsetY,
-                width: 300,
-                height: 30,
+                x: centerX - ruler1Size.width / 2 + offsetX,
+                y: centerY - ruler1Size.height - 20 + offsetY,
+                width: ruler1Size.width,
+                height: ruler1Size.height,
                 rotation: 0,
                 image: this.rulerImage1
             });
@@ -737,47 +864,42 @@ class TeachingToolsManager {
             this.addTool({
                 type: 'ruler',
                 variant: 2,
-                x: centerX - 150 + offsetX,
-                y: centerY - 50 + offsetY,
-                width: 300,
-                height: 30,
+                x: centerX - ruler2Size.width / 2 + offsetX,
+                y: centerY + 20 + offsetY,
+                width: ruler2Size.width,
+                height: ruler2Size.height,
                 rotation: 0,
                 image: this.rulerImage2
             });
         }
         
         // Insert 60° set squares
-        // Set square aspect ratio is √3:1 (width:height)
-        const setSquare60Height = 100;
-        const setSquare60Width = Math.round(setSquare60Height * Math.sqrt(3));
         for (let i = 0; i < this.setSquare60Count; i++) {
             const offsetX = (i - this.setSquare60Count / 2) * 50;
             const offsetY = (i - this.setSquare60Count / 2) * 30;
             this.addTool({
                 type: 'setSquare',
                 variant: 60,
-                x: centerX - setSquare60Width / 2 + offsetX,
-                y: centerY + 50 + offsetY,
-                width: setSquare60Width,
-                height: setSquare60Height,
+                x: centerX - setSquare60Size.width / 2 + offsetX,
+                y: centerY + ruler2Size.height + 40 + offsetY,
+                width: setSquare60Size.width,
+                height: setSquare60Size.height,
                 rotation: 0,
                 image: this.setSquareImage1
             });
         }
         
         // Insert 45° set squares
-        // 45° set square aspect ratio is 1:1
-        const setSquare45Size = 100;
         for (let i = 0; i < this.setSquare45Count; i++) {
             const offsetX = (i - this.setSquare45Count / 2) * 50;
             const offsetY = (i - this.setSquare45Count / 2) * 30;
             this.addTool({
                 type: 'setSquare',
                 variant: 45,
-                x: centerX - setSquare45Size / 2 + offsetX,
-                y: centerY + 150 + offsetY,
-                width: setSquare45Size,
-                height: setSquare45Size,
+                x: centerX - setSquare45Size.width / 2 + offsetX,
+                y: centerY + ruler2Size.height + setSquare60Size.height + 60 + offsetY,
+                width: setSquare45Size.width,
+                height: setSquare45Size.height,
                 rotation: 0,
                 image: this.setSquareImage2
             });
@@ -866,6 +988,15 @@ class TeachingToolsManager {
     setupToolOverlayEvents(tool, overlay) {
         // Prevent default touch behavior
         overlay.addEventListener('touchstart', (e) => {
+            // For set squares, check if touch is in the free-drawing area (bottom-right)
+            if (tool.type === 'setSquare' && e.touches.length === 1) {
+                const touch = e.touches[0];
+                if (this.isPointInSetSquareFreeArea(touch.clientX, touch.clientY, tool)) {
+                    // Allow the event to pass through for free drawing
+                    return;
+                }
+            }
+            
             // Two-finger gesture for pinch zoom - only if tool is already selected
             if (e.touches.length === 2 && this.selectedTool === tool) {
                 e.preventDefault();
@@ -919,6 +1050,12 @@ class TeachingToolsManager {
         
         // Mouse drag - single click only moves, doesn't select for editing
         overlay.addEventListener('mousedown', (e) => {
+            // For set squares, check if click is in the free-drawing area (bottom-right)
+            if (tool.type === 'setSquare' && this.isPointInSetSquareFreeArea(e.clientX, e.clientY, tool)) {
+                // Allow the event to pass through for free drawing
+                return;
+            }
+            
             // If clicking on control handles, only allow if tool is selected
             if (e.target.closest('.teaching-tool-resize-handle') ||
                 e.target.closest('.teaching-tool-rotate-handle') ||
@@ -947,6 +1084,12 @@ class TeachingToolsManager {
         
         // Double-click to select and show controls
         overlay.addEventListener('dblclick', (e) => {
+            // For set squares, check if double-click is in the free-drawing area (bottom-right)
+            if (tool.type === 'setSquare' && this.isPointInSetSquareFreeArea(e.clientX, e.clientY, tool)) {
+                // Allow the event to pass through, don't select the tool
+                return;
+            }
+            
             e.stopPropagation();
             this.selectTool(tool);
         });
@@ -1104,6 +1247,39 @@ class TeachingToolsManager {
         const centerY = tool.y + tool.height / 2;
         // Rotate point in opposite direction to get local coordinates
         return this.rotatePoint(x, y, centerX, centerY, -tool.rotation);
+    }
+    
+    /**
+     * Check if a screen point is in the bottom-right area of a set square
+     * The bottom-right area is below the diagonal from top-right to bottom-left
+     * @param {number} clientX - Screen X coordinate
+     * @param {number} clientY - Screen Y coordinate  
+     * @param {Object} tool - The teaching tool
+     * @returns {boolean} - true if point is in the free-drawing area
+     */
+    isPointInSetSquareFreeArea(clientX, clientY, tool) {
+        if (tool.type !== 'setSquare') {
+            return false;
+        }
+        
+        // Get position relative to the overlay element
+        const overlay = tool.overlay;
+        if (!overlay) return false;
+        
+        const rect = overlay.getBoundingClientRect();
+        
+        // Get position relative to overlay (0,0 is top-left)
+        const relX = clientX - rect.left;
+        const relY = clientY - rect.top;
+        
+        // Normalize to 0-1 range
+        const normalizedX = relX / rect.width;
+        const normalizedY = relY / rect.height;
+        
+        // Check if point is below the diagonal line from top-right (1,0) to bottom-left (0,1)
+        // The line equation: normalizedX + normalizedY = 1
+        // Points below/right of this line satisfy: normalizedX + normalizedY > 1
+        return (normalizedX + normalizedY) > 1;
     }
     
     getToolAtPosition(x, y) {

@@ -84,6 +84,15 @@
     gap: 24px;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
+}
+
+/* 4-column layout for current count display */
+.teaching-tools-current-row.teaching-tools-current-row-4 {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    gap: 16px;
+    justify-content: center;
 }
 
 .teaching-tool-current-item {
@@ -96,6 +105,7 @@
     font-size: 14px;
     color: #1976d2;
     font-weight: 500;
+    white-space: nowrap;
 }
 
 /* New section */
@@ -409,6 +419,10 @@
         grid-template-columns: repeat(2, 1fr);
     }
     
+    .teaching-tools-current-row.teaching-tools-current-row-4 {
+        grid-template-columns: repeat(2, auto);
+    }
+    
     .teaching-tool-item {
         min-width: 120px;
     }
@@ -432,6 +446,11 @@
     .teaching-tools-row.teaching-tools-row-4 {
         grid-template-columns: 1fr 1fr;
         gap: 8px;
+    }
+    
+    .teaching-tools-current-row.teaching-tools-current-row-4 {
+        grid-template-columns: repeat(2, auto);
+        gap: 12px;
     }
     
     .teaching-tool-item {
