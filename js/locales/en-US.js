@@ -36,6 +36,7 @@ window.translations = {
         eraser: 'Eraser',
         clear: 'Clear',
         background: 'Background',
+        teachingTools: 'Tools',
         more: 'More',
         settings: 'Settings',
         export: 'Export Canvas',
@@ -346,6 +347,18 @@ window.translations = {
         moreFeatures: 'More Features',
         time: 'Time',
         timer: 'Timer'
+    },
+
+    // Teaching Tools
+    teachingTools: {
+        title: 'Teaching Tools',
+        ruler: 'Ruler',
+        setSquare: 'Set Square',
+        insertHint: 'Select the number of tools to insert',
+        rotate: 'Rotate',
+        resize: 'Resize',
+        delete: 'Delete',
+        drawAlongEdge: 'Draw along edge'
     },
 
     // Time Display

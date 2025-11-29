@@ -29,6 +29,7 @@ class DrawingBoard {
         this.collapsibleManager = new CollapsibleManager();
         this.announcementManager = new AnnouncementManager();
         this.exportManager = new ExportManager(this.canvas, this.bgCanvas, this);
+        this.teachingToolsManager = new TeachingToolsManager(this.canvas, this.ctx, this.historyManager);
         
         // Canvas fit scale - calculated once on init and window resize
         this.canvasFitScale = 1.0;
@@ -349,6 +350,7 @@ class DrawingBoard {
         document.getElementById('clear-btn').addEventListener('click', () => this.confirmClear());
         document.getElementById('settings-btn').addEventListener('click', () => this.openSettings());
         document.getElementById('more-btn').addEventListener('click', () => this.setTool('more'));
+        document.getElementById('teaching-tools-btn').addEventListener('click', () => this.teachingToolsManager.showModal());
         
         document.getElementById('config-close-btn').addEventListener('click', () => this.closeConfigPanel());
         document.getElementById('feature-close-btn').addEventListener('click', () => this.closeFeaturePanel());

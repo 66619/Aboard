@@ -36,6 +36,7 @@ window.translations = {
         eraser: '橡皮',
         clear: '清空',
         background: '背景',
+        teachingTools: '教具',
         more: '更多',
         settings: '设置',
         export: '导出画布',
@@ -346,6 +347,18 @@ window.translations = {
         moreFeatures: '更多功能',
         time: '时间',
         timer: '计时'
+    },
+
+    // Teaching Tools
+    teachingTools: {
+        title: '教具',
+        ruler: '直尺',
+        setSquare: '三角板',
+        insertHint: '选择要插入的教具数量',
+        rotate: '旋转',
+        resize: '调整大小',
+        delete: '删除',
+        drawAlongEdge: '沿边缘画线'
     },
 
     // Time Display

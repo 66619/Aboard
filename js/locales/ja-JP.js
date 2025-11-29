@@ -36,6 +36,7 @@ window.translations = {
         eraser: '消しゴム',
         clear: 'クリア',
         background: '背景',
+        teachingTools: '教具',
         more: 'もっと',
         settings: '設定',
         export: 'キャンバスをエクスポート',
@@ -331,6 +332,18 @@ window.translations = {
         moreFeatures: 'その他の機能',
         time: '時刻',
         timer: 'タイマー'
+    },
+
+    // Teaching Tools
+    teachingTools: {
+        title: '教具',
+        ruler: '定規',
+        setSquare: '三角定規',
+        insertHint: '挿入する教具の数を選択',
+        rotate: '回転',
+        resize: 'サイズ変更',
+        delete: '削除',
+        drawAlongEdge: 'エッジに沿って描画'
     },
 
     // Time Display

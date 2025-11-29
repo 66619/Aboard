@@ -36,6 +36,7 @@ window.translations = {
         eraser: '지우개',
         clear: '지우기',
         background: '배경',
+        teachingTools: '교구',
         more: '더보기',
         settings: '설정',
         export: '캔버스 내보내기',
@@ -331,6 +332,18 @@ window.translations = {
         moreFeatures: '더 많은 기능',
         time: '시간',
         timer: '타이머'
+    },
+
+    // Teaching Tools
+    teachingTools: {
+        title: '교구',
+        ruler: '자',
+        setSquare: '삼각자',
+        insertHint: '삽입할 교구 수를 선택하세요',
+        rotate: '회전',
+        resize: '크기 조절',
+        delete: '삭제',
+        drawAlongEdge: '가장자리를 따라 그리기'
     },
 
     // Time Display

@@ -1,0 +1,289 @@
+/* Teaching Tools Module Styles */
+
+/* Teaching Tools Modal */
+#teaching-tools-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+#teaching-tools-modal.show {
+    display: flex;
+}
+
+.teaching-tools-modal-content {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow: hidden;
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.teaching-tools-modal-content .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid #eee;
+}
+
+.teaching-tools-modal-content .modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Teaching Tools Body */
+.teaching-tools-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Teaching Tool Item */
+.teaching-tool-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    background: #f8f9fa;
+    transition: all 0.2s ease;
+}
+
+.teaching-tool-item:hover {
+    border-color: var(--theme-color, #007AFF);
+    background: #f0f7ff;
+}
+
+/* Tool Preview */
+.teaching-tool-preview {
+    width: 100%;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+.teaching-tool-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.teaching-tool-image.set-square-image {
+    max-height: 70px;
+}
+
+/* Tool Label */
+.teaching-tool-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Counter Controls */
+.teaching-tool-counter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.counter-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    background: var(--theme-color, #007AFF);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.counter-btn:hover {
+    opacity: 0.9;
+    transform: scale(1.05);
+}
+
+.counter-btn:active {
+    transform: scale(0.95);
+}
+
+.counter-btn svg {
+    stroke: white;
+}
+
+.counter-input {
+    width: 50px;
+    height: 32px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.counter-input:focus {
+    border-color: var(--theme-color, #007AFF);
+}
+
+.counter-input::-webkit-inner-spin-button,
+.counter-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.counter-input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Footer */
+.teaching-tools-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.teaching-tools-confirm-btn {
+    padding: 10px 24px;
+    background: var(--theme-color, #007AFF);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.teaching-tools-confirm-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.teaching-tools-confirm-btn:active {
+    transform: translateY(0);
+}
+
+/* Teaching Tool Overlay (on canvas) */
+.teaching-tool-overlay {
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
+    border: 2px solid transparent;
+    border-radius: 4px;
+}
+
+.teaching-tool-overlay:hover {
+    opacity: 1;
+    border-color: var(--theme-color, #007AFF);
+}
+
+.teaching-tool-overlay.selected {
+    border-color: var(--theme-color, #007AFF);
+    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);
+}
+
+/* Teaching Tool Controls */
+.teaching-tool-controls {
+    position: fixed;
+    display: none;
+    gap: 8px;
+    background: #ffffff;
+    padding: 8px 12px;
+    border-radius: 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    z-index: 1001;
+}
+
+.teaching-tool-control-handle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.teaching-tool-control-handle:hover {
+    background: var(--theme-color, #007AFF);
+}
+
+.teaching-tool-control-handle:hover svg {
+    stroke: white;
+}
+
+.teaching-tool-control-handle svg {
+    width: 18px;
+    height: 18px;
+    stroke: #666;
+}
+
+.teaching-tool-control-handle.delete-handle:hover {
+    background: #ff3b30;
+}
+
+.teaching-tool-control-handle.rotate-handle {
+    cursor: grab;
+}
+
+.teaching-tool-control-handle.rotate-handle:active {
+    cursor: grabbing;
+}
+
+.teaching-tool-control-handle.resize-handle {
+    cursor: nwse-resize;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .teaching-tools-modal-content {
+        width: 95%;
+        max-height: 85vh;
+    }
+    
+    .teaching-tools-body {
+        padding: 16px;
+    }
+    
+    .teaching-tool-preview {
+        height: 60px;
+    }
+}

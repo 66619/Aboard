@@ -36,6 +36,7 @@ window.translations = {
         eraser: 'Borrador',
         clear: 'Borrar',
         background: 'Fondo',
+        teachingTools: 'Herramientas',
         more: 'Más',
         settings: 'Configuración',
         export: 'Exportar lienzo',
@@ -336,6 +337,18 @@ window.translations = {
         title: 'Características',
         time: 'Hora',
         timer: 'Temporizador'
+    },
+
+    // Teaching Tools
+    teachingTools: {
+        title: 'Herramientas didácticas',
+        ruler: 'Regla',
+        setSquare: 'Escuadra',
+        insertHint: 'Seleccione la cantidad de herramientas a insertar',
+        rotate: 'Rotar',
+        resize: 'Cambiar tamaño',
+        delete: 'Eliminar',
+        drawAlongEdge: 'Dibujar a lo largo del borde'
     },
 
     // Time Display
