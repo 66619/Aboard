@@ -87,11 +87,11 @@
     flex-wrap: wrap;
 }
 
-/* 4-column layout for current count display */
+/* 2x2 grid layout for current count display (2 rows) */
 .teaching-tools-current-row.teaching-tools-current-row-4 {
     display: grid;
-    grid-template-columns: repeat(4, auto);
-    gap: 16px;
+    grid-template-columns: repeat(2, auto);
+    gap: 12px 24px;
     justify-content: center;
 }
 

@@ -105,30 +105,26 @@ class EdgeDrawingManager {
     
     /**
      * Check if a point is near a set square edge
-     * Set squares are right triangles - only the top and left edges should allow drawing
+     * Set squares are right triangles with three drawable edges:
      * Top edge: horizontal edge at the top
      * Left edge: vertical edge on the left side
-     * (Bottom and hypotenuse edges do not support edge drawing)
+     * Hypotenuse: diagonal edge from top-right to bottom-left
      */
     getSetSquareEdgeAtPoint(localPoint, tool, originalX, originalY) {
         const { x: tx, y: ty, width, height } = tool;
         const lx = localPoint.x;
         const ly = localPoint.y;
         
-        // Triangle vertices in local space (assuming right triangle):
-        // Bottom-left (origin of triangle): (tx, ty + height)
-        // Bottom-right: (tx + width, ty + height)
-        // Top-left (right angle): (tx, ty)
-        const p1 = { x: tx, y: ty + height };           // Bottom-left
-        const p3 = { x: tx, y: ty };                     // Top-left (right angle vertex)
-        
-        // For the set square image, we need to check the actual visible edges:
-        // Top edge: from top-left corner across the top (horizontal)
-        // Left edge: from top-left down to bottom-left (vertical)
-        
-        // Check top edge (horizontal) - from top-left to top-right of image bounds
+        // Triangle vertices in local space:
+        // Top-left (right angle vertex): (tx, ty)
+        // Top-right: (tx + width, ty)
+        // Bottom-left: (tx, ty + height)
+        const topLeft = { x: tx, y: ty };
         const topRight = { x: tx + width, y: ty };
-        const distToTop = this.distanceToSegment(lx, ly, p3.x, p3.y, topRight.x, topRight.y);
+        const bottomLeft = { x: tx, y: ty + height };
+        
+        // Check top edge (horizontal) - from top-left to top-right
+        const distToTop = this.distanceToSegment(lx, ly, topLeft.x, topLeft.y, topRight.x, topRight.y);
         if (distToTop < this.edgeTolerance && lx >= tx && lx <= tx + width) {
             const snappedLocal = { x: Math.max(tx, Math.min(tx + width, lx)), y: ty };
             const snappedWorld = this.transformToWorldSpace(snappedLocal.x, snappedLocal.y, tool);
@@ -136,14 +132,26 @@ class EdgeDrawingManager {
         }
         
         // Check left edge (vertical) - from top-left to bottom-left
-        const distToLeft = this.distanceToSegment(lx, ly, p3.x, p3.y, p1.x, p1.y);
+        const distToLeft = this.distanceToSegment(lx, ly, topLeft.x, topLeft.y, bottomLeft.x, bottomLeft.y);
         if (distToLeft < this.edgeTolerance && ly >= ty && ly <= ty + height) {
             const snappedLocal = { x: tx, y: Math.max(ty, Math.min(ty + height, ly)) };
             const snappedWorld = this.transformToWorldSpace(snappedLocal.x, snappedLocal.y, tool);
             return { edge: 'left', snappedPoint: snappedWorld };
         }
         
-        // Bottom edge and hypotenuse do not support edge drawing
+        // Check hypotenuse (diagonal) - from top-right to bottom-left
+        const distToHypotenuse = this.distanceToSegment(lx, ly, topRight.x, topRight.y, bottomLeft.x, bottomLeft.y);
+        if (distToHypotenuse < this.edgeTolerance) {
+            // Project point onto the hypotenuse line segment
+            const snappedLocal = this.projectPointOnSegment(lx, ly, topRight.x, topRight.y, bottomLeft.x, bottomLeft.y);
+            // Verify the snapped point is within bounds
+            if (snappedLocal.x >= tx && snappedLocal.x <= tx + width &&
+                snappedLocal.y >= ty && snappedLocal.y <= ty + height) {
+                const snappedWorld = this.transformToWorldSpace(snappedLocal.x, snappedLocal.y, tool);
+                return { edge: 'hypotenuse', snappedPoint: snappedWorld };
+            }
+        }
+        
         return null;
     }
     
@@ -176,7 +184,7 @@ class EdgeDrawingManager {
         const lx = localPoint.x;
         const ly = localPoint.y;
         
-        // For set square: only the top and left edges support edge drawing.
+        // For set square: all three edges (top, left, hypotenuse) support edge drawing.
         // The bottom-right area (below the diagonal from top-right to bottom-left) 
         // should allow normal drawing without blocking.
         
@@ -184,6 +192,10 @@ class EdgeDrawingManager {
         if (lx < tx || lx > tx + width || ly < ty || ly > ty + height) {
             return false; // Outside bounds, allow drawing
         }
+        
+        // Triangle vertices
+        const topRight = { x: tx + width, y: ty };
+        const bottomLeft = { x: tx, y: ty + height };
         
         // Check if point is in the bottom-right area (below the hypotenuse diagonal)
         // The diagonal goes from top-right (tx + width, ty) to bottom-left (tx, ty + height)
@@ -207,6 +219,12 @@ class EdgeDrawingManager {
         const distToLeft = Math.abs(lx - tx);
         if (distToLeft < this.edgeTolerance) {
             return false; // Near left edge, don't block
+        }
+        
+        // Check distance from hypotenuse - will snap to edge
+        const distToHypotenuse = this.distanceToSegment(lx, ly, topRight.x, topRight.y, bottomLeft.x, bottomLeft.y);
+        if (distToHypotenuse < this.edgeTolerance) {
+            return false; // Near hypotenuse, don't block
         }
         
         // Point is inside the set square area (upper-left triangle) and not near any edge
