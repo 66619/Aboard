@@ -379,7 +379,11 @@ window.translations = {
     teachingTools: {
         title: 'Lehrmittel',
         ruler: 'Lineal',
+        rulerStyle1: 'Lineal 1',
+        rulerStyle2: 'Lineal 2',
         setSquare: 'Geodreieck',
+        setSquare60: 'Geodreieck 60°',
+        setSquare45: 'Geodreieck 45°',
         hint: 'Hinweis: Einfacher Klick zum Verschieben, Doppelklick zum Größe ändern, Drehen oder Löschen',
         insertHint: 'Wählen Sie die Anzahl der einzufügenden Werkzeuge',
         currentOnCanvas: 'Aktuelle Anzahl auf der Leinwand',

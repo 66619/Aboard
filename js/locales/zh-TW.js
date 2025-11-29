@@ -353,7 +353,11 @@ window.translations = {
     teachingTools: {
         title: '教具',
         ruler: '直尺',
+        rulerStyle1: '直尺 1',
+        rulerStyle2: '直尺 2',
         setSquare: '三角板',
+        setSquare60: '三角板 60°',
+        setSquare45: '三角板 45°',
         hint: '提示：單擊移動，雙擊調整大小、旋轉和刪除',
         insertHint: '選擇要插入的教具數量',
         currentOnCanvas: '畫布上當前數量',

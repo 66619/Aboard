@@ -338,7 +338,11 @@ window.translations = {
     teachingTools: {
         title: '교구',
         ruler: '자',
+        rulerStyle1: '자 1',
+        rulerStyle2: '자 2',
         setSquare: '삼각자',
+        setSquare60: '삼각자 60°',
+        setSquare45: '삼각자 45°',
         hint: '힌트: 단일 클릭으로 이동, 더블클릭하여 크기 조절, 회전 또는 삭제',
         insertHint: '삽입할 교구 수를 선택하세요',
         currentOnCanvas: '캔버스의 현재 수량',
