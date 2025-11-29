@@ -356,6 +356,7 @@ window.translations = {
         setSquare: '三角板',
         hint: '提示：雙擊教具可調整大小、旋轉和刪除',
         insertHint: '選擇要插入的教具數量',
+        currentOnCanvas: '畫布上當前數量',
         rotate: '旋轉',
         resize: '調整大小',
         delete: '刪除',

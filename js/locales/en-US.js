@@ -356,6 +356,7 @@ window.translations = {
         setSquare: 'Set Square',
         hint: 'Hint: Double-click to resize, rotate, or delete',
         insertHint: 'Select the number of tools to insert',
+        currentOnCanvas: 'Current on canvas',
         rotate: 'Rotate',
         resize: 'Resize',
         delete: 'Delete',

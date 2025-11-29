@@ -346,6 +346,7 @@ window.translations = {
         setSquare: 'Équerre',
         hint: 'Astuce : Double-cliquez pour redimensionner, pivoter ou supprimer',
         insertHint: 'Sélectionnez le nombre d\'outils à insérer',
+        currentOnCanvas: 'Nombre actuel sur le canevas',
         rotate: 'Pivoter',
         resize: 'Redimensionner',
         delete: 'Supprimer',

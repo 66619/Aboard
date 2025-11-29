@@ -382,6 +382,7 @@ window.translations = {
         setSquare: 'Geodreieck',
         hint: 'Hinweis: Doppelklicken zum Größe ändern, Drehen oder Löschen',
         insertHint: 'Wählen Sie die Anzahl der einzufügenden Werkzeuge',
+        currentOnCanvas: 'Aktuelle Anzahl auf der Leinwand',
         rotate: 'Drehen',
         resize: 'Größe ändern',
         delete: 'Löschen',

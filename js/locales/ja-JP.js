@@ -341,6 +341,7 @@ window.translations = {
         setSquare: '三角定規',
         hint: 'ヒント：ダブルクリックでサイズ変更、回転、削除',
         insertHint: '挿入する教具の数を選択',
+        currentOnCanvas: 'キャンバス上の現在の数',
         rotate: '回転',
         resize: 'サイズ変更',
         delete: '削除',

@@ -85,6 +85,11 @@ class TeachingToolsManager {
                     </button>
                 </div>
                 <div class="teaching-tools-body">
+                    <div class="teaching-tools-current-count">
+                        <span data-i18n="teachingTools.currentOnCanvas">画布上当前数量</span>: 
+                        <span id="current-ruler-count">0</span> <span data-i18n="teachingTools.ruler">直尺</span>, 
+                        <span id="current-set-square-count">0</span> <span data-i18n="teachingTools.setSquare">三角板</span>
+                    </div>
                     <div class="teaching-tools-row">
                         <!-- Ruler Section -->
                         <div class="teaching-tool-item">
@@ -143,6 +148,22 @@ class TeachingToolsManager {
         
         // Setup modal event listeners
         this.setupModalListeners();
+    }
+    
+    // Get counts of tools currently on canvas
+    getToolCounts() {
+        const rulerCount = this.tools.filter(t => t.type === 'ruler').length;
+        const setSquareCount = this.tools.filter(t => t.type === 'setSquare').length;
+        return { rulerCount, setSquareCount };
+    }
+    
+    // Update the current count display in modal
+    updateCurrentCountDisplay() {
+        const counts = this.getToolCounts();
+        const rulerEl = document.getElementById('current-ruler-count');
+        const setSquareEl = document.getElementById('current-set-square-count');
+        if (rulerEl) rulerEl.textContent = counts.rulerCount;
+        if (setSquareEl) setSquareEl.textContent = counts.setSquareCount;
     }
     
     setupModalListeners() {
@@ -233,14 +254,19 @@ class TeachingToolsManager {
     }
     
     handleMouseMove(e) {
+        // Dragging can work with _draggedTool (any tool being dragged)
+        if (this.isDragging && this._draggedTool) {
+            const rect = this.canvas.getBoundingClientRect();
+            this._draggedTool.x = e.clientX - rect.left - this.dragOffset.x;
+            this._draggedTool.y = e.clientY - rect.top - this.dragOffset.y;
+            this.updateToolOverlay(this._draggedTool);
+            return;
+        }
+        
+        // Rotating and resizing only work with selectedTool (double-clicked)
         if (!this.selectedTool) return;
         
-        if (this.isDragging) {
-            const rect = this.canvas.getBoundingClientRect();
-            this.selectedTool.x = e.clientX - rect.left - this.dragOffset.x;
-            this.selectedTool.y = e.clientY - rect.top - this.dragOffset.y;
-            this.updateToolOverlay(this.selectedTool);
-        } else if (this.isRotating) {
+        if (this.isRotating) {
             const rect = this.canvas.getBoundingClientRect();
             const centerX = this.selectedTool.x + this.selectedTool.width / 2;
             const centerY = this.selectedTool.y + this.selectedTool.height / 2;
@@ -334,6 +360,7 @@ class TeachingToolsManager {
             this.isResizing = false;
             this.activeResizeHandle = null;
             this.isInteracting = false;
+            this._draggedTool = null;
         }
     }
     
@@ -380,15 +407,19 @@ class TeachingToolsManager {
         if (this.isDragging) {
             this.isDragging = false;
             this.isInteracting = false;
+            this._draggedTool = null;
         }
     }
     
     showModal() {
-        // Reset counts
+        // Reset counts to add
         this.rulerCount = 1;
         this.setSquareCount = 1;
         document.getElementById('ruler-count-input').value = 1;
         document.getElementById('set-square-count-input').value = 1;
+        
+        // Update current count display
+        this.updateCurrentCountDisplay();
         
         // Update i18n if available
         if (window.i18n && window.i18n.applyTranslations) {
@@ -451,6 +482,13 @@ class TeachingToolsManager {
         overlay.className = 'teaching-tool-overlay';
         overlay.dataset.toolId = tool.id;
         
+        // Add type-specific class for styling (e.g., triangle clip for set square)
+        if (tool.type === 'setSquare') {
+            overlay.classList.add('set-square-tool');
+        } else if (tool.type === 'ruler') {
+            overlay.classList.add('ruler-tool');
+        }
+        
         // Create inner image container
         const imageContainer = document.createElement('div');
         imageContainer.className = 'teaching-tool-image-container';
@@ -504,12 +542,11 @@ class TeachingToolsManager {
     setupToolOverlayEvents(tool, overlay) {
         // Prevent default touch behavior
         overlay.addEventListener('touchstart', (e) => {
-            // Two-finger gesture for pinch zoom
-            if (e.touches.length === 2) {
+            // Two-finger gesture for pinch zoom - only if tool is already selected
+            if (e.touches.length === 2 && this.selectedTool === tool) {
                 e.preventDefault();
                 e.stopPropagation();
                 
-                this.selectTool(tool);
                 this.isInteracting = true;
                 
                 const touch1 = e.touches[0];
@@ -528,14 +565,14 @@ class TeachingToolsManager {
                     initialAngle: Math.atan2(dy, dx)
                 };
             } else if (e.touches.length === 1) {
-                // Single finger drag
+                // Single finger - only drag, don't select for editing
                 if (!e.target.closest('.teaching-tool-resize-handle') &&
                     !e.target.closest('.teaching-tool-rotate-handle') &&
                     !e.target.closest('.teaching-tool-delete-btn')) {
                     
-                    this.selectTool(tool);
                     this.isDragging = true;
                     this.isInteracting = true;
+                    this._draggedTool = tool;
                     
                     const rect = this.canvas.getBoundingClientRect();
                     const touch = e.touches[0];
@@ -546,7 +583,7 @@ class TeachingToolsManager {
         }, { passive: false });
         
         overlay.addEventListener('touchmove', (e) => {
-            if (this.isDragging && e.touches.length === 1) {
+            if (this.isDragging && e.touches.length === 1 && this._draggedTool === tool) {
                 e.preventDefault();
                 const rect = this.canvas.getBoundingClientRect();
                 const touch = e.touches[0];
@@ -556,20 +593,28 @@ class TeachingToolsManager {
             }
         }, { passive: false });
         
-        // Mouse drag
+        // Mouse drag - single click only moves, doesn't select for editing
         overlay.addEventListener('mousedown', (e) => {
+            // If clicking on control handles, only allow if tool is selected
             if (e.target.closest('.teaching-tool-resize-handle') ||
                 e.target.closest('.teaching-tool-rotate-handle') ||
                 e.target.closest('.teaching-tool-delete-btn')) {
+                // Only allow if this tool is already selected
+                if (this.selectedTool !== tool) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
                 return;
             }
             
             e.preventDefault();
             e.stopPropagation();
             
-            this.selectTool(tool);
+            // Single click just drags, doesn't select
             this.isDragging = true;
             this.isInteracting = true;
+            this._draggedTool = tool;
             
             const rect = this.canvas.getBoundingClientRect();
             this.dragOffset.x = e.clientX - rect.left - tool.x;
@@ -582,13 +627,14 @@ class TeachingToolsManager {
             this.selectTool(tool);
         });
         
-        // Resize handles
+        // Resize handles - only work if tool is already selected
         overlay.querySelectorAll('.teaching-tool-resize-handle').forEach(handle => {
             handle.addEventListener('mousedown', (e) => {
+                if (this.selectedTool !== tool) return;
+                
                 e.preventDefault();
                 e.stopPropagation();
                 
-                this.selectTool(tool);
                 this.isResizing = true;
                 this.isInteracting = true;
                 this.activeResizeHandle = handle.dataset.handle;
@@ -603,12 +649,13 @@ class TeachingToolsManager {
             });
         });
         
-        // Rotate handle
+        // Rotate handle - only works if tool is already selected
         overlay.querySelector('.teaching-tool-rotate-handle').addEventListener('mousedown', (e) => {
+            if (this.selectedTool !== tool) return;
+            
             e.preventDefault();
             e.stopPropagation();
             
-            this.selectTool(tool);
             this.isRotating = true;
             this.isInteracting = true;
             
@@ -618,8 +665,10 @@ class TeachingToolsManager {
             this.rotateStart = Math.atan2(e.clientY - rect.top - centerY, e.clientX - rect.left - centerX);
         });
         
-        // Delete button
+        // Delete button - only works if tool is already selected
         overlay.querySelector('.teaching-tool-delete-btn').addEventListener('click', (e) => {
+            if (this.selectedTool !== tool) return;
+            
             e.preventDefault();
             e.stopPropagation();
             this.removeTool(tool);
@@ -640,14 +689,6 @@ class TeachingToolsManager {
         overlay.style.transform = `rotate(${tool.rotation}deg)`;
         overlay.style.transformOrigin = 'center center';
         overlay.style.zIndex = '100';
-        
-        // Update image size
-        const img = overlay.querySelector('.teaching-tool-img');
-        if (img) {
-            img.style.width = '100%';
-            img.style.height = '100%';
-            img.style.objectFit = 'contain';
-        }
         
         // Show/hide controls based on selection
         const isSelected = this.selectedTool === tool;

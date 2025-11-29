@@ -346,6 +346,7 @@ window.translations = {
         setSquare: 'Escuadra',
         hint: 'Sugerencia: Doble clic para cambiar tamaño, rotar o eliminar',
         insertHint: 'Seleccione la cantidad de herramientas a insertar',
+        currentOnCanvas: 'Cantidad actual en el lienzo',
         rotate: 'Rotar',
         resize: 'Cambiar tamaño',
         delete: 'Eliminar',
