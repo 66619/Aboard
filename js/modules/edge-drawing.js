@@ -4,6 +4,9 @@
  * When the pen touches the edge of a ruler or set square, it constrains drawing to that edge
  */
 
+// Default edge tolerance in pixels for detecting edge proximity
+const DEFAULT_EDGE_TOLERANCE = 15;
+
 class EdgeDrawingManager {
     constructor(teachingToolsManager, drawingEngine) {
         this.teachingToolsManager = teachingToolsManager;
@@ -13,7 +16,7 @@ class EdgeDrawingManager {
         this.isSnappedToEdge = false;
         this.snappedTool = null;
         this.snappedEdge = null;
-        this.edgeTolerance = 15; // Pixels distance to detect edge proximity
+        this.edgeTolerance = DEFAULT_EDGE_TOLERANCE;
     }
     
     /**

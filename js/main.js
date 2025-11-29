@@ -36,7 +36,6 @@ class DrawingBoard {
         
         // Canvas fit scale - calculated once on init and window resize
         this.canvasFitScale = 1.0;
-        this.canvasFitScale = 1.0;
         
         // Pagination
         this.currentPage = 1;
