@@ -230,12 +230,16 @@ class TeachingToolsManager {
                 image: this.rulerImage
             });
         } else if (type === 'setSquare') {
+            // Set square aspect ratio is √3:1 (width:height)
+            // For a 30-60-90 triangle, width = √3 × height
+            const setSquareHeight = 100;
+            const setSquareWidth = Math.round(setSquareHeight * Math.sqrt(3));
             this.addTool({
                 type: 'setSquare',
-                x: centerX - 75 + Math.random() * 50,
-                y: centerY - 75 + Math.random() * 50,
-                width: 150,
-                height: 150,
+                x: centerX - setSquareWidth / 2 + Math.random() * 50,
+                y: centerY - setSquareHeight / 2 + Math.random() * 50,
+                width: setSquareWidth,
+                height: setSquareHeight,
                 rotation: 0,
                 image: this.setSquareImage
             });
@@ -553,15 +557,18 @@ class TeachingToolsManager {
         }
         
         // Insert set squares
+        // Set square aspect ratio is √3:1 (width:height)
+        const setSquareHeight = 100;
+        const setSquareWidth = Math.round(setSquareHeight * Math.sqrt(3));
         for (let i = 0; i < this.setSquareCount; i++) {
             const offsetX = (i - this.setSquareCount / 2) * 50;
             const offsetY = (i - this.setSquareCount / 2) * 30;
             this.addTool({
                 type: 'setSquare',
-                x: centerX - 75 + offsetX,
+                x: centerX - setSquareWidth / 2 + offsetX,
                 y: centerY + 50 + offsetY,
-                width: 150,
-                height: 150,
+                width: setSquareWidth,
+                height: setSquareHeight,
                 rotation: 0,
                 image: this.setSquareImage
             });

@@ -31,7 +31,11 @@ class DrawingBoard {
         this.exportManager = new ExportManager(this.canvas, this.bgCanvas, this);
         this.teachingToolsManager = new TeachingToolsManager(this.canvas, this.ctx, this.historyManager);
         
+        // Initialize edge drawing manager for teaching tools
+        this.edgeDrawingManager = new EdgeDrawingManager(this.teachingToolsManager, this.drawingEngine);
+        
         // Canvas fit scale - calculated once on init and window resize
+        this.canvasFitScale = 1.0;
         this.canvasFitScale = 1.0;
         
         // Pagination
@@ -68,6 +72,9 @@ class DrawingBoard {
         
         // Uploaded images storage
         this.uploadedImages = this.loadUploadedImages();
+        
+        // Connect edge drawing manager to drawing engine
+        this.drawingEngine.setEdgeDrawingManager(this.edgeDrawingManager);
         
         // Initialize
         this.resizeCanvas();
@@ -2143,7 +2150,6 @@ class DrawingBoard {
             const newScale = Math.max(0.5, Math.min(5.0, this.drawingEngine.canvasScale * scale));
             
             this.drawingEngine.canvasScale = newScale;
-            this.applyZoom(false); // Don't update config-area scale on zoom
             this.updateZoomUI();
             localStorage.setItem('canvasScale', newScale);
             
@@ -2157,10 +2163,8 @@ class DrawingBoard {
             localStorage.setItem('panOffsetX', this.drawingEngine.panOffset.x);
             localStorage.setItem('panOffsetY', this.drawingEngine.panOffset.y);
             
-            // Apply visual pan and zoom effect
-            const transform = `scale(${this.drawingEngine.canvasScale}) translate(${this.drawingEngine.panOffset.x}px, ${this.drawingEngine.panOffset.y}px)`;
-            this.canvas.style.transform = transform;
-            this.bgCanvas.style.transform = transform;
+            // Apply zoom using applyZoom for consistency
+            this.applyZoom(false);
         }
         
         this.lastPinchDistance = currentDistance;
@@ -2190,16 +2194,17 @@ class DrawingBoard {
         // Apply pan offset using CSS transform for better performance
         const panX = this.drawingEngine.panOffset.x;
         const panY = this.drawingEngine.panOffset.y;
-        const scale = this.drawingEngine.canvasScale;
+        // Use the combined fit scale and user zoom scale
+        const finalScale = this.canvasFitScale * this.drawingEngine.canvasScale;
         
         if (!this.settingsManager.infiniteCanvas) {
             // In paginated mode, combine translate and scale
-            const transform = `translate(-50%, -50%) translate(${panX}px, ${panY}px) scale(${scale})`;
+            const transform = `translate(-50%, -50%) translate(${panX}px, ${panY}px) scale(${finalScale})`;
             this.canvas.style.transform = transform;
             this.bgCanvas.style.transform = transform;
         } else {
             // In infinite mode, combine translate and scale
-            const transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+            const transform = `translate(${panX}px, ${panY}px) scale(${finalScale})`;
             this.canvas.style.transform = transform;
             this.bgCanvas.style.transform = transform;
         }

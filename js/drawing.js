@@ -19,6 +19,10 @@ class DrawingEngine {
         this.points = [];
         this.lastPoint = null;
         
+        // Edge drawing support
+        this.edgeDrawingManager = null;
+        this.isSnappedToEdge = false;
+        
         // Stroke storage for selection
         this.strokes = [];
         this.selectedStrokeIndex = null;
@@ -33,6 +37,13 @@ class DrawingEngine {
         };
         this.isPanning = false;
         this.lastPanPoint = null;
+    }
+    
+    /**
+     * Set the edge drawing manager for snapping to teaching tool edges
+     */
+    setEdgeDrawingManager(edgeDrawingManager) {
+        this.edgeDrawingManager = edgeDrawingManager;
     }
     
     getPosition(e) {
@@ -98,7 +109,24 @@ class DrawingEngine {
     
     startDrawing(e) {
         this.isDrawing = true;
-        const pos = this.getPosition(e);
+        let pos = this.getPosition(e);
+        
+        // Check for edge snapping when pen tool is active
+        if (this.currentTool === 'pen' && this.edgeDrawingManager) {
+            const processed = this.edgeDrawingManager.processDrawingPoint(pos.x, pos.y);
+            if (processed.blocked) {
+                // Point is inside a tool, don't draw
+                this.isDrawing = false;
+                return;
+            }
+            if (processed.snapped) {
+                pos = { x: processed.x, y: processed.y };
+                this.isSnappedToEdge = true;
+            } else {
+                this.isSnappedToEdge = false;
+            }
+        }
+        
         this.points = [pos];
         this.lastPoint = pos;
         
@@ -113,7 +141,22 @@ class DrawingEngine {
     draw(e) {
         if (!this.isDrawing) return;
         
-        const pos = this.getPosition(e);
+        let pos = this.getPosition(e);
+        
+        // Check for edge snapping when pen tool is active
+        if (this.currentTool === 'pen' && this.edgeDrawingManager) {
+            const processed = this.edgeDrawingManager.processDrawingPoint(pos.x, pos.y);
+            if (processed.blocked) {
+                // Point is inside a tool, don't draw this segment
+                return;
+            }
+            if (processed.snapped) {
+                pos = { x: processed.x, y: processed.y };
+                this.isSnappedToEdge = true;
+            } else {
+                this.isSnappedToEdge = false;
+            }
+        }
         
         if (this.lastPoint && 
             Math.abs(pos.x - this.lastPoint.x) < 0.5 && 
@@ -142,6 +185,12 @@ class DrawingEngine {
     stopDrawing() {
         if (this.isDrawing) {
             this.isDrawing = false;
+            this.isSnappedToEdge = false;
+            
+            // Reset edge drawing state
+            if (this.edgeDrawingManager) {
+                this.edgeDrawingManager.resetSnapping();
+            }
             
             // Save the stroke if it has points
             if (this.points.length > 0) {
