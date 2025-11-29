@@ -343,7 +343,11 @@ window.translations = {
     teachingTools: {
         title: 'Outils pédagogiques',
         ruler: 'Règle',
+        rulerStyle1: 'Règle 1',
+        rulerStyle2: 'Règle 2',
         setSquare: 'Équerre',
+        setSquare60: 'Équerre 60°',
+        setSquare45: 'Équerre 45°',
         hint: 'Astuce : Clic simple pour déplacer, double-clic pour redimensionner, pivoter ou supprimer',
         insertHint: 'Sélectionnez le nombre d\'outils à insérer',
         currentOnCanvas: 'Nombre actuel sur le canevas',

@@ -343,7 +343,11 @@ window.translations = {
     teachingTools: {
         title: 'Herramientas didácticas',
         ruler: 'Regla',
+        rulerStyle1: 'Regla 1',
+        rulerStyle2: 'Regla 2',
         setSquare: 'Escuadra',
+        setSquare60: 'Escuadra 60°',
+        setSquare45: 'Escuadra 45°',
         hint: 'Sugerencia: Clic simple para mover, doble clic para cambiar tamaño, rotar o eliminar',
         insertHint: 'Seleccione la cantidad de herramientas a insertar',
         currentOnCanvas: 'Cantidad actual en el lienzo',

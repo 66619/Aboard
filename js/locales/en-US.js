@@ -353,7 +353,11 @@ window.translations = {
     teachingTools: {
         title: 'Teaching Tools',
         ruler: 'Ruler',
+        rulerStyle1: 'Ruler 1',
+        rulerStyle2: 'Ruler 2',
         setSquare: 'Set Square',
+        setSquare60: 'Set Square 60°',
+        setSquare45: 'Set Square 45°',
         hint: 'Hint: Single-click to move, double-click to resize, rotate, or delete',
         insertHint: 'Select the number of tools to insert',
         currentOnCanvas: 'Current on canvas',
