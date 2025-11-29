@@ -36,6 +36,7 @@ window.translations = {
         eraser: 'Gomme',
         clear: 'Effacer',
         background: 'Arrière-plan',
+        teachingTools: 'Outils',
         more: 'Plus',
         settings: 'Paramètres',
         export: 'Exporter le canevas',
@@ -336,6 +337,21 @@ window.translations = {
         title: 'Fonctionnalités',
         time: 'Heure',
         timer: 'Minuteur'
+    },
+
+    // Teaching Tools
+    teachingTools: {
+        title: 'Outils pédagogiques',
+        ruler: 'Règle',
+        setSquare: 'Équerre',
+        hint: 'Astuce : Clic simple pour déplacer, double-clic pour redimensionner, pivoter ou supprimer',
+        insertHint: 'Sélectionnez le nombre d\'outils à insérer',
+        currentOnCanvas: 'Nombre actuel sur le canevas',
+        addNew: 'Ajouter nouveau',
+        rotate: 'Pivoter',
+        resize: 'Redimensionner',
+        delete: 'Supprimer',
+        drawAlongEdge: 'Tracer le long du bord'
     },
 
     // Time Display
