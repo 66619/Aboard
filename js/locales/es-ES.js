@@ -344,6 +344,7 @@ window.translations = {
         title: 'Herramientas didácticas',
         ruler: 'Regla',
         setSquare: 'Escuadra',
+        hint: 'Sugerencia: Doble clic para cambiar tamaño, rotar o eliminar',
         insertHint: 'Seleccione la cantidad de herramientas a insertar',
         rotate: 'Rotar',
         resize: 'Cambiar tamaño',

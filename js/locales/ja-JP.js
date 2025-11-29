@@ -339,6 +339,7 @@ window.translations = {
         title: '教具',
         ruler: '定規',
         setSquare: '三角定規',
+        hint: 'ヒント：ダブルクリックでサイズ変更、回転、削除',
         insertHint: '挿入する教具の数を選択',
         rotate: '回転',
         resize: 'サイズ変更',

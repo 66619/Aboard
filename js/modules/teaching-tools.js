@@ -13,9 +13,23 @@ class TeachingToolsManager {
         this.isDragging = false;
         this.isRotating = false;
         this.isResizing = false;
+        this.activeResizeHandle = null;
         this.dragOffset = { x: 0, y: 0 };
         this.rotateStart = 0;
-        this.resizeStart = { width: 0, height: 0 };
+        this.resizeStart = { width: 0, height: 0, x: 0, y: 0 };
+        
+        // Flag to prevent drawing while interacting with tools
+        this.isInteracting = false;
+        
+        // Touch/pinch state for tools
+        this.toolPinchState = {
+            active: false,
+            initialDistance: 0,
+            initialWidth: 0,
+            initialHeight: 0,
+            initialRotation: 0,
+            initialAngle: 0
+        };
         
         // Tool images
         this.rulerImage = null;
@@ -31,7 +45,6 @@ class TeachingToolsManager {
         
         this.loadImages();
         this.createModal();
-        this.createControlOverlay();
         this.setupEventListeners();
     }
     
@@ -47,12 +60,12 @@ class TeachingToolsManager {
         this.rulerImage = new Image();
         this.rulerImage.onload = checkLoaded;
         this.rulerImage.onerror = () => console.error('Failed to load ruler image');
-        this.rulerImage.src = 'img/ruler_1.svg';
+        this.rulerImage.src = 'img/ruler_1.png';
         
         this.setSquareImage = new Image();
         this.setSquareImage.onload = checkLoaded;
         this.setSquareImage.onerror = () => console.error('Failed to load set square image');
-        this.setSquareImage.src = 'img/set_square_1.svg';
+        this.setSquareImage.src = 'img/set_square_1.png';
     }
     
     createModal() {
@@ -72,48 +85,53 @@ class TeachingToolsManager {
                     </button>
                 </div>
                 <div class="teaching-tools-body">
-                    <!-- Ruler Section -->
-                    <div class="teaching-tool-item">
-                        <div class="teaching-tool-preview">
-                            <img src="img/ruler_1.svg" alt="Ruler" class="teaching-tool-image">
+                    <div class="teaching-tools-row">
+                        <!-- Ruler Section -->
+                        <div class="teaching-tool-item">
+                            <div class="teaching-tool-preview">
+                                <img src="img/ruler_1.png" alt="Ruler" class="teaching-tool-image">
+                            </div>
+                            <div class="teaching-tool-label" data-i18n="teachingTools.ruler">直尺</div>
+                            <div class="teaching-tool-counter">
+                                <button class="counter-btn minus-btn" data-tool="ruler" data-action="minus">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                </button>
+                                <input type="number" id="ruler-count-input" class="counter-input" value="1" min="0" max="10">
+                                <button class="counter-btn plus-btn" data-tool="ruler" data-action="plus">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
-                        <div class="teaching-tool-label" data-i18n="teachingTools.ruler">直尺</div>
-                        <div class="teaching-tool-counter">
-                            <button class="counter-btn minus-btn" data-tool="ruler" data-action="minus">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                </svg>
-                            </button>
-                            <input type="number" id="ruler-count-input" class="counter-input" value="1" min="0" max="10">
-                            <button class="counter-btn plus-btn" data-tool="ruler" data-action="plus">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                </svg>
-                            </button>
+                        
+                        <!-- Set Square Section -->
+                        <div class="teaching-tool-item">
+                            <div class="teaching-tool-preview">
+                                <img src="img/set_square_1.png" alt="Set Square" class="teaching-tool-image set-square-image">
+                            </div>
+                            <div class="teaching-tool-label" data-i18n="teachingTools.setSquare">三角板</div>
+                            <div class="teaching-tool-counter">
+                                <button class="counter-btn minus-btn" data-tool="setSquare" data-action="minus">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                </button>
+                                <input type="number" id="set-square-count-input" class="counter-input" value="1" min="0" max="10">
+                                <button class="counter-btn plus-btn" data-tool="setSquare" data-action="plus">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    
-                    <!-- Set Square Section -->
-                    <div class="teaching-tool-item">
-                        <div class="teaching-tool-preview">
-                            <img src="img/set_square_1.svg" alt="Set Square" class="teaching-tool-image set-square-image">
-                        </div>
-                        <div class="teaching-tool-label" data-i18n="teachingTools.setSquare">三角板</div>
-                        <div class="teaching-tool-counter">
-                            <button class="counter-btn minus-btn" data-tool="setSquare" data-action="minus">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                </svg>
-                            </button>
-                            <input type="number" id="set-square-count-input" class="counter-input" value="1" min="0" max="10">
-                            <button class="counter-btn plus-btn" data-tool="setSquare" data-action="plus">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                </svg>
-                            </button>
-                        </div>
+                    <div class="teaching-tools-hint">
+                        <span data-i18n="teachingTools.hint">提示：双击教具可调整大小、旋转和删除</span>
                     </div>
                 </div>
                 <div class="teaching-tools-footer">
@@ -187,144 +205,182 @@ class TeachingToolsManager {
         });
     }
     
-    createControlOverlay() {
-        // Create control overlay for selected tool
-        const overlay = document.createElement('div');
-        overlay.id = 'teaching-tool-controls';
-        overlay.className = 'teaching-tool-controls';
-        overlay.style.display = 'none';
-        overlay.innerHTML = `
-            <div class="teaching-tool-control-handle rotate-handle" title="旋转">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                    <path d="M3 3v5h5"></path>
-                    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
-                    <path d="M21 21v-5h-5"></path>
-                </svg>
-            </div>
-            <div class="teaching-tool-control-handle resize-handle" title="调整大小">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="15 3 21 3 21 9"></polyline>
-                    <polyline points="9 21 3 21 3 15"></polyline>
-                    <line x1="21" y1="3" x2="14" y2="10"></line>
-                    <line x1="3" y1="21" x2="10" y2="14"></line>
-                </svg>
-            </div>
-            <div class="teaching-tool-control-handle delete-handle" title="删除">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
-                </svg>
-            </div>
-        `;
-        document.body.appendChild(overlay);
-        this.controlOverlay = overlay;
-        
-        // Setup control event listeners
-        this.setupControlListeners();
-    }
-    
-    setupControlListeners() {
-        const overlay = this.controlOverlay;
-        
-        // Delete handle
-        overlay.querySelector('.delete-handle').addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (this.selectedTool) {
-                this.removeTool(this.selectedTool);
-            }
-        });
-        
-        // Rotate handle
-        overlay.querySelector('.rotate-handle').addEventListener('mousedown', (e) => {
-            e.stopPropagation();
-            if (this.selectedTool) {
-                this.isRotating = true;
-                const rect = this.canvas.getBoundingClientRect();
-                const centerX = this.selectedTool.x + this.selectedTool.width / 2;
-                const centerY = this.selectedTool.y + this.selectedTool.height / 2;
-                this.rotateStart = Math.atan2(e.clientY - rect.top - centerY, e.clientX - rect.left - centerX);
-            }
-        });
-        
-        // Resize handle
-        overlay.querySelector('.resize-handle').addEventListener('mousedown', (e) => {
-            e.stopPropagation();
-            if (this.selectedTool) {
-                this.isResizing = true;
-                this.resizeStart = {
-                    width: this.selectedTool.width,
-                    height: this.selectedTool.height,
-                    mouseX: e.clientX,
-                    mouseY: e.clientY
-                };
-            }
-        });
-    }
-    
     setupEventListeners() {
-        // Double-click to show controls
-        this.canvas.addEventListener('dblclick', (e) => {
+        // Store bound handlers for cleanup
+        this._boundHandlers = {
+            mouseMove: (e) => this.handleMouseMove(e),
+            mouseUp: (e) => this.handleMouseUp(e),
+            touchMove: (e) => this.handleTouchMove(e),
+            touchEnd: (e) => this.handleTouchEnd(e),
+            click: (e) => {
+                if (!e.target.closest('#teaching-tools-modal') &&
+                    !e.target.closest('.teaching-tool-overlay')) {
+                    this.deselectTool();
+                }
+            }
+        };
+        
+        // Mouse events for dragging/resizing tools
+        document.addEventListener('mousemove', this._boundHandlers.mouseMove);
+        document.addEventListener('mouseup', this._boundHandlers.mouseUp);
+        
+        // Touch events for pinch zoom on tools
+        document.addEventListener('touchmove', this._boundHandlers.touchMove, { passive: false });
+        document.addEventListener('touchend', this._boundHandlers.touchEnd);
+        
+        // Click outside to deselect
+        document.addEventListener('click', this._boundHandlers.click);
+    }
+    
+    handleMouseMove(e) {
+        if (!this.selectedTool) return;
+        
+        if (this.isDragging) {
             const rect = this.canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const tool = this.getToolAtPosition(x, y);
-            if (tool) {
-                this.selectTool(tool);
-                this.showControls();
-            }
-        });
+            this.selectedTool.x = e.clientX - rect.left - this.dragOffset.x;
+            this.selectedTool.y = e.clientY - rect.top - this.dragOffset.y;
+            this.updateToolOverlay(this.selectedTool);
+        } else if (this.isRotating) {
+            const rect = this.canvas.getBoundingClientRect();
+            const centerX = this.selectedTool.x + this.selectedTool.width / 2;
+            const centerY = this.selectedTool.y + this.selectedTool.height / 2;
+            const angle = Math.atan2(e.clientY - rect.top - centerY, e.clientX - rect.left - centerX);
+            this.selectedTool.rotation += (angle - this.rotateStart) * (180 / Math.PI);
+            this.rotateStart = angle;
+            this.updateToolOverlay(this.selectedTool);
+        } else if (this.isResizing && this.activeResizeHandle) {
+            this.handleResize(e);
+        }
+    }
+    
+    handleResize(e) {
+        const rect = this.canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        const tool = this.selectedTool;
+        const handle = this.activeResizeHandle;
         
-        // Mouse events for dragging tools
-        document.addEventListener('mousemove', (e) => {
-            if (this.isDragging && this.selectedTool) {
-                const rect = this.canvas.getBoundingClientRect();
-                this.selectedTool.x = e.clientX - rect.left - this.dragOffset.x;
-                this.selectedTool.y = e.clientY - rect.top - this.dragOffset.y;
-                this.updateControlPosition();
-                this.redrawTools();
-            } else if (this.isRotating && this.selectedTool) {
-                const rect = this.canvas.getBoundingClientRect();
-                const centerX = this.selectedTool.x + this.selectedTool.width / 2;
-                const centerY = this.selectedTool.y + this.selectedTool.height / 2;
-                const angle = Math.atan2(e.clientY - rect.top - centerY, e.clientX - rect.left - centerX);
-                this.selectedTool.rotation += (angle - this.rotateStart) * (180 / Math.PI);
-                this.rotateStart = angle;
-                this.updateControlPosition();
-                this.redrawTools();
-            } else if (this.isResizing && this.selectedTool) {
-                const deltaX = e.clientX - this.resizeStart.mouseX;
-                const deltaY = e.clientY - this.resizeStart.mouseY;
-                const scale = 1 + (deltaX + deltaY) / 200;
-                this.selectedTool.width = Math.max(50, this.resizeStart.width * scale);
-                this.selectedTool.height = Math.max(50, this.resizeStart.height * scale);
-                this.updateControlPosition();
-                this.redrawTools();
-            }
-        });
+        // Get the center of the tool for rotation calculations
+        const centerX = this.resizeStart.x + this.resizeStart.width / 2;
+        const centerY = this.resizeStart.y + this.resizeStart.height / 2;
         
-        document.addEventListener('mouseup', () => {
+        // Transform mouse position to local coordinate space (accounting for rotation)
+        const localMouse = this.rotatePoint(mouseX, mouseY, centerX, centerY, -tool.rotation);
+        
+        let newX = tool.x;
+        let newY = tool.y;
+        let newWidth = tool.width;
+        let newHeight = tool.height;
+        
+        // Prevent division by zero
+        if (this.resizeStart.height === 0) return;
+        const aspectRatio = this.resizeStart.width / this.resizeStart.height;
+        
+        switch (handle) {
+            case 'nw':
+                newWidth = this.resizeStart.x + this.resizeStart.width - localMouse.x;
+                newHeight = newWidth / aspectRatio;
+                newX = this.resizeStart.x + this.resizeStart.width - newWidth;
+                newY = this.resizeStart.y + this.resizeStart.height - newHeight;
+                break;
+            case 'ne':
+                newWidth = localMouse.x - this.resizeStart.x;
+                newHeight = newWidth / aspectRatio;
+                newY = this.resizeStart.y + this.resizeStart.height - newHeight;
+                break;
+            case 'sw':
+                newWidth = this.resizeStart.x + this.resizeStart.width - localMouse.x;
+                newHeight = newWidth / aspectRatio;
+                newX = this.resizeStart.x + this.resizeStart.width - newWidth;
+                break;
+            case 'se':
+                newWidth = localMouse.x - this.resizeStart.x;
+                newHeight = newWidth / aspectRatio;
+                break;
+            case 'n':
+                newHeight = this.resizeStart.y + this.resizeStart.height - localMouse.y;
+                newY = this.resizeStart.y + this.resizeStart.height - newHeight;
+                break;
+            case 's':
+                newHeight = localMouse.y - this.resizeStart.y;
+                break;
+            case 'w':
+                newWidth = this.resizeStart.x + this.resizeStart.width - localMouse.x;
+                newX = this.resizeStart.x + this.resizeStart.width - newWidth;
+                break;
+            case 'e':
+                newWidth = localMouse.x - this.resizeStart.x;
+                break;
+        }
+        
+        // Apply minimum size constraints
+        const minSize = 30;
+        if (newWidth >= minSize) {
+            tool.width = newWidth;
+            tool.x = newX;
+        }
+        if (newHeight >= minSize) {
+            tool.height = newHeight;
+            tool.y = newY;
+        }
+        
+        this.updateToolOverlay(tool);
+    }
+    
+    handleMouseUp(e) {
+        if (this.isDragging || this.isRotating || this.isResizing) {
             this.isDragging = false;
             this.isRotating = false;
             this.isResizing = false;
-        });
+            this.activeResizeHandle = null;
+            this.isInteracting = false;
+        }
+    }
+    
+    handleTouchMove(e) {
+        if (!this.selectedTool) return;
         
-        // Click outside to deselect
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('#teaching-tool-controls') && 
-                !e.target.closest('#teaching-tools-modal') &&
-                !e.target.closest('.teaching-tool-overlay')) {
-                // Check if clicking on a tool
-                const rect = this.canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const tool = this.getToolAtPosition(x, y);
-                if (!tool) {
-                    this.hideControls();
-                }
-            }
-        });
+        // Handle pinch zoom for teaching tools
+        if (e.touches.length === 2 && this.toolPinchState.active) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const touch1 = e.touches[0];
+            const touch2 = e.touches[1];
+            
+            // Calculate current distance and angle
+            const dx = touch2.clientX - touch1.clientX;
+            const dy = touch2.clientY - touch1.clientY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx);
+            
+            // Prevent division by zero
+            if (this.toolPinchState.initialDistance < 1) return;
+            
+            // Calculate scale factor
+            const scale = distance / this.toolPinchState.initialDistance;
+            
+            // Apply scale to tool dimensions
+            this.selectedTool.width = this.toolPinchState.initialWidth * scale;
+            this.selectedTool.height = this.toolPinchState.initialHeight * scale;
+            
+            // Apply rotation
+            const angleDiff = (angle - this.toolPinchState.initialAngle) * (180 / Math.PI);
+            this.selectedTool.rotation = this.toolPinchState.initialRotation + angleDiff;
+            
+            this.updateToolOverlay(this.selectedTool);
+        }
+    }
+    
+    handleTouchEnd(e) {
+        if (this.toolPinchState.active) {
+            this.toolPinchState.active = false;
+            this.isInteracting = false;
+        }
+        if (this.isDragging) {
+            this.isDragging = false;
+            this.isInteracting = false;
+        }
     }
     
     showModal() {
@@ -394,35 +450,180 @@ class TeachingToolsManager {
         const overlay = document.createElement('div');
         overlay.className = 'teaching-tool-overlay';
         overlay.dataset.toolId = tool.id;
-        overlay.style.cssText = `
-            position: fixed;
-            cursor: move;
-            z-index: 100;
-            pointer-events: auto;
+        
+        // Create inner image container
+        const imageContainer = document.createElement('div');
+        imageContainer.className = 'teaching-tool-image-container';
+        
+        // Create the image element
+        const img = document.createElement('img');
+        img.src = tool.image.src;
+        img.className = 'teaching-tool-img';
+        img.draggable = false;
+        imageContainer.appendChild(img);
+        overlay.appendChild(imageContainer);
+        
+        // Create Word-style resize handles (8 handles)
+        const handles = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
+        handles.forEach(pos => {
+            const handle = document.createElement('div');
+            handle.className = `teaching-tool-resize-handle handle-${pos}`;
+            handle.dataset.handle = pos;
+            overlay.appendChild(handle);
+        });
+        
+        // Create rotate handle
+        const rotateHandle = document.createElement('div');
+        rotateHandle.className = 'teaching-tool-rotate-handle';
+        rotateHandle.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+            </svg>
         `;
+        overlay.appendChild(rotateHandle);
+        
+        // Create delete button
+        const deleteBtn = document.createElement('div');
+        deleteBtn.className = 'teaching-tool-delete-btn';
+        deleteBtn.innerHTML = `
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        `;
+        overlay.appendChild(deleteBtn);
         
         this.updateToolOverlay(tool, overlay);
+        this.setupToolOverlayEvents(tool, overlay);
         
-        // Drag events
+        document.body.appendChild(overlay);
+        tool.overlay = overlay;
+    }
+    
+    setupToolOverlayEvents(tool, overlay) {
+        // Prevent default touch behavior
+        overlay.addEventListener('touchstart', (e) => {
+            // Two-finger gesture for pinch zoom
+            if (e.touches.length === 2) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                this.selectTool(tool);
+                this.isInteracting = true;
+                
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                const dx = touch2.clientX - touch1.clientX;
+                const dy = touch2.clientY - touch1.clientY;
+                const initialDistance = Math.sqrt(dx * dx + dy * dy);
+                
+                // Ensure minimum distance to prevent division by zero
+                this.toolPinchState = {
+                    active: true,
+                    initialDistance: Math.max(initialDistance, 1),
+                    initialWidth: tool.width,
+                    initialHeight: tool.height,
+                    initialRotation: tool.rotation,
+                    initialAngle: Math.atan2(dy, dx)
+                };
+            } else if (e.touches.length === 1) {
+                // Single finger drag
+                if (!e.target.closest('.teaching-tool-resize-handle') &&
+                    !e.target.closest('.teaching-tool-rotate-handle') &&
+                    !e.target.closest('.teaching-tool-delete-btn')) {
+                    
+                    this.selectTool(tool);
+                    this.isDragging = true;
+                    this.isInteracting = true;
+                    
+                    const rect = this.canvas.getBoundingClientRect();
+                    const touch = e.touches[0];
+                    this.dragOffset.x = touch.clientX - rect.left - tool.x;
+                    this.dragOffset.y = touch.clientY - rect.top - tool.y;
+                }
+            }
+        }, { passive: false });
+        
+        overlay.addEventListener('touchmove', (e) => {
+            if (this.isDragging && e.touches.length === 1) {
+                e.preventDefault();
+                const rect = this.canvas.getBoundingClientRect();
+                const touch = e.touches[0];
+                tool.x = touch.clientX - rect.left - this.dragOffset.x;
+                tool.y = touch.clientY - rect.top - this.dragOffset.y;
+                this.updateToolOverlay(tool);
+            }
+        }, { passive: false });
+        
+        // Mouse drag
         overlay.addEventListener('mousedown', (e) => {
-            if (e.target.closest('.teaching-tool-control-handle')) return;
+            if (e.target.closest('.teaching-tool-resize-handle') ||
+                e.target.closest('.teaching-tool-rotate-handle') ||
+                e.target.closest('.teaching-tool-delete-btn')) {
+                return;
+            }
+            
+            e.preventDefault();
+            e.stopPropagation();
             
             this.selectTool(tool);
             this.isDragging = true;
+            this.isInteracting = true;
+            
             const rect = this.canvas.getBoundingClientRect();
             this.dragOffset.x = e.clientX - rect.left - tool.x;
             this.dragOffset.y = e.clientY - rect.top - tool.y;
         });
         
-        // Double-click to show controls
+        // Double-click to select and show controls
         overlay.addEventListener('dblclick', (e) => {
             e.stopPropagation();
             this.selectTool(tool);
-            this.showControls();
         });
         
-        document.body.appendChild(overlay);
-        tool.overlay = overlay;
+        // Resize handles
+        overlay.querySelectorAll('.teaching-tool-resize-handle').forEach(handle => {
+            handle.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                this.selectTool(tool);
+                this.isResizing = true;
+                this.isInteracting = true;
+                this.activeResizeHandle = handle.dataset.handle;
+                this.resizeStart = {
+                    width: tool.width,
+                    height: tool.height,
+                    x: tool.x,
+                    y: tool.y,
+                    mouseX: e.clientX,
+                    mouseY: e.clientY
+                };
+            });
+        });
+        
+        // Rotate handle
+        overlay.querySelector('.teaching-tool-rotate-handle').addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            this.selectTool(tool);
+            this.isRotating = true;
+            this.isInteracting = true;
+            
+            const rect = this.canvas.getBoundingClientRect();
+            const centerX = tool.x + tool.width / 2;
+            const centerY = tool.y + tool.height / 2;
+            this.rotateStart = Math.atan2(e.clientY - rect.top - centerY, e.clientX - rect.left - centerX);
+        });
+        
+        // Delete button
+        overlay.querySelector('.teaching-tool-delete-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.removeTool(tool);
+        });
     }
     
     updateToolOverlay(tool, overlay = null) {
@@ -431,16 +632,26 @@ class TeachingToolsManager {
         
         const canvasRect = this.canvas.getBoundingClientRect();
         
+        overlay.style.position = 'fixed';
         overlay.style.left = (canvasRect.left + tool.x) + 'px';
         overlay.style.top = (canvasRect.top + tool.y) + 'px';
         overlay.style.width = tool.width + 'px';
         overlay.style.height = tool.height + 'px';
         overlay.style.transform = `rotate(${tool.rotation}deg)`;
         overlay.style.transformOrigin = 'center center';
-        overlay.style.backgroundImage = `url(${tool.image.src})`;
-        overlay.style.backgroundSize = 'contain';
-        overlay.style.backgroundRepeat = 'no-repeat';
-        overlay.style.backgroundPosition = 'center';
+        overlay.style.zIndex = '100';
+        
+        // Update image size
+        const img = overlay.querySelector('.teaching-tool-img');
+        if (img) {
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'contain';
+        }
+        
+        // Show/hide controls based on selection
+        const isSelected = this.selectedTool === tool;
+        overlay.classList.toggle('selected', isSelected);
     }
     
     removeTool(tool) {
@@ -451,14 +662,28 @@ class TeachingToolsManager {
                 tool.overlay.remove();
             }
         }
-        this.hideControls();
-        this.selectedTool = null;
+        if (this.selectedTool === tool) {
+            this.selectedTool = null;
+        }
         this.redrawTools();
     }
     
     selectTool(tool) {
+        // Deselect previous tool
+        if (this.selectedTool && this.selectedTool !== tool) {
+            this.selectedTool.overlay?.classList.remove('selected');
+        }
         this.selectedTool = tool;
-        this.updateControlPosition();
+        if (tool.overlay) {
+            tool.overlay.classList.add('selected');
+        }
+    }
+    
+    deselectTool() {
+        if (this.selectedTool) {
+            this.selectedTool.overlay?.classList.remove('selected');
+            this.selectedTool = null;
+        }
     }
     
     // Helper function to rotate a point around a center
@@ -492,32 +717,6 @@ class TeachingToolsManager {
             }
         }
         return null;
-    }
-    
-    showControls() {
-        if (this.selectedTool && this.controlOverlay) {
-            this.controlOverlay.style.display = 'flex';
-            this.updateControlPosition();
-        }
-    }
-    
-    hideControls() {
-        if (this.controlOverlay) {
-            this.controlOverlay.style.display = 'none';
-        }
-        this.selectedTool = null;
-    }
-    
-    updateControlPosition() {
-        if (!this.selectedTool || !this.controlOverlay) return;
-        
-        const tool = this.selectedTool;
-        const canvasRect = this.canvas.getBoundingClientRect();
-        
-        // Position controls above the tool
-        this.controlOverlay.style.left = (canvasRect.left + tool.x + tool.width / 2) + 'px';
-        this.controlOverlay.style.top = (canvasRect.top + tool.y - 40) + 'px';
-        this.controlOverlay.style.transform = 'translateX(-50%)';
     }
     
     redrawTools() {
@@ -582,6 +781,15 @@ class TeachingToolsManager {
     
     // Clean up when destroyed
     destroy() {
+        // Remove event listeners
+        if (this._boundHandlers) {
+            document.removeEventListener('mousemove', this._boundHandlers.mouseMove);
+            document.removeEventListener('mouseup', this._boundHandlers.mouseUp);
+            document.removeEventListener('touchmove', this._boundHandlers.touchMove);
+            document.removeEventListener('touchend', this._boundHandlers.touchEnd);
+            document.removeEventListener('click', this._boundHandlers.click);
+        }
+        
         // Remove all tool overlays
         this.tools.forEach(tool => {
             if (tool.overlay) {
@@ -589,11 +797,6 @@ class TeachingToolsManager {
             }
         });
         this.tools = [];
-        
-        // Remove control overlay
-        if (this.controlOverlay) {
-            this.controlOverlay.remove();
-        }
         
         // Remove modal
         const modal = document.getElementById('teaching-tools-modal');

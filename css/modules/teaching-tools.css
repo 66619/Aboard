@@ -22,7 +22,7 @@
     background: #ffffff;
     border-radius: 16px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    max-width: 500px;
+    max-width: 600px;
     width: 90%;
     max-height: 90vh;
     overflow: hidden;
@@ -60,7 +60,14 @@
     padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 16px;
+}
+
+/* Tools Row - side by side layout */
+.teaching-tools-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
 }
 
 /* Teaching Tool Item */
@@ -74,6 +81,8 @@
     border-radius: 12px;
     background: #f8f9fa;
     transition: all 0.2s ease;
+    flex: 1;
+    max-width: 250px;
 }
 
 .teaching-tool-item:hover {
@@ -171,6 +180,16 @@
     -moz-appearance: textfield;
 }
 
+/* Hint text */
+.teaching-tools-hint {
+    text-align: center;
+    padding: 12px;
+    background: #f0f7ff;
+    border-radius: 8px;
+    color: #666;
+    font-size: 13px;
+}
+
 /* Footer */
 .teaching-tools-footer {
     padding: 16px 24px;
@@ -202,74 +221,121 @@
 
 /* Teaching Tool Overlay (on canvas) */
 .teaching-tool-overlay {
-    opacity: 0.9;
-    transition: opacity 0.2s ease;
-    border: 2px solid transparent;
-    border-radius: 4px;
-}
-
-.teaching-tool-overlay:hover {
-    opacity: 1;
-    border-color: var(--theme-color, #007AFF);
-}
-
-.teaching-tool-overlay.selected {
-    border-color: var(--theme-color, #007AFF);
-    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);
-}
-
-/* Teaching Tool Controls */
-.teaching-tool-controls {
     position: fixed;
-    display: none;
-    gap: 8px;
-    background: #ffffff;
-    padding: 8px 12px;
-    border-radius: 24px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-    z-index: 1001;
+    cursor: move;
+    z-index: 100;
+    pointer-events: auto;
+    touch-action: none;
 }
 
-.teaching-tool-control-handle {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #f0f0f0;
+.teaching-tool-overlay .teaching-tool-image-container {
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
 }
 
-.teaching-tool-control-handle:hover {
-    background: var(--theme-color, #007AFF);
+.teaching-tool-overlay .teaching-tool-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
 }
 
-.teaching-tool-control-handle:hover svg {
-    stroke: white;
+/* Selection border - tight to image */
+.teaching-tool-overlay.selected {
+    outline: 2px solid var(--theme-color, #007AFF);
+    outline-offset: 0;
 }
 
-.teaching-tool-control-handle svg {
-    width: 18px;
-    height: 18px;
-    stroke: #666;
+/* Word-style resize handles */
+.teaching-tool-resize-handle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border: 2px solid var(--theme-color, #007AFF);
+    border-radius: 2px;
+    display: none;
+    z-index: 10;
 }
 
-.teaching-tool-control-handle.delete-handle:hover {
-    background: #ff3b30;
+.teaching-tool-overlay.selected .teaching-tool-resize-handle {
+    display: block;
 }
 
-.teaching-tool-control-handle.rotate-handle {
+/* Handle positions */
+.handle-nw { top: -5px; left: -5px; cursor: nw-resize; }
+.handle-n { top: -5px; left: 50%; transform: translateX(-50%); cursor: n-resize; }
+.handle-ne { top: -5px; right: -5px; cursor: ne-resize; }
+.handle-e { top: 50%; right: -5px; transform: translateY(-50%); cursor: e-resize; }
+.handle-se { bottom: -5px; right: -5px; cursor: se-resize; }
+.handle-s { bottom: -5px; left: 50%; transform: translateX(-50%); cursor: s-resize; }
+.handle-sw { bottom: -5px; left: -5px; cursor: sw-resize; }
+.handle-w { top: 50%; left: -5px; transform: translateY(-50%); cursor: w-resize; }
+
+/* Rotate handle */
+.teaching-tool-rotate-handle {
+    position: absolute;
+    top: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 24px;
+    background: #fff;
+    border: 2px solid var(--theme-color, #007AFF);
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
     cursor: grab;
+    z-index: 10;
 }
 
-.teaching-tool-control-handle.rotate-handle:active {
+.teaching-tool-rotate-handle:active {
     cursor: grabbing;
 }
 
-.teaching-tool-control-handle.resize-handle {
-    cursor: nwse-resize;
+.teaching-tool-rotate-handle svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--theme-color, #007AFF);
+}
+
+.teaching-tool-overlay.selected .teaching-tool-rotate-handle {
+    display: flex;
+}
+
+/* Delete button */
+.teaching-tool-delete-btn {
+    position: absolute;
+    top: -35px;
+    right: -10px;
+    width: 24px;
+    height: 24px;
+    background: #ff3b30;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s ease;
+}
+
+.teaching-tool-delete-btn:hover {
+    transform: scale(1.1);
+    background: #e0352b;
+}
+
+.teaching-tool-delete-btn svg {
+    stroke: white;
+}
+
+.teaching-tool-overlay.selected .teaching-tool-delete-btn {
+    display: flex;
 }
 
 /* Responsive adjustments */
@@ -281,6 +347,16 @@
     
     .teaching-tools-body {
         padding: 16px;
+    }
+    
+    .teaching-tools-row {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .teaching-tool-item {
+        max-width: 100%;
+        width: 100%;
     }
     
     .teaching-tool-preview {

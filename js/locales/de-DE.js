@@ -380,6 +380,7 @@ window.translations = {
         title: 'Lehrmittel',
         ruler: 'Lineal',
         setSquare: 'Geodreieck',
+        hint: 'Hinweis: Doppelklicken zum Größe ändern, Drehen oder Löschen',
         insertHint: 'Wählen Sie die Anzahl der einzufügenden Werkzeuge',
         rotate: 'Drehen',
         resize: 'Größe ändern',

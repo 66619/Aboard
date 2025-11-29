@@ -339,6 +339,7 @@ window.translations = {
         title: '교구',
         ruler: '자',
         setSquare: '삼각자',
+        hint: '힌트: 더블클릭하여 크기 조절, 회전 또는 삭제',
         insertHint: '삽입할 교구 수를 선택하세요',
         rotate: '회전',
         resize: '크기 조절',

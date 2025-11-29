@@ -260,13 +260,17 @@ class DrawingBoard {
             if (e.button === 1 || (e.button === 0 && e.shiftKey) || this.drawingEngine.currentTool === 'pan') {
                 this.drawingEngine.startPanning(e);
             } else if (this.drawingEngine.currentTool === 'pen' || this.drawingEngine.currentTool === 'eraser') {
+                // Don't start drawing if interacting with teaching tools
+                if (this.teachingToolsManager && this.teachingToolsManager.isInteracting) {
+                    return;
+                }
                 this.drawingEngine.startDrawing(e);
             }
         });
         
         document.addEventListener('mousemove', (e) => {
-            // Don't draw when dragging panels
-            if (this.isDraggingPanel) {
+            // Don't draw when dragging panels or teaching tools
+            if (this.isDraggingPanel || (this.teachingToolsManager && this.teachingToolsManager.isInteracting)) {
                 return;
             }
             
@@ -304,6 +308,10 @@ class DrawingBoard {
         
         // Touch events
         this.canvas.addEventListener('touchstart', (e) => {
+            // Don't start drawing if interacting with teaching tools
+            if (this.teachingToolsManager && this.teachingToolsManager.isInteracting) {
+                return;
+            }
             e.preventDefault();
             if (e.touches.length === 2) {
                 // Two-finger gesture - prevent drawing
@@ -319,6 +327,10 @@ class DrawingBoard {
         }, { passive: false });
         
         this.canvas.addEventListener('touchmove', (e) => {
+            // Don't draw if interacting with teaching tools
+            if (this.teachingToolsManager && this.teachingToolsManager.isInteracting) {
+                return;
+            }
             e.preventDefault();
             if (e.touches.length === 2) {
                 // Two-finger pinch to zoom and pan
@@ -329,6 +341,10 @@ class DrawingBoard {
         }, { passive: false });
         
         this.canvas.addEventListener('touchend', (e) => {
+            // Don't handle if interacting with teaching tools
+            if (this.teachingToolsManager && this.teachingToolsManager.isInteracting) {
+                return;
+            }
             e.preventDefault();
             if (e.touches.length < 2) {
                 this.handlePinchEnd();

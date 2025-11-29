@@ -354,6 +354,7 @@ window.translations = {
         title: 'Teaching Tools',
         ruler: 'Ruler',
         setSquare: 'Set Square',
+        hint: 'Hint: Double-click to resize, rotate, or delete',
         insertHint: 'Select the number of tools to insert',
         rotate: 'Rotate',
         resize: 'Resize',

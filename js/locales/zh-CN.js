@@ -354,6 +354,7 @@ window.translations = {
         title: '教具',
         ruler: '直尺',
         setSquare: '三角板',
+        hint: '提示：双击教具可调整大小、旋转和删除',
         insertHint: '选择要插入的教具数量',
         rotate: '旋转',
         resize: '调整大小',

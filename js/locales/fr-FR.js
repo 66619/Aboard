@@ -344,6 +344,7 @@ window.translations = {
         title: 'Outils pédagogiques',
         ruler: 'Règle',
         setSquare: 'Équerre',
+        hint: 'Astuce : Double-cliquez pour redimensionner, pivoter ou supprimer',
         insertHint: 'Sélectionnez le nombre d\'outils à insérer',
         rotate: 'Pivoter',
         resize: 'Redimensionner',
