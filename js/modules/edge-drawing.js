@@ -175,32 +175,44 @@ class EdgeDrawingManager {
         const { x: tx, y: ty, width, height } = tool;
         const lx = localPoint.x;
         const ly = localPoint.y;
-        const margin = this.edgeTolerance;
         
-        // For set square with PNG image, block drawing inside the entire image bounds
-        // except near the top and left edges where edge drawing is allowed
+        // For set square: only the top and left edges support edge drawing.
+        // The bottom edge and hypotenuse should allow normal drawing through them.
         
         // Check if point is within the image bounds
         if (lx < tx || lx > tx + width || ly < ty || ly > ty + height) {
-            return false;
+            return false; // Outside bounds, allow drawing
         }
         
-        // Check distance from top edge
+        // Check distance from top edge - will snap to edge
         const distToTop = Math.abs(ly - ty);
         if (distToTop < this.edgeTolerance) {
-            return false; // Near top edge, allow drawing
+            return false; // Near top edge, don't block
         }
         
-        // Check distance from left edge
+        // Check distance from left edge - will snap to edge
         const distToLeft = Math.abs(lx - tx);
         if (distToLeft < this.edgeTolerance) {
-            return false; // Near left edge, allow drawing
+            return false; // Near left edge, don't block
         }
         
-        // Point is inside the set square area and not near allowed edges
-        // Block drawing
-        return lx > tx + margin && lx < tx + width - margin &&
-               ly > ty + margin && ly < ty + height - margin;
+        // Check distance from bottom edge - allow normal drawing through
+        const distToBottom = Math.abs(ly - (ty + height));
+        if (distToBottom < this.edgeTolerance) {
+            return false; // Near bottom edge, allow drawing
+        }
+        
+        // Check distance from right edge (hypotenuse area) - allow normal drawing through
+        const distToRight = Math.abs(lx - (tx + width));
+        if (distToRight < this.edgeTolerance) {
+            return false; // Near right edge, allow drawing
+        }
+        
+        // Point is inside the set square area and not near any edge
+        // Only block if the point is truly in the interior
+        const interiorMargin = this.edgeTolerance * 2;
+        return lx > tx + interiorMargin && lx < tx + width - interiorMargin &&
+               ly > ty + interiorMargin && ly < ty + height - interiorMargin;
     }
     
     /**

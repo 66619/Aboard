@@ -2193,7 +2193,15 @@ class DrawingBoard {
         const finalScale = this.canvasFitScale * this.drawingEngine.canvasScale;
         
         if (!this.settingsManager.infiniteCanvas) {
-            // In paginated mode, combine translate and scale
+            // In paginated mode, center canvas using position and translate
+            this.canvas.style.position = 'absolute';
+            this.canvas.style.left = '50%';
+            this.canvas.style.top = '50%';
+            this.bgCanvas.style.position = 'absolute';
+            this.bgCanvas.style.left = '50%';
+            this.bgCanvas.style.top = '50%';
+            
+            // Combine translate and scale
             const transform = `translate(-50%, -50%) translate(${panX}px, ${panY}px) scale(${finalScale})`;
             this.canvas.style.transform = transform;
             this.bgCanvas.style.transform = transform;

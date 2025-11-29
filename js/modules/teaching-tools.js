@@ -205,10 +205,15 @@ class TeachingToolsManager {
         if (rulerEl) rulerEl.value = counts.rulerCount;
         if (setSquareEl) setSquareEl.value = counts.setSquareCount;
         
-        // Disable/enable minus buttons based on count
+        // Disable/enable minus and plus buttons based on count
+        // When count is 0, both minus and plus should be disabled
+        // User must use "Add New" section to add tools
         const rulerMinusBtn = document.querySelector('[data-tool="currentRuler"][data-action="minus"]');
+        const rulerPlusBtn = document.querySelector('[data-tool="currentRuler"][data-action="plus"]');
         const setSquareMinusBtn = document.querySelector('[data-tool="currentSetSquare"][data-action="minus"]');
+        const setSquarePlusBtn = document.querySelector('[data-tool="currentSetSquare"][data-action="plus"]');
         
+        // Ruler controls
         if (rulerMinusBtn) {
             if (counts.rulerCount <= 0) {
                 rulerMinusBtn.classList.add('disabled');
@@ -219,6 +224,17 @@ class TeachingToolsManager {
             }
         }
         
+        if (rulerPlusBtn) {
+            if (counts.rulerCount <= 0) {
+                rulerPlusBtn.classList.add('disabled');
+                rulerPlusBtn.disabled = true;
+            } else {
+                rulerPlusBtn.classList.remove('disabled');
+                rulerPlusBtn.disabled = false;
+            }
+        }
+        
+        // Set square controls
         if (setSquareMinusBtn) {
             if (counts.setSquareCount <= 0) {
                 setSquareMinusBtn.classList.add('disabled');
@@ -226,6 +242,16 @@ class TeachingToolsManager {
             } else {
                 setSquareMinusBtn.classList.remove('disabled');
                 setSquareMinusBtn.disabled = false;
+            }
+        }
+        
+        if (setSquarePlusBtn) {
+            if (counts.setSquareCount <= 0) {
+                setSquarePlusBtn.classList.add('disabled');
+                setSquarePlusBtn.disabled = true;
+            } else {
+                setSquarePlusBtn.classList.remove('disabled');
+                setSquarePlusBtn.disabled = false;
             }
         }
     }
