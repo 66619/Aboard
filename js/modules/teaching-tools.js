@@ -7,6 +7,9 @@ class TeachingToolsManager {
         this.ctx = ctx;
         this.historyManager = historyManager;
         
+        // Scale factor reference (will be set by main.js)
+        this.canvasScaleFactor = 1.0;
+        
         // Tools on canvas
         this.tools = [];
         this.selectedTool = null;
@@ -201,6 +204,56 @@ class TeachingToolsManager {
         const setSquareEl = document.getElementById('current-set-square-count');
         if (rulerEl) rulerEl.value = counts.rulerCount;
         if (setSquareEl) setSquareEl.value = counts.setSquareCount;
+        
+        // Disable/enable minus and plus buttons based on count
+        // When count is 0, both minus and plus should be disabled
+        // User must use "Add New" section to add tools
+        const rulerMinusBtn = document.querySelector('[data-tool="currentRuler"][data-action="minus"]');
+        const rulerPlusBtn = document.querySelector('[data-tool="currentRuler"][data-action="plus"]');
+        const setSquareMinusBtn = document.querySelector('[data-tool="currentSetSquare"][data-action="minus"]');
+        const setSquarePlusBtn = document.querySelector('[data-tool="currentSetSquare"][data-action="plus"]');
+        
+        // Ruler controls
+        if (rulerMinusBtn) {
+            if (counts.rulerCount <= 0) {
+                rulerMinusBtn.classList.add('disabled');
+                rulerMinusBtn.disabled = true;
+            } else {
+                rulerMinusBtn.classList.remove('disabled');
+                rulerMinusBtn.disabled = false;
+            }
+        }
+        
+        if (rulerPlusBtn) {
+            if (counts.rulerCount <= 0) {
+                rulerPlusBtn.classList.add('disabled');
+                rulerPlusBtn.disabled = true;
+            } else {
+                rulerPlusBtn.classList.remove('disabled');
+                rulerPlusBtn.disabled = false;
+            }
+        }
+        
+        // Set square controls
+        if (setSquareMinusBtn) {
+            if (counts.setSquareCount <= 0) {
+                setSquareMinusBtn.classList.add('disabled');
+                setSquareMinusBtn.disabled = true;
+            } else {
+                setSquareMinusBtn.classList.remove('disabled');
+                setSquareMinusBtn.disabled = false;
+            }
+        }
+        
+        if (setSquarePlusBtn) {
+            if (counts.setSquareCount <= 0) {
+                setSquarePlusBtn.classList.add('disabled');
+                setSquarePlusBtn.disabled = true;
+            } else {
+                setSquarePlusBtn.classList.remove('disabled');
+                setSquarePlusBtn.disabled = false;
+            }
+        }
     }
     
     // Remove the last tool of a specific type
@@ -216,26 +269,32 @@ class TeachingToolsManager {
     // Add a new tool of a specific type
     addToolOfType(type) {
         const rect = this.canvas.getBoundingClientRect();
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
+        const scaleFactor = this.canvasScaleFactor;
+        // Get center in canvas coordinates
+        const centerX = rect.width / scaleFactor / 2;
+        const centerY = rect.height / scaleFactor / 2;
         
         if (type === 'ruler') {
             this.addTool({
                 type: 'ruler',
                 x: centerX - 150 + Math.random() * 50,
-                y: centerY - 25 + Math.random() * 50,
+                y: centerY - 15 + Math.random() * 50,
                 width: 300,
-                height: 50,
+                height: 30,
                 rotation: 0,
                 image: this.rulerImage
             });
         } else if (type === 'setSquare') {
+            // Set square aspect ratio is √3:1 (width:height)
+            // For a 30-60-90 triangle, width = √3 × height
+            const setSquareHeight = 100;
+            const setSquareWidth = Math.round(setSquareHeight * Math.sqrt(3));
             this.addTool({
                 type: 'setSquare',
-                x: centerX - 75 + Math.random() * 50,
-                y: centerY - 75 + Math.random() * 50,
-                width: 150,
-                height: 150,
+                x: centerX - setSquareWidth / 2 + Math.random() * 50,
+                y: centerY - setSquareHeight / 2 + Math.random() * 50,
+                width: setSquareWidth,
+                height: setSquareHeight,
                 rotation: 0,
                 image: this.setSquareImage
             });
@@ -355,9 +414,9 @@ class TeachingToolsManager {
     handleMouseMove(e) {
         // Dragging can work with _draggedTool (any tool being dragged)
         if (this.isDragging && this._draggedTool) {
-            const rect = this.canvas.getBoundingClientRect();
-            this._draggedTool.x = e.clientX - rect.left - this.dragOffset.x;
-            this._draggedTool.y = e.clientY - rect.top - this.dragOffset.y;
+            const canvasCoords = this.screenToCanvasCoords(e.clientX, e.clientY);
+            this._draggedTool.x = canvasCoords.x - this.dragOffset.x;
+            this._draggedTool.y = canvasCoords.y - this.dragOffset.y;
             this.updateToolOverlay(this._draggedTool);
             return;
         }
@@ -379,11 +438,13 @@ class TeachingToolsManager {
     }
     
     handleResize(e) {
-        const rect = this.canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
         const tool = this.selectedTool;
         const handle = this.activeResizeHandle;
+        
+        // Convert mouse position to canvas coordinates (accounting for scale)
+        const canvasCoords = this.screenToCanvasCoords(e.clientX, e.clientY);
+        const mouseX = canvasCoords.x;
+        const mouseY = canvasCoords.y;
         
         // Get the center of the tool for rotation calculations
         const centerX = this.resizeStart.x + this.resizeStart.width / 2;
@@ -534,8 +595,10 @@ class TeachingToolsManager {
     
     insertTools() {
         const canvasRect = this.canvas.getBoundingClientRect();
-        const centerX = (canvasRect.right - canvasRect.left) / 2;
-        const centerY = (canvasRect.bottom - canvasRect.top) / 2;
+        const scaleFactor = this.canvasScaleFactor;
+        // Get center in canvas coordinates
+        const centerX = (canvasRect.right - canvasRect.left) / scaleFactor / 2;
+        const centerY = (canvasRect.bottom - canvasRect.top) / scaleFactor / 2;
         
         // Insert rulers
         for (let i = 0; i < this.rulerCount; i++) {
@@ -546,22 +609,25 @@ class TeachingToolsManager {
                 x: centerX - 150 + offsetX,
                 y: centerY - 100 + offsetY,
                 width: 300,
-                height: 60,
+                height: 30,
                 rotation: 0,
                 image: this.rulerImage
             });
         }
         
         // Insert set squares
+        // Set square aspect ratio is √3:1 (width:height)
+        const setSquareHeight = 100;
+        const setSquareWidth = Math.round(setSquareHeight * Math.sqrt(3));
         for (let i = 0; i < this.setSquareCount; i++) {
             const offsetX = (i - this.setSquareCount / 2) * 50;
             const offsetY = (i - this.setSquareCount / 2) * 30;
             this.addTool({
                 type: 'setSquare',
-                x: centerX - 75 + offsetX,
+                x: centerX - setSquareWidth / 2 + offsetX,
                 y: centerY + 50 + offsetY,
-                width: 150,
-                height: 150,
+                width: setSquareWidth,
+                height: setSquareHeight,
                 rotation: 0,
                 image: this.setSquareImage
             });
@@ -673,10 +739,10 @@ class TeachingToolsManager {
                     this.isInteracting = true;
                     this._draggedTool = tool;
                     
-                    const rect = this.canvas.getBoundingClientRect();
                     const touch = e.touches[0];
-                    this.dragOffset.x = touch.clientX - rect.left - tool.x;
-                    this.dragOffset.y = touch.clientY - rect.top - tool.y;
+                    const canvasCoords = this.screenToCanvasCoords(touch.clientX, touch.clientY);
+                    this.dragOffset.x = canvasCoords.x - tool.x;
+                    this.dragOffset.y = canvasCoords.y - tool.y;
                 }
             }
         }, { passive: false });
@@ -684,10 +750,10 @@ class TeachingToolsManager {
         overlay.addEventListener('touchmove', (e) => {
             if (this.isDragging && e.touches.length === 1 && this._draggedTool === tool) {
                 e.preventDefault();
-                const rect = this.canvas.getBoundingClientRect();
                 const touch = e.touches[0];
-                tool.x = touch.clientX - rect.left - this.dragOffset.x;
-                tool.y = touch.clientY - rect.top - this.dragOffset.y;
+                const canvasCoords = this.screenToCanvasCoords(touch.clientX, touch.clientY);
+                tool.x = canvasCoords.x - this.dragOffset.x;
+                tool.y = canvasCoords.y - this.dragOffset.y;
                 this.updateToolOverlay(tool);
             }
         }, { passive: false });
@@ -715,9 +781,9 @@ class TeachingToolsManager {
             this.isInteracting = true;
             this._draggedTool = tool;
             
-            const rect = this.canvas.getBoundingClientRect();
-            this.dragOffset.x = e.clientX - rect.left - tool.x;
-            this.dragOffset.y = e.clientY - rect.top - tool.y;
+            const canvasCoords = this.screenToCanvasCoords(e.clientX, e.clientY);
+            this.dragOffset.x = canvasCoords.x - tool.x;
+            this.dragOffset.y = canvasCoords.y - tool.y;
         });
         
         // Double-click to select and show controls
@@ -779,12 +845,19 @@ class TeachingToolsManager {
         if (!overlay) return;
         
         const canvasRect = this.canvas.getBoundingClientRect();
+        const scaleFactor = this.canvasScaleFactor;
+        
+        // Convert tool position from canvas space to screen space
+        // Tool x,y are in unscaled canvas coordinates
+        // We need to convert to screen coordinates
+        const screenX = canvasRect.left + tool.x * scaleFactor;
+        const screenY = canvasRect.top + tool.y * scaleFactor;
         
         overlay.style.position = 'fixed';
-        overlay.style.left = (canvasRect.left + tool.x) + 'px';
-        overlay.style.top = (canvasRect.top + tool.y) + 'px';
-        overlay.style.width = tool.width + 'px';
-        overlay.style.height = tool.height + 'px';
+        overlay.style.left = screenX + 'px';
+        overlay.style.top = screenY + 'px';
+        overlay.style.width = (tool.width * scaleFactor) + 'px';
+        overlay.style.height = (tool.height * scaleFactor) + 'px';
         overlay.style.transform = `rotate(${tool.rotation}deg)`;
         overlay.style.transformOrigin = 'center center';
         overlay.style.zIndex = '100';
@@ -824,6 +897,36 @@ class TeachingToolsManager {
             this.selectedTool.overlay?.classList.remove('selected');
             this.selectedTool = null;
         }
+    }
+    
+    /**
+     * Convert screen coordinates to canvas coordinates, accounting for canvas scale transform
+     * @param {number} clientX - Screen X coordinate
+     * @param {number} clientY - Screen Y coordinate
+     * @returns {Object} - {x, y} in canvas coordinate space
+     */
+    screenToCanvasCoords(clientX, clientY) {
+        const rect = this.canvas.getBoundingClientRect();
+        const scaleFactor = this.canvasScaleFactor;
+        
+        // The canvas is centered using translate(-50%, -50%) and then scaled
+        // rect gives us the transformed bounds, so we need to:
+        // 1. Get position relative to the rect (which is the visible canvas)
+        // 2. Convert from screen space to canvas space by dividing by scale
+        
+        // Get the unscaled canvas dimensions
+        const unscaledWidth = this.canvas.offsetWidth;
+        const unscaledHeight = this.canvas.offsetHeight;
+        
+        // Position relative to the canvas rect
+        const relX = clientX - rect.left;
+        const relY = clientY - rect.top;
+        
+        // Convert to canvas coordinates by dividing by scale
+        const x = relX / scaleFactor;
+        const y = relY / scaleFactor;
+        
+        return { x, y };
     }
     
     // Helper function to rotate a point around a center
