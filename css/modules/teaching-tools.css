@@ -63,15 +63,46 @@
     gap: 16px;
 }
 
-/* Current count display */
-.teaching-tools-current-count {
+/* Section labels */
+.teaching-tools-section-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
     text-align: center;
-    padding: 10px 16px;
+}
+
+/* Current count section */
+.teaching-tools-current-count-section {
+    padding: 12px 16px;
     background: #e8f4fd;
     border-radius: 8px;
-    color: #1976d2;
+}
+
+.teaching-tools-current-row {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    align-items: center;
+}
+
+.teaching-tool-current-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.teaching-tool-current-item span {
     font-size: 14px;
+    color: #1976d2;
     font-weight: 500;
+}
+
+/* New section */
+.teaching-tools-new-section {
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
 }
 
 /* Tools Row - side by side layout */
@@ -121,8 +152,6 @@
 
 .teaching-tool-image.set-square-image {
     max-height: 70px;
-    /* Clip to bottom-left triangle shape: top-left corner, bottom-right corner, bottom-left corner */
-    clip-path: polygon(0 0, 100% 100%, 0 100%);
 }
 
 /* Tool Label */
@@ -255,11 +284,6 @@
     object-fit: fill;
     pointer-events: none;
     user-select: none;
-}
-
-/* Set square triangle shape - clip to bottom-left triangle: top-left, bottom-right, bottom-left */
-.teaching-tool-overlay.set-square-tool .teaching-tool-img {
-    clip-path: polygon(0 0, 100% 100%, 0 100%);
 }
 
 /* Selection border - tight to image */

@@ -85,58 +85,95 @@ class TeachingToolsManager {
                     </button>
                 </div>
                 <div class="teaching-tools-body">
-                    <div class="teaching-tools-current-count">
-                        <span data-i18n="teachingTools.currentOnCanvas">画布上当前数量</span>: 
-                        <span id="current-ruler-count">0</span> <span data-i18n="teachingTools.ruler">直尺</span>, 
-                        <span id="current-set-square-count">0</span> <span data-i18n="teachingTools.setSquare">三角板</span>
-                    </div>
-                    <div class="teaching-tools-row">
-                        <!-- Ruler Section -->
-                        <div class="teaching-tool-item">
-                            <div class="teaching-tool-preview">
-                                <img src="img/ruler_1.png" alt="Ruler" class="teaching-tool-image">
+                    <div class="teaching-tools-current-count-section">
+                        <div class="teaching-tools-section-label" data-i18n="teachingTools.currentOnCanvas">画布上当前数量</div>
+                        <div class="teaching-tools-current-row">
+                            <div class="teaching-tool-current-item">
+                                <span data-i18n="teachingTools.ruler">直尺</span>
+                                <div class="teaching-tool-counter">
+                                    <button class="counter-btn minus-btn" data-tool="currentRuler" data-action="minus">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                    <input type="number" id="current-ruler-count" class="counter-input" value="0" min="0" max="10" readonly>
+                                    <button class="counter-btn plus-btn" data-tool="currentRuler" data-action="plus">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="teaching-tool-label" data-i18n="teachingTools.ruler">直尺</div>
-                            <div class="teaching-tool-counter">
-                                <button class="counter-btn minus-btn" data-tool="ruler" data-action="minus">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    </svg>
-                                </button>
-                                <input type="number" id="ruler-count-input" class="counter-input" value="1" min="0" max="10">
-                                <button class="counter-btn plus-btn" data-tool="ruler" data-action="plus">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    </svg>
-                                </button>
+                            <div class="teaching-tool-current-item">
+                                <span data-i18n="teachingTools.setSquare">三角板</span>
+                                <div class="teaching-tool-counter">
+                                    <button class="counter-btn minus-btn" data-tool="currentSetSquare" data-action="minus">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                    <input type="number" id="current-set-square-count" class="counter-input" value="0" min="0" max="10" readonly>
+                                    <button class="counter-btn plus-btn" data-tool="currentSetSquare" data-action="plus">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        
-                        <!-- Set Square Section -->
-                        <div class="teaching-tool-item">
-                            <div class="teaching-tool-preview">
-                                <img src="img/set_square_1.png" alt="Set Square" class="teaching-tool-image set-square-image">
+                    </div>
+                    <div class="teaching-tools-new-section">
+                        <div class="teaching-tools-section-label" data-i18n="teachingTools.addNew">新增</div>
+                        <div class="teaching-tools-row">
+                            <!-- Ruler Section -->
+                            <div class="teaching-tool-item">
+                                <div class="teaching-tool-preview">
+                                    <img src="img/ruler_1.png" alt="Ruler" class="teaching-tool-image">
+                                </div>
+                                <div class="teaching-tool-label" data-i18n="teachingTools.ruler">直尺</div>
+                                <div class="teaching-tool-counter">
+                                    <button class="counter-btn minus-btn" data-tool="ruler" data-action="minus">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                    <input type="number" id="ruler-count-input" class="counter-input" value="0" min="0" max="10">
+                                    <button class="counter-btn plus-btn" data-tool="ruler" data-action="plus">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="teaching-tool-label" data-i18n="teachingTools.setSquare">三角板</div>
-                            <div class="teaching-tool-counter">
-                                <button class="counter-btn minus-btn" data-tool="setSquare" data-action="minus">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    </svg>
-                                </button>
-                                <input type="number" id="set-square-count-input" class="counter-input" value="1" min="0" max="10">
-                                <button class="counter-btn plus-btn" data-tool="setSquare" data-action="plus">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    </svg>
-                                </button>
+                            
+                            <!-- Set Square Section -->
+                            <div class="teaching-tool-item">
+                                <div class="teaching-tool-preview">
+                                    <img src="img/set_square_1.png" alt="Set Square" class="teaching-tool-image set-square-image">
+                                </div>
+                                <div class="teaching-tool-label" data-i18n="teachingTools.setSquare">三角板</div>
+                                <div class="teaching-tool-counter">
+                                    <button class="counter-btn minus-btn" data-tool="setSquare" data-action="minus">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                    <input type="number" id="set-square-count-input" class="counter-input" value="0" min="0" max="10">
+                                    <button class="counter-btn plus-btn" data-tool="setSquare" data-action="plus">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="teaching-tools-hint">
-                        <span data-i18n="teachingTools.hint">提示：双击教具可调整大小、旋转和删除</span>
+                        <span data-i18n="teachingTools.hint">提示：单击移动，双击调整大小、旋转和删除</span>
                     </div>
                 </div>
                 <div class="teaching-tools-footer">
@@ -162,8 +199,47 @@ class TeachingToolsManager {
         const counts = this.getToolCounts();
         const rulerEl = document.getElementById('current-ruler-count');
         const setSquareEl = document.getElementById('current-set-square-count');
-        if (rulerEl) rulerEl.textContent = counts.rulerCount;
-        if (setSquareEl) setSquareEl.textContent = counts.setSquareCount;
+        if (rulerEl) rulerEl.value = counts.rulerCount;
+        if (setSquareEl) setSquareEl.value = counts.setSquareCount;
+    }
+    
+    // Remove the last tool of a specific type
+    removeLastToolOfType(type) {
+        // Find all tools of this type and remove the last one (LIFO)
+        const toolsOfType = this.tools.filter(t => t.type === type);
+        if (toolsOfType.length > 0) {
+            const lastTool = toolsOfType[toolsOfType.length - 1];
+            this.removeTool(lastTool);
+        }
+    }
+    
+    // Add a new tool of a specific type
+    addToolOfType(type) {
+        const rect = this.canvas.getBoundingClientRect();
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        if (type === 'ruler') {
+            this.addTool({
+                type: 'ruler',
+                x: centerX - 150 + Math.random() * 50,
+                y: centerY - 25 + Math.random() * 50,
+                width: 300,
+                height: 50,
+                rotation: 0,
+                image: this.rulerImage
+            });
+        } else if (type === 'setSquare') {
+            this.addTool({
+                type: 'setSquare',
+                x: centerX - 75 + Math.random() * 50,
+                y: centerY - 75 + Math.random() * 50,
+                width: 150,
+                height: 150,
+                rotation: 0,
+                image: this.setSquareImage
+            });
+        }
     }
     
     setupModalListeners() {
@@ -179,11 +255,34 @@ class TeachingToolsManager {
             }
         });
         
-        // Counter buttons
+        // Counter buttons for new tools
         document.querySelectorAll('#teaching-tools-modal .counter-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const tool = btn.dataset.tool;
                 const action = btn.dataset.action;
+                
+                // Handle current count adjustments (directly modify canvas)
+                if (tool === 'currentRuler') {
+                    if (action === 'plus') {
+                        this.addToolOfType('ruler');
+                    } else if (action === 'minus') {
+                        this.removeLastToolOfType('ruler');
+                    }
+                    this.updateCurrentCountDisplay();
+                    return;
+                }
+                
+                if (tool === 'currentSetSquare') {
+                    if (action === 'plus') {
+                        this.addToolOfType('setSquare');
+                    } else if (action === 'minus') {
+                        this.removeLastToolOfType('setSquare');
+                    }
+                    this.updateCurrentCountDisplay();
+                    return;
+                }
+                
+                // Handle new tool count adjustments
                 const input = tool === 'ruler' 
                     ? document.getElementById('ruler-count-input')
                     : document.getElementById('set-square-count-input');
@@ -204,7 +303,7 @@ class TeachingToolsManager {
             });
         });
         
-        // Input change
+        // Input change for new tools
         document.getElementById('ruler-count-input').addEventListener('change', (e) => {
             let value = parseInt(e.target.value) || 0;
             value = Math.max(0, Math.min(10, value));
@@ -412,11 +511,11 @@ class TeachingToolsManager {
     }
     
     showModal() {
-        // Reset counts to add
-        this.rulerCount = 1;
-        this.setSquareCount = 1;
-        document.getElementById('ruler-count-input').value = 1;
-        document.getElementById('set-square-count-input').value = 1;
+        // Reset new tool counts to 0
+        this.rulerCount = 0;
+        this.setSquareCount = 0;
+        document.getElementById('ruler-count-input').value = 0;
+        document.getElementById('set-square-count-input').value = 0;
         
         // Update current count display
         this.updateCurrentCountDisplay();
