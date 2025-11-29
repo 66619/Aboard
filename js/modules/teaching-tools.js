@@ -355,7 +355,7 @@ class TeachingToolsManager {
                 rotation: 0,
                 image: image
             });
-        } else if (type === 'setSquare' || type === 'setSquare60') {
+        } else if (type === 'setSquare60') {
             // 60° set square: aspect ratio is √3:1 (width:height)
             const setSquareHeight = 100;
             const setSquareWidth = Math.round(setSquareHeight * Math.sqrt(3));
