@@ -382,23 +382,21 @@ class TeachingToolsManager {
         const imgWidth = image.naturalWidth || image.width;
         const imgHeight = image.naturalHeight || image.height;
         
-        if (!imgWidth || !imgHeight) {
-            // Fallback to default size if image not loaded
+        if (!imgWidth || !imgHeight || imgWidth <= 0 || imgHeight <= 0) {
+            // Fallback to default size if image not loaded or has invalid dimensions
             return { width: 200, height: 100 };
         }
         
         const aspectRatio = imgWidth / imgHeight;
         
         // Target approximately 20% of canvas area
-        // Area = width * height, so we target sqrt(0.2) ≈ 0.447 of both dimensions
-        // But we need to adjust based on aspect ratio
+        // To achieve 20% area while preserving aspect ratio:
+        // targetArea = width * height = width * (width / aspectRatio) = width² / aspectRatio
+        // Therefore: width = sqrt(targetArea * aspectRatio)
         const canvasArea = canvasWidth * canvasHeight;
         const targetArea = canvasArea * 0.20;
         
         // Calculate dimensions that preserve aspect ratio and approximate target area
-        // targetArea = width * height = width * (width / aspectRatio)
-        // targetArea = width² / aspectRatio
-        // width = sqrt(targetArea * aspectRatio)
         let toolWidth = Math.sqrt(targetArea * aspectRatio);
         let toolHeight = toolWidth / aspectRatio;
         
