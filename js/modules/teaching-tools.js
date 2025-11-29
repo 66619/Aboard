@@ -68,7 +68,7 @@ class TeachingToolsManager {
         this.setSquareImage = new Image();
         this.setSquareImage.onload = checkLoaded;
         this.setSquareImage.onerror = () => console.error('Failed to load set square image');
-        this.setSquareImage.src = 'img/set_square_1.png';
+        this.setSquareImage.src = 'img/set_square_1.svg';
     }
     
     createModal() {
@@ -219,16 +219,18 @@ class TeachingToolsManager {
     // Add a new tool of a specific type
     addToolOfType(type) {
         const rect = this.canvas.getBoundingClientRect();
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
+        const scaleFactor = this.canvasScaleFactor;
+        // Get center in canvas coordinates
+        const centerX = rect.width / scaleFactor / 2;
+        const centerY = rect.height / scaleFactor / 2;
         
         if (type === 'ruler') {
             this.addTool({
                 type: 'ruler',
                 x: centerX - 150 + Math.random() * 50,
-                y: centerY - 25 + Math.random() * 50,
+                y: centerY - 15 + Math.random() * 50,
                 width: 300,
-                height: 50,
+                height: 30,
                 rotation: 0,
                 image: this.rulerImage
             });
@@ -541,8 +543,10 @@ class TeachingToolsManager {
     
     insertTools() {
         const canvasRect = this.canvas.getBoundingClientRect();
-        const centerX = (canvasRect.right - canvasRect.left) / 2;
-        const centerY = (canvasRect.bottom - canvasRect.top) / 2;
+        const scaleFactor = this.canvasScaleFactor;
+        // Get center in canvas coordinates
+        const centerX = (canvasRect.right - canvasRect.left) / scaleFactor / 2;
+        const centerY = (canvasRect.bottom - canvasRect.top) / scaleFactor / 2;
         
         // Insert rulers
         for (let i = 0; i < this.rulerCount; i++) {
@@ -553,7 +557,7 @@ class TeachingToolsManager {
                 x: centerX - 150 + offsetX,
                 y: centerY - 100 + offsetY,
                 width: 300,
-                height: 60,
+                height: 30,
                 rotation: 0,
                 image: this.rulerImage
             });
@@ -791,21 +795,11 @@ class TeachingToolsManager {
         const canvasRect = this.canvas.getBoundingClientRect();
         const scaleFactor = this.canvasScaleFactor;
         
-        // Canvas is centered, so calculate the position accounting for scale
-        const canvasCenterX = canvasRect.left + canvasRect.width / 2;
-        const canvasCenterY = canvasRect.top + canvasRect.height / 2;
-        
-        // Convert tool position from unscaled canvas space to screen space
-        const unscaledCanvasWidth = canvasRect.width / scaleFactor;
-        const unscaledCanvasHeight = canvasRect.height / scaleFactor;
-        
-        // Tool position relative to canvas center in unscaled space
-        const toolCenterOffsetX = tool.x - unscaledCanvasWidth / 2;
-        const toolCenterOffsetY = tool.y - unscaledCanvasHeight / 2;
-        
-        // Convert to screen position
-        const screenX = canvasCenterX + toolCenterOffsetX * scaleFactor;
-        const screenY = canvasCenterY + toolCenterOffsetY * scaleFactor;
+        // Convert tool position from canvas space to screen space
+        // Tool x,y are in unscaled canvas coordinates
+        // We need to convert to screen coordinates
+        const screenX = canvasRect.left + tool.x * scaleFactor;
+        const screenY = canvasRect.top + tool.y * scaleFactor;
         
         overlay.style.position = 'fixed';
         overlay.style.left = screenX + 'px';
@@ -862,11 +856,24 @@ class TeachingToolsManager {
     screenToCanvasCoords(clientX, clientY) {
         const rect = this.canvas.getBoundingClientRect();
         const scaleFactor = this.canvasScaleFactor;
-        const canvasCenterX = rect.left + rect.width / 2;
-        const canvasCenterY = rect.top + rect.height / 2;
-        // Convert screen coords to unscaled canvas space
-        const x = (clientX - canvasCenterX) / scaleFactor + (rect.width / scaleFactor) / 2;
-        const y = (clientY - canvasCenterY) / scaleFactor + (rect.height / scaleFactor) / 2;
+        
+        // The canvas is centered using translate(-50%, -50%) and then scaled
+        // rect gives us the transformed bounds, so we need to:
+        // 1. Get position relative to the rect (which is the visible canvas)
+        // 2. Convert from screen space to canvas space by dividing by scale
+        
+        // Get the unscaled canvas dimensions
+        const unscaledWidth = this.canvas.offsetWidth;
+        const unscaledHeight = this.canvas.offsetHeight;
+        
+        // Position relative to the canvas rect
+        const relX = clientX - rect.left;
+        const relY = clientY - rect.top;
+        
+        // Convert to canvas coordinates by dividing by scale
+        const x = relX / scaleFactor;
+        const y = relY / scaleFactor;
+        
         return { x, y };
     }
     

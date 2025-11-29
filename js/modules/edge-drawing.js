@@ -63,32 +63,41 @@ class EdgeDrawingManager {
     /**
      * Check if a point is near a ruler edge
      * Rulers have 4 edges: top, bottom, left, right
-     * Only the bottom edge (the straight edge used for drawing) should allow snapping
+     * All edges can be used for drawing straight lines
      */
     getRulerEdgeAtPoint(localPoint, tool, originalX, originalY) {
         const { x: tx, y: ty, width, height } = tool;
         const lx = localPoint.x;
         const ly = localPoint.y;
         
-        // Check if point is within the ruler's horizontal bounds
-        if (lx < tx - this.edgeTolerance || lx > tx + width + this.edgeTolerance) {
-            return null;
-        }
-        
-        // Check bottom edge (the drawing edge)
+        // Check bottom edge (horizontal)
         const bottomY = ty + height;
-        if (Math.abs(ly - bottomY) < this.edgeTolerance && lx >= tx && lx <= tx + width) {
-            // Snap to bottom edge
+        if (Math.abs(ly - bottomY) < this.edgeTolerance && lx >= tx - this.edgeTolerance && lx <= tx + width + this.edgeTolerance) {
             const snappedLocal = { x: Math.max(tx, Math.min(tx + width, lx)), y: bottomY };
             const snappedWorld = this.transformToWorldSpace(snappedLocal.x, snappedLocal.y, tool);
             return { edge: 'bottom', snappedPoint: snappedWorld };
         }
         
-        // Check top edge
-        if (Math.abs(ly - ty) < this.edgeTolerance && lx >= tx && lx <= tx + width) {
+        // Check top edge (horizontal)
+        if (Math.abs(ly - ty) < this.edgeTolerance && lx >= tx - this.edgeTolerance && lx <= tx + width + this.edgeTolerance) {
             const snappedLocal = { x: Math.max(tx, Math.min(tx + width, lx)), y: ty };
             const snappedWorld = this.transformToWorldSpace(snappedLocal.x, snappedLocal.y, tool);
             return { edge: 'top', snappedPoint: snappedWorld };
+        }
+        
+        // Check left edge (vertical) - for drawing vertical lines along ruler edge
+        if (Math.abs(lx - tx) < this.edgeTolerance && ly >= ty - this.edgeTolerance && ly <= ty + height + this.edgeTolerance) {
+            const snappedLocal = { x: tx, y: Math.max(ty, Math.min(ty + height, ly)) };
+            const snappedWorld = this.transformToWorldSpace(snappedLocal.x, snappedLocal.y, tool);
+            return { edge: 'left', snappedPoint: snappedWorld };
+        }
+        
+        // Check right edge (vertical) - for drawing vertical lines along ruler edge
+        const rightX = tx + width;
+        if (Math.abs(lx - rightX) < this.edgeTolerance && ly >= ty - this.edgeTolerance && ly <= ty + height + this.edgeTolerance) {
+            const snappedLocal = { x: rightX, y: Math.max(ty, Math.min(ty + height, ly)) };
+            const snappedWorld = this.transformToWorldSpace(snappedLocal.x, snappedLocal.y, tool);
+            return { edge: 'right', snappedPoint: snappedWorld };
         }
         
         return null;

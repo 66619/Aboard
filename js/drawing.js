@@ -171,15 +171,92 @@ class DrawingEngine {
             const prevPoint = this.points[lastIndex - 1];
             const currPoint = this.points[lastIndex];
             
-            this.ctx.beginPath();
-            this.ctx.moveTo(prevPoint.x, prevPoint.y);
-            this.ctx.lineTo(currPoint.x, currPoint.y);
-            this.ctx.stroke();
+            // Calculate distance between points for pressure simulation
+            // Larger distance = faster movement = less pressure
+            const dx = currPoint.x - prevPoint.x;
+            const dy = currPoint.y - prevPoint.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            // Apply pen-specific drawing effects
+            if (this.penType === 'ballpoint') {
+                // Ballpoint pen: varying thickness based on movement speed (simulating pressure)
+                // Slower = more pressure = thicker, faster = less pressure = thinner
+                const minWidth = this.penSize * 0.5;
+                const maxWidth = this.penSize * 1.3;
+                const speedFactor = Math.min(distance / 10, 1); // Normalize distance as speed proxy
+                const lineWidth = maxWidth - (speedFactor * (maxWidth - minWidth));
+                this.ctx.lineWidth = lineWidth;
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(prevPoint.x, prevPoint.y);
+                this.ctx.lineTo(currPoint.x, currPoint.y);
+                this.ctx.stroke();
+            } else if (this.penType === 'brush') {
+                // Brush pen: fuzzy edges with multiple strokes and varying opacity
+                this.drawBrushStroke(prevPoint, currPoint, distance);
+            } else {
+                // Normal, pencil, fountain pens
+                this.ctx.beginPath();
+                this.ctx.moveTo(prevPoint.x, prevPoint.y);
+                this.ctx.lineTo(currPoint.x, currPoint.y);
+                this.ctx.stroke();
+            }
             
             this.lastPoint = currPoint;
         } else {
             this.lastPoint = pos;
         }
+    }
+    
+    /**
+     * Draw a brush stroke with fuzzy edges and calligraphic effect
+     * @param {Object} prevPoint - Previous point
+     * @param {Object} currPoint - Current point
+     * @param {number} distance - Distance between points (used as speed proxy)
+     */
+    drawBrushStroke(prevPoint, currPoint, distance) {
+        const dx = currPoint.x - prevPoint.x;
+        const dy = currPoint.y - prevPoint.y;
+        const angle = Math.atan2(dy, dx);
+        
+        // Calculate brush width based on distance (faster movement = thinner for brush effect)
+        const baseWidth = this.penSize * 1.5;
+        const speedFactor = Math.min(distance / 15, 1);
+        const brushWidth = baseWidth * (1 - speedFactor * 0.5);
+        
+        // Draw main stroke with varying width
+        this.ctx.save();
+        this.ctx.globalAlpha = 0.7;
+        this.ctx.lineWidth = brushWidth;
+        this.ctx.lineCap = 'round';
+        this.ctx.beginPath();
+        this.ctx.moveTo(prevPoint.x, prevPoint.y);
+        this.ctx.lineTo(currPoint.x, currPoint.y);
+        this.ctx.stroke();
+        
+        // Add fuzzy edge effects using deterministic offsets based on point positions
+        // Using position-based seeds for consistent but varied appearance
+        const numFuzzyStrokes = 3;
+        for (let i = 0; i < numFuzzyStrokes; i++) {
+            // Use deterministic pseudo-random based on point position and index
+            const seed1 = (prevPoint.x * 1000 + currPoint.y + i) % 1;
+            const seed2 = (prevPoint.y * 1000 + currPoint.x + i) % 1;
+            const seed3 = (currPoint.x * 1000 + prevPoint.y + i) % 1;
+            
+            const offset = (seed1 - 0.5) * brushWidth * 0.5;
+            const perpX = Math.cos(angle + Math.PI / 2) * offset;
+            const perpY = Math.sin(angle + Math.PI / 2) * offset;
+            
+            this.ctx.globalAlpha = 0.15 + seed2 * 0.1;
+            this.ctx.lineWidth = brushWidth * (0.3 + seed3 * 0.3);
+            this.ctx.beginPath();
+            this.ctx.moveTo(prevPoint.x + perpX, prevPoint.y + perpY);
+            this.ctx.lineTo(currPoint.x + perpX, currPoint.y + perpY);
+            this.ctx.stroke();
+        }
+        
+        this.ctx.restore();
+        this.setupDrawingContext(); // Restore original context settings
     }
     
     stopDrawing() {
