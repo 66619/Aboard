@@ -6,6 +6,8 @@
 
 // Default edge tolerance in pixels for detecting edge proximity
 const DEFAULT_EDGE_TOLERANCE = 15;
+// Corner tolerance is larger to make it easier to hit corners when drawing
+const DEFAULT_CORNER_TOLERANCE = 25;
 
 class EdgeDrawingManager {
     constructor(teachingToolsManager, drawingEngine) {
@@ -17,6 +19,7 @@ class EdgeDrawingManager {
         this.snappedTool = null;
         this.snappedEdge = null;
         this.edgeTolerance = DEFAULT_EDGE_TOLERANCE;
+        this.cornerTolerance = DEFAULT_CORNER_TOLERANCE;
     }
     
     /**
@@ -109,6 +112,7 @@ class EdgeDrawingManager {
      * Top edge: horizontal edge at the top
      * Left edge: vertical edge on the left side
      * Hypotenuse: diagonal edge from top-right to bottom-left
+     * Corners use a larger tolerance for easier angle drawing
      */
     getSetSquareEdgeAtPoint(localPoint, tool, originalX, originalY) {
         const { x: tx, y: ty, width, height } = tool;
@@ -123,9 +127,26 @@ class EdgeDrawingManager {
         const topRight = { x: tx + width, y: ty };
         const bottomLeft = { x: tx, y: ty + height };
         
+        // Calculate distance to each vertex for corner tolerance
+        const distToTopLeft = Math.sqrt((lx - topLeft.x) ** 2 + (ly - topLeft.y) ** 2);
+        const distToTopRight = Math.sqrt((lx - topRight.x) ** 2 + (ly - topRight.y) ** 2);
+        const distToBottomLeft = Math.sqrt((lx - bottomLeft.x) ** 2 + (ly - bottomLeft.y) ** 2);
+        
+        // Use larger corner tolerance near vertices
+        const isNearTopLeft = distToTopLeft < this.cornerTolerance;
+        const isNearTopRight = distToTopRight < this.cornerTolerance;
+        const isNearBottomLeft = distToBottomLeft < this.cornerTolerance;
+        
+        // Determine effective tolerance based on proximity to corners
+        const effectiveTolerance = (isNearTopLeft || isNearTopRight || isNearBottomLeft) 
+            ? this.cornerTolerance 
+            : this.edgeTolerance;
+        
         // Check top edge (horizontal) - from top-left to top-right
+        // Use distance to segment which already handles bounds correctly
         const distToTop = this.distanceToSegment(lx, ly, topLeft.x, topLeft.y, topRight.x, topRight.y);
-        if (distToTop < this.edgeTolerance && lx >= tx && lx <= tx + width) {
+        if (distToTop < effectiveTolerance) {
+            // Snap to the nearest point on the edge, clamped to edge bounds
             const snappedLocal = { x: Math.max(tx, Math.min(tx + width, lx)), y: ty };
             const snappedWorld = this.transformToWorldSpace(snappedLocal.x, snappedLocal.y, tool);
             return { edge: 'top', snappedPoint: snappedWorld };
@@ -133,7 +154,8 @@ class EdgeDrawingManager {
         
         // Check left edge (vertical) - from top-left to bottom-left
         const distToLeft = this.distanceToSegment(lx, ly, topLeft.x, topLeft.y, bottomLeft.x, bottomLeft.y);
-        if (distToLeft < this.edgeTolerance && ly >= ty && ly <= ty + height) {
+        if (distToLeft < effectiveTolerance) {
+            // Snap to the nearest point on the edge, clamped to edge bounds
             const snappedLocal = { x: tx, y: Math.max(ty, Math.min(ty + height, ly)) };
             const snappedWorld = this.transformToWorldSpace(snappedLocal.x, snappedLocal.y, tool);
             return { edge: 'left', snappedPoint: snappedWorld };
@@ -141,15 +163,11 @@ class EdgeDrawingManager {
         
         // Check hypotenuse (diagonal) - from top-right to bottom-left
         const distToHypotenuse = this.distanceToSegment(lx, ly, topRight.x, topRight.y, bottomLeft.x, bottomLeft.y);
-        if (distToHypotenuse < this.edgeTolerance) {
-            // Project point onto the hypotenuse line segment
+        if (distToHypotenuse < effectiveTolerance) {
+            // Project point onto the hypotenuse line segment (already clamped by projectPointOnSegment)
             const snappedLocal = this.projectPointOnSegment(lx, ly, topRight.x, topRight.y, bottomLeft.x, bottomLeft.y);
-            // Verify the snapped point is within bounds
-            if (snappedLocal.x >= tx && snappedLocal.x <= tx + width &&
-                snappedLocal.y >= ty && snappedLocal.y <= ty + height) {
-                const snappedWorld = this.transformToWorldSpace(snappedLocal.x, snappedLocal.y, tool);
-                return { edge: 'hypotenuse', snappedPoint: snappedWorld };
-            }
+            const snappedWorld = this.transformToWorldSpace(snappedLocal.x, snappedLocal.y, tool);
+            return { edge: 'hypotenuse', snappedPoint: snappedWorld };
         }
         
         return null;
