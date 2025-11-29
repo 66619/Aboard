@@ -132,19 +132,11 @@ class DrawingBoard {
     }
     
     centerCanvas() {
-        // Get the viewport dimensions
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-        
-        // Get the canvas center (at 0,0 without pan offset, canvas is conceptually infinite)
-        // We want to move the canvas so that the origin (0,0) is centered in the viewport
-        // Pan offset moves the canvas, so positive offset moves content right/down
-        const centerX = viewportWidth / 2;
-        const centerY = viewportHeight / 2;
-        
-        // Set pan offset to center the origin
-        this.drawingEngine.panOffset.x = centerX / this.drawingEngine.canvasScale;
-        this.drawingEngine.panOffset.y = centerY / this.drawingEngine.canvasScale;
+        // In paginated mode, the canvas uses translate(-50%, -50%) to center itself
+        // So pan offset of 0,0 means the canvas is centered
+        // Reset pan offset to center the canvas
+        this.drawingEngine.panOffset.x = 0;
+        this.drawingEngine.panOffset.y = 0;
         
         // Save to localStorage
         localStorage.setItem('panOffsetX', this.drawingEngine.panOffset.x);

@@ -179,23 +179,33 @@ class DrawingEngine {
             
             // Apply pen-specific drawing effects
             if (this.penType === 'ballpoint') {
-                // Ballpoint pen: varying thickness based on movement speed (simulating pressure)
-                // Slower = more pressure = thicker, faster = less pressure = thinner
-                const minWidth = this.penSize * 0.5;
-                const maxWidth = this.penSize * 1.3;
-                const speedFactor = Math.min(distance / 10, 1); // Normalize distance as speed proxy
+                // Ballpoint pen: smooth ink flow with slight pressure variation
+                // Creates clean lines with subtle thickness changes
+                this.ctx.save();
+                const minWidth = this.penSize * 0.7;
+                const maxWidth = this.penSize * 1.2;
+                const speedFactor = Math.min(distance / 8, 1);
                 const lineWidth = maxWidth - (speedFactor * (maxWidth - minWidth));
                 this.ctx.lineWidth = lineWidth;
+                this.ctx.globalAlpha = 0.95;
                 
                 this.ctx.beginPath();
                 this.ctx.moveTo(prevPoint.x, prevPoint.y);
                 this.ctx.lineTo(currPoint.x, currPoint.y);
                 this.ctx.stroke();
+                this.ctx.restore();
+                this.setupDrawingContext();
             } else if (this.penType === 'brush') {
-                // Brush pen: fuzzy edges with multiple strokes and varying opacity
+                // Brush pen: soft edges with ink spread effect like calligraphy
                 this.drawBrushStroke(prevPoint, currPoint, distance);
+            } else if (this.penType === 'pencil') {
+                // Pencil: grainy texture with lighter strokes
+                this.drawPencilStroke(prevPoint, currPoint, distance);
+            } else if (this.penType === 'fountain') {
+                // Fountain pen: variable line width with elegant flow
+                this.drawFountainStroke(prevPoint, currPoint, distance);
             } else {
-                // Normal, pencil, fountain pens
+                // Normal pen: consistent line width
                 this.ctx.beginPath();
                 this.ctx.moveTo(prevPoint.x, prevPoint.y);
                 this.ctx.lineTo(currPoint.x, currPoint.y);
@@ -206,6 +216,76 @@ class DrawingEngine {
         } else {
             this.lastPoint = pos;
         }
+    }
+    
+    /**
+     * Draw a pencil stroke with grainy texture
+     */
+    drawPencilStroke(prevPoint, currPoint, distance) {
+        const dx = currPoint.x - prevPoint.x;
+        const dy = currPoint.y - prevPoint.y;
+        const angle = Math.atan2(dy, dx);
+        
+        // Base stroke
+        this.ctx.save();
+        this.ctx.globalAlpha = 0.6;
+        this.ctx.lineWidth = this.penSize * 0.9;
+        this.ctx.beginPath();
+        this.ctx.moveTo(prevPoint.x, prevPoint.y);
+        this.ctx.lineTo(currPoint.x, currPoint.y);
+        this.ctx.stroke();
+        
+        // Add grainy texture effect with thin secondary strokes
+        // Use a hash-based pseudo-random to avoid patterns
+        const numGrainStrokes = 2;
+        for (let i = 0; i < numGrainStrokes; i++) {
+            // Simple hash function for better distribution
+            const hash = Math.sin(prevPoint.x * 12.9898 + currPoint.y * 78.233 + i * 43758.5453) * 43758.5453;
+            const seed = hash - Math.floor(hash);
+            const offset = (seed - 0.5) * this.penSize * 0.3;
+            const perpX = Math.cos(angle + Math.PI / 2) * offset;
+            const perpY = Math.sin(angle + Math.PI / 2) * offset;
+            
+            this.ctx.globalAlpha = 0.3 + seed * 0.2;
+            this.ctx.lineWidth = this.penSize * 0.4;
+            this.ctx.beginPath();
+            this.ctx.moveTo(prevPoint.x + perpX, prevPoint.y + perpY);
+            this.ctx.lineTo(currPoint.x + perpX, currPoint.y + perpY);
+            this.ctx.stroke();
+        }
+        
+        this.ctx.restore();
+        this.setupDrawingContext();
+    }
+    
+    /**
+     * Draw a fountain pen stroke with elegant variable width
+     */
+    drawFountainStroke(prevPoint, currPoint, distance) {
+        // Fountain pen has more dramatic width variation based on direction and speed
+        const dx = currPoint.x - prevPoint.x;
+        const dy = currPoint.y - prevPoint.y;
+        const angle = Math.atan2(dy, dx);
+        
+        // Width varies more dramatically with speed
+        const minWidth = this.penSize * 0.4;
+        const maxWidth = this.penSize * 1.8;
+        const speedFactor = Math.min(distance / 12, 1);
+        
+        // Also vary width based on stroke direction (like a calligraphy pen)
+        const directionFactor = Math.abs(Math.sin(angle * 2)) * 0.3;
+        const lineWidth = maxWidth - (speedFactor * (maxWidth - minWidth)) - (directionFactor * this.penSize);
+        
+        this.ctx.save();
+        this.ctx.globalAlpha = 1.0;
+        this.ctx.lineWidth = Math.max(minWidth, lineWidth);
+        this.ctx.lineCap = 'round';
+        this.ctx.beginPath();
+        this.ctx.moveTo(prevPoint.x, prevPoint.y);
+        this.ctx.lineTo(currPoint.x, currPoint.y);
+        this.ctx.stroke();
+        this.ctx.restore();
+        this.setupDrawingContext();
     }
     
     /**
@@ -220,13 +300,19 @@ class DrawingEngine {
         const angle = Math.atan2(dy, dx);
         
         // Calculate brush width based on distance (faster movement = thinner for brush effect)
-        const baseWidth = this.penSize * 1.5;
-        const speedFactor = Math.min(distance / 15, 1);
-        const brushWidth = baseWidth * (1 - speedFactor * 0.5);
+        const baseWidth = this.penSize * 2.0;
+        const speedFactor = Math.min(distance / 12, 1);
+        const brushWidth = baseWidth * (1 - speedFactor * 0.6);
+        
+        // Hash function for better pseudo-random distribution
+        const hash = (x, y, i) => {
+            const h = Math.sin(x * 12.9898 + y * 78.233 + i * 43758.5453) * 43758.5453;
+            return h - Math.floor(h);
+        };
         
         // Draw main stroke with varying width
         this.ctx.save();
-        this.ctx.globalAlpha = 0.7;
+        this.ctx.globalAlpha = 0.75;
         this.ctx.lineWidth = brushWidth;
         this.ctx.lineCap = 'round';
         this.ctx.beginPath();
@@ -235,20 +321,20 @@ class DrawingEngine {
         this.ctx.stroke();
         
         // Add fuzzy edge effects using deterministic offsets based on point positions
-        // Using position-based seeds for consistent but varied appearance
-        const numFuzzyStrokes = 3;
+        // Simulates ink spreading on paper
+        const numFuzzyStrokes = 4;
         for (let i = 0; i < numFuzzyStrokes; i++) {
-            // Use deterministic pseudo-random based on point position and index
-            const seed1 = (prevPoint.x * 1000 + currPoint.y + i) % 1;
-            const seed2 = (prevPoint.y * 1000 + currPoint.x + i) % 1;
-            const seed3 = (currPoint.x * 1000 + prevPoint.y + i) % 1;
+            // Use hash-based pseudo-random for better distribution
+            const seed1 = hash(prevPoint.x, currPoint.y, i * 1.1);
+            const seed2 = hash(prevPoint.y, currPoint.x, i * 2.2);
+            const seed3 = hash(currPoint.x, prevPoint.y, i * 3.3);
             
-            const offset = (seed1 - 0.5) * brushWidth * 0.5;
+            const offset = (seed1 - 0.5) * brushWidth * 0.6;
             const perpX = Math.cos(angle + Math.PI / 2) * offset;
             const perpY = Math.sin(angle + Math.PI / 2) * offset;
             
-            this.ctx.globalAlpha = 0.15 + seed2 * 0.1;
-            this.ctx.lineWidth = brushWidth * (0.3 + seed3 * 0.3);
+            this.ctx.globalAlpha = 0.1 + seed2 * 0.15;
+            this.ctx.lineWidth = brushWidth * (0.2 + seed3 * 0.4);
             this.ctx.beginPath();
             this.ctx.moveTo(prevPoint.x + perpX, prevPoint.y + perpY);
             this.ctx.lineTo(currPoint.x + perpX, currPoint.y + perpY);

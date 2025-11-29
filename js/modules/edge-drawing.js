@@ -105,8 +105,10 @@ class EdgeDrawingManager {
     
     /**
      * Check if a point is near a set square edge
-     * Set squares are right triangles - only the edges should allow drawing
-     * The three edges: hypotenuse, bottom, and vertical right side
+     * Set squares are right triangles - only the top and left edges should allow drawing
+     * Top edge: horizontal edge at the top
+     * Left edge: vertical edge on the left side
+     * (Bottom and hypotenuse edges do not support edge drawing)
      */
     getSetSquareEdgeAtPoint(localPoint, tool, originalX, originalY) {
         const { x: tx, y: ty, width, height } = tool;
@@ -118,33 +120,30 @@ class EdgeDrawingManager {
         // Bottom-right: (tx + width, ty + height)
         // Top-left (right angle): (tx, ty)
         const p1 = { x: tx, y: ty + height };           // Bottom-left
-        const p2 = { x: tx + width, y: ty + height };   // Bottom-right
         const p3 = { x: tx, y: ty };                     // Top-left (right angle vertex)
         
-        // Check bottom edge (horizontal)
-        const distToBottom = this.distanceToSegment(lx, ly, p1.x, p1.y, p2.x, p2.y);
-        if (distToBottom < this.edgeTolerance) {
-            const snappedLocal = this.projectPointOnSegment(lx, ly, p1.x, p1.y, p2.x, p2.y);
+        // For the set square image, we need to check the actual visible edges:
+        // Top edge: from top-left corner across the top (horizontal)
+        // Left edge: from top-left down to bottom-left (vertical)
+        
+        // Check top edge (horizontal) - from top-left to top-right of image bounds
+        const topRight = { x: tx + width, y: ty };
+        const distToTop = this.distanceToSegment(lx, ly, p3.x, p3.y, topRight.x, topRight.y);
+        if (distToTop < this.edgeTolerance && lx >= tx && lx <= tx + width) {
+            const snappedLocal = { x: Math.max(tx, Math.min(tx + width, lx)), y: ty };
             const snappedWorld = this.transformToWorldSpace(snappedLocal.x, snappedLocal.y, tool);
-            return { edge: 'bottom', snappedPoint: snappedWorld };
+            return { edge: 'top', snappedPoint: snappedWorld };
         }
         
-        // Check left edge (vertical)
-        const distToLeft = this.distanceToSegment(lx, ly, p1.x, p1.y, p3.x, p3.y);
-        if (distToLeft < this.edgeTolerance) {
-            const snappedLocal = this.projectPointOnSegment(lx, ly, p1.x, p1.y, p3.x, p3.y);
+        // Check left edge (vertical) - from top-left to bottom-left
+        const distToLeft = this.distanceToSegment(lx, ly, p3.x, p3.y, p1.x, p1.y);
+        if (distToLeft < this.edgeTolerance && ly >= ty && ly <= ty + height) {
+            const snappedLocal = { x: tx, y: Math.max(ty, Math.min(ty + height, ly)) };
             const snappedWorld = this.transformToWorldSpace(snappedLocal.x, snappedLocal.y, tool);
             return { edge: 'left', snappedPoint: snappedWorld };
         }
         
-        // Check hypotenuse (diagonal from top-left to bottom-right)
-        const distToHypotenuse = this.distanceToSegment(lx, ly, p3.x, p3.y, p2.x, p2.y);
-        if (distToHypotenuse < this.edgeTolerance) {
-            const snappedLocal = this.projectPointOnSegment(lx, ly, p3.x, p3.y, p2.x, p2.y);
-            const snappedWorld = this.transformToWorldSpace(snappedLocal.x, snappedLocal.y, tool);
-            return { edge: 'hypotenuse', snappedPoint: snappedWorld };
-        }
-        
+        // Bottom edge and hypotenuse do not support edge drawing
         return null;
     }
     
@@ -176,46 +175,32 @@ class EdgeDrawingManager {
         const { x: tx, y: ty, width, height } = tool;
         const lx = localPoint.x;
         const ly = localPoint.y;
+        const margin = this.edgeTolerance;
         
-        // Triangle vertices
-        const p1 = { x: tx, y: ty + height };           // Bottom-left
-        const p2 = { x: tx + width, y: ty + height };   // Bottom-right
-        const p3 = { x: tx, y: ty };                     // Top-left
+        // For set square with PNG image, block drawing inside the entire image bounds
+        // except near the top and left edges where edge drawing is allowed
         
-        // Check if point is inside the triangle using barycentric coordinates
-        // First check bounds
+        // Check if point is within the image bounds
         if (lx < tx || lx > tx + width || ly < ty || ly > ty + height) {
             return false;
         }
         
-        // Use sign of cross products to determine if point is inside
-        const sign = (px, py, ax, ay, bx, by) => {
-            return (px - bx) * (ay - by) - (ax - bx) * (py - by);
-        };
-        
-        const d1 = sign(lx, ly, p1.x, p1.y, p2.x, p2.y);
-        const d2 = sign(lx, ly, p2.x, p2.y, p3.x, p3.y);
-        const d3 = sign(lx, ly, p3.x, p3.y, p1.x, p1.y);
-        
-        const hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
-        const hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
-        
-        const isInside = !(hasNeg && hasPos);
-        
-        // Add margin check - must be sufficiently inside (not just on edge)
-        if (isInside) {
-            const distToBottom = this.distanceToSegment(lx, ly, p1.x, p1.y, p2.x, p2.y);
-            const distToLeft = this.distanceToSegment(lx, ly, p1.x, p1.y, p3.x, p3.y);
-            const distToHypotenuse = this.distanceToSegment(lx, ly, p3.x, p3.y, p2.x, p2.y);
-            
-            // Only consider inside if away from all edges
-            if (distToBottom > this.edgeTolerance && 
-                distToLeft > this.edgeTolerance && 
-                distToHypotenuse > this.edgeTolerance) {
-                return true;
-            }
+        // Check distance from top edge
+        const distToTop = Math.abs(ly - ty);
+        if (distToTop < this.edgeTolerance) {
+            return false; // Near top edge, allow drawing
         }
-        return false;
+        
+        // Check distance from left edge
+        const distToLeft = Math.abs(lx - tx);
+        if (distToLeft < this.edgeTolerance) {
+            return false; // Near left edge, allow drawing
+        }
+        
+        // Point is inside the set square area and not near allowed edges
+        // Block drawing
+        return lx > tx + margin && lx < tx + width - margin &&
+               ly > ty + margin && ly < ty + height - margin;
     }
     
     /**

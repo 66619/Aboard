@@ -68,7 +68,7 @@ class TeachingToolsManager {
         this.setSquareImage = new Image();
         this.setSquareImage.onload = checkLoaded;
         this.setSquareImage.onerror = () => console.error('Failed to load set square image');
-        this.setSquareImage.src = 'img/set_square_1.svg';
+        this.setSquareImage.src = 'img/set_square_1.png';
     }
     
     createModal() {
@@ -204,6 +204,30 @@ class TeachingToolsManager {
         const setSquareEl = document.getElementById('current-set-square-count');
         if (rulerEl) rulerEl.value = counts.rulerCount;
         if (setSquareEl) setSquareEl.value = counts.setSquareCount;
+        
+        // Disable/enable minus buttons based on count
+        const rulerMinusBtn = document.querySelector('[data-tool="currentRuler"][data-action="minus"]');
+        const setSquareMinusBtn = document.querySelector('[data-tool="currentSetSquare"][data-action="minus"]');
+        
+        if (rulerMinusBtn) {
+            if (counts.rulerCount <= 0) {
+                rulerMinusBtn.classList.add('disabled');
+                rulerMinusBtn.disabled = true;
+            } else {
+                rulerMinusBtn.classList.remove('disabled');
+                rulerMinusBtn.disabled = false;
+            }
+        }
+        
+        if (setSquareMinusBtn) {
+            if (counts.setSquareCount <= 0) {
+                setSquareMinusBtn.classList.add('disabled');
+                setSquareMinusBtn.disabled = true;
+            } else {
+                setSquareMinusBtn.classList.remove('disabled');
+                setSquareMinusBtn.disabled = false;
+            }
+        }
     }
     
     // Remove the last tool of a specific type
@@ -388,11 +412,13 @@ class TeachingToolsManager {
     }
     
     handleResize(e) {
-        const rect = this.canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
         const tool = this.selectedTool;
         const handle = this.activeResizeHandle;
+        
+        // Convert mouse position to canvas coordinates (accounting for scale)
+        const canvasCoords = this.screenToCanvasCoords(e.clientX, e.clientY);
+        const mouseX = canvasCoords.x;
+        const mouseY = canvasCoords.y;
         
         // Get the center of the tool for rotation calculations
         const centerX = this.resizeStart.x + this.resizeStart.width / 2;
