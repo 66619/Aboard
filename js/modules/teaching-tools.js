@@ -348,8 +348,8 @@ class TeachingToolsManager {
     
     insertTools() {
         const canvasRect = this.canvas.getBoundingClientRect();
-        const centerX = canvasRect.width / 2;
-        const centerY = canvasRect.height / 2;
+        const centerX = (canvasRect.right - canvasRect.left) / 2;
+        const centerY = (canvasRect.bottom - canvasRect.top) / 2;
         
         // Insert rulers
         for (let i = 0; i < this.rulerCount; i++) {
@@ -385,7 +385,7 @@ class TeachingToolsManager {
     }
     
     addTool(tool) {
-        tool.id = Date.now() + Math.random();
+        tool.id = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         this.tools.push(tool);
         this.createToolOverlay(tool);
     }
@@ -461,13 +461,33 @@ class TeachingToolsManager {
         this.updateControlPosition();
     }
     
+    // Helper function to rotate a point around a center
+    rotatePoint(px, py, cx, cy, angle) {
+        const radians = (angle * Math.PI) / 180;
+        const cos = Math.cos(radians);
+        const sin = Math.sin(radians);
+        const nx = (cos * (px - cx)) + (sin * (py - cy)) + cx;
+        const ny = (cos * (py - cy)) - (sin * (px - cx)) + cy;
+        return { x: nx, y: ny };
+    }
+    
+    // Helper function to transform point to tool's local coordinate space (accounting for rotation)
+    transformToToolSpace(x, y, tool) {
+        const centerX = tool.x + tool.width / 2;
+        const centerY = tool.y + tool.height / 2;
+        // Rotate point in opposite direction to get local coordinates
+        return this.rotatePoint(x, y, centerX, centerY, -tool.rotation);
+    }
+    
     getToolAtPosition(x, y) {
         // Check tools in reverse order (top-most first)
         for (let i = this.tools.length - 1; i >= 0; i--) {
             const tool = this.tools[i];
-            // Simple bounding box check (doesn't account for rotation)
-            if (x >= tool.x && x <= tool.x + tool.width &&
-                y >= tool.y && y <= tool.y + tool.height) {
+            // Transform point to tool's local coordinate space
+            const localPoint = this.transformToToolSpace(x, y, tool);
+            // Now check against unrotated bounding box
+            if (localPoint.x >= tool.x && localPoint.x <= tool.x + tool.width &&
+                localPoint.y >= tool.y && localPoint.y <= tool.y + tool.height) {
                 return tool;
             }
         }
@@ -510,9 +530,11 @@ class TeachingToolsManager {
     // Check if a point is near the edge of a tool (for drawing along edges)
     isNearToolEdge(x, y, tolerance = 10) {
         for (const tool of this.tools) {
-            // Check if near edges
-            if (this.isNearRectEdge(x, y, tool, tolerance)) {
-                return { tool, edge: this.getNearestEdge(x, y, tool) };
+            // Transform point to tool's local coordinate space
+            const localPoint = this.transformToToolSpace(x, y, tool);
+            // Check if near edges in local space
+            if (this.isNearRectEdge(localPoint.x, localPoint.y, tool, tolerance)) {
+                return { tool, edge: this.getNearestEdge(localPoint.x, localPoint.y, tool) };
             }
         }
         return null;
@@ -521,7 +543,7 @@ class TeachingToolsManager {
     isNearRectEdge(x, y, tool, tolerance) {
         const { x: tx, y: ty, width, height } = tool;
         
-        // Check each edge
+        // Check each edge (in local coordinate space)
         const nearTop = Math.abs(y - ty) < tolerance && x >= tx && x <= tx + width;
         const nearBottom = Math.abs(y - (ty + height)) < tolerance && x >= tx && x <= tx + width;
         const nearLeft = Math.abs(x - tx) < tolerance && y >= ty && y <= ty + height;
