@@ -179,8 +179,8 @@ class LineStyleModal {
         this.updatePreview();
         
         // Apply i18n translations if available
-        if (window.i18n) {
-            window.i18n.updatePageTranslations();
+        if (window.i18n && window.i18n.applyTranslations) {
+            window.i18n.applyTranslations();
         }
     }
     
