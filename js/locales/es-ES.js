@@ -32,6 +32,7 @@ window.translations = {
         undo: 'Deshacer',
         redo: 'Rehacer',
         pen: 'Bolígrafo',
+        shape: 'Forma',
         move: 'Mover',
         eraser: 'Borrador',
         clear: 'Borrar',
@@ -58,6 +59,16 @@ window.translations = {
             brush: 'Pincel',
             colorAndSize: 'Color y tamaño',
             colorPicker: 'Selector de color'
+        },
+        shape: {
+            title: 'Forma',
+            type: 'Tipo de forma',
+            line: 'Línea',
+            rectangle: 'Rectángulo',
+            circle: 'Círculo',
+            ellipse: 'Elipse',
+            arrow: 'Flecha',
+            hint: 'Presione y arrastre para dibujar, suelte para terminar'
         },
         eraser: {
             title: 'Borrador',
@@ -92,6 +103,7 @@ window.translations = {
         english4line: 'Línea inglesa 4',
         musicStaff: 'Pentagrama',
         coordinate: 'Coordenadas',
+        coordinateOriginHint: 'Doble clic para seleccionar el origen en modo Mover, luego arrastre para moverlo',
         image: 'Imagen',
         opacity: 'Opacidad del fondo',
         opacityHint: 'Ajustar la transparencia del fondo, 100% es completamente opaco',

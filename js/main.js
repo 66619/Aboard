@@ -31,6 +31,9 @@ class DrawingBoard {
         this.exportManager = new ExportManager(this.canvas, this.bgCanvas, this);
         this.teachingToolsManager = new TeachingToolsManager(this.canvas, this.ctx, this.historyManager);
         
+        // Initialize shape drawing manager
+        this.shapeDrawingManager = new ShapeDrawingManager(this.canvas, this.ctx, this.drawingEngine, this.historyManager);
+        
         // Initialize edge drawing manager for teaching tools
         this.edgeDrawingManager = new EdgeDrawingManager(this.teachingToolsManager, this.drawingEngine);
         
@@ -235,17 +238,21 @@ class DrawingBoard {
                 }
             }
             
-            // Check if clicking on coordinate origin point (in background mode)
-            if (this.drawingEngine.currentTool === 'background' && 
-                this.backgroundManager.backgroundPattern === 'coordinate') {
+            // Check if clicking on coordinate origin point (in background or pan mode)
+            // In pan mode, require double-click to select coordinate origin
+            if (this.backgroundManager.backgroundPattern === 'coordinate') {
                 const rect = this.bgCanvas.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
                 
                 if (this.backgroundManager.isPointNearCoordinateOrigin(x, y)) {
-                    this.isDraggingCoordinateOrigin = true;
-                    this.coordinateOriginDragStart = { x: e.clientX, y: e.clientY };
-                    return;
+                    if (this.drawingEngine.currentTool === 'background') {
+                        // In background mode, single click to drag
+                        this.isDraggingCoordinateOrigin = true;
+                        this.coordinateOriginDragStart = { x: e.clientX, y: e.clientY };
+                        return;
+                    }
+                    // In pan mode, we'll handle this in dblclick event
                 }
             }
             
@@ -257,6 +264,12 @@ class DrawingBoard {
             
             if (e.button === 1 || (e.button === 0 && e.shiftKey) || this.drawingEngine.currentTool === 'pan') {
                 this.drawingEngine.startPanning(e);
+            } else if (this.drawingEngine.currentTool === 'shape') {
+                // Handle shape drawing
+                if (this.teachingToolsManager && this.teachingToolsManager.isInteracting) {
+                    return;
+                }
+                this.shapeDrawingManager.startDrawing(e);
             } else if (this.drawingEngine.currentTool === 'pen' || this.drawingEngine.currentTool === 'eraser') {
                 // Don't start drawing if interacting with teaching tools
                 if (this.teachingToolsManager && this.teachingToolsManager.isInteracting) {
@@ -277,6 +290,9 @@ class DrawingBoard {
             } else if (this.drawingEngine.isPanning) {
                 this.drawingEngine.pan(e);
                 this.applyPanTransform();
+            } else if (this.shapeDrawingManager && this.shapeDrawingManager.isDrawing) {
+                // Handle shape drawing
+                this.shapeDrawingManager.draw(e);
             } else if (this.drawingEngine.isDrawing) {
                 this.drawingEngine.draw(e);
                 this.updateEraserCursor(e);
@@ -289,6 +305,24 @@ class DrawingBoard {
             this.stopDraggingCoordinateOrigin();
             this.handleDrawingComplete();
             this.drawingEngine.stopPanning();
+        });
+        
+        // Double-click handler for coordinate origin selection in pan mode
+        this.canvas.addEventListener('dblclick', (e) => {
+            // In pan mode, double-click to select coordinate origin
+            if (this.drawingEngine.currentTool === 'pan' && 
+                this.backgroundManager.backgroundPattern === 'coordinate') {
+                const rect = this.bgCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                if (this.backgroundManager.isPointNearCoordinateOrigin(x, y)) {
+                    this.isDraggingCoordinateOrigin = true;
+                    this.coordinateOriginDragStart = { x: e.clientX, y: e.clientY };
+                    // Visual feedback - change cursor
+                    this.canvas.style.cursor = 'move';
+                }
+            }
         });
         
         this.canvas.addEventListener('mouseenter', (e) => {
@@ -358,6 +392,7 @@ class DrawingBoard {
         
         // Toolbar buttons
         document.getElementById('pen-btn').addEventListener('click', () => this.setTool('pen'));
+        document.getElementById('shape-btn').addEventListener('click', () => this.setTool('shape'));
         document.getElementById('pan-btn').addEventListener('click', () => this.setTool('pan'));
         document.getElementById('eraser-btn').addEventListener('click', () => this.setTool('eraser'));
         document.getElementById('background-btn').addEventListener('click', () => this.setTool('background'));
@@ -1396,7 +1431,7 @@ class DrawingBoard {
         document.getElementById('feature-area').classList.remove('show');
         
         // Show appropriate panel based on tool
-        if (showConfig && (tool === 'pen' || tool === 'eraser' || tool === 'background')) {
+        if (showConfig && (tool === 'pen' || tool === 'eraser' || tool === 'background' || tool === 'shape')) {
             document.getElementById('config-area').classList.add('show');
         } else if (tool === 'more') {
             document.getElementById('feature-area').classList.add('show');
@@ -1415,6 +1450,12 @@ class DrawingBoard {
     }
     
     handleDrawingComplete() {
+        // Handle shape drawing completion
+        if (this.drawingEngine.currentTool === 'shape') {
+            this.shapeDrawingManager.stopDrawing();
+            return;
+        }
+        
         if (this.drawingEngine.stopDrawing()) {
             this.historyManager.saveState();
             this.closeConfigPanel();
@@ -1542,6 +1583,10 @@ class DrawingBoard {
         if (tool === 'pen') {
             document.getElementById('pen-btn').classList.add('active');
             document.getElementById('pen-config').classList.add('active');
+            this.canvas.style.cursor = 'crosshair';
+        } else if (tool === 'shape') {
+            document.getElementById('shape-btn').classList.add('active');
+            document.getElementById('shape-config').classList.add('active');
             this.canvas.style.cursor = 'crosshair';
         } else if (tool === 'pan') {
             document.getElementById('pan-btn').classList.add('active');
@@ -2294,7 +2339,13 @@ class DrawingBoard {
     }
     
     stopDraggingCoordinateOrigin() {
-        this.isDraggingCoordinateOrigin = false;
+        if (this.isDraggingCoordinateOrigin) {
+            this.isDraggingCoordinateOrigin = false;
+            // Restore cursor based on current tool
+            if (this.drawingEngine.currentTool === 'pan') {
+                this.canvas.style.cursor = 'grab';
+            }
+        }
     }
 }
 

@@ -32,6 +32,7 @@ window.translations = {
         undo: '撤销',
         redo: '重做',
         pen: '笔',
+        shape: '形状',
         move: '移动',
         eraser: '橡皮',
         clear: '清空',
@@ -61,6 +62,16 @@ window.translations = {
             size: '粗细',
             sizeLabel: '粗细：当前',
             sizePx: 'px'
+        },
+        shape: {
+            title: '形状',
+            type: '形状类型',
+            line: '直线',
+            rectangle: '矩形',
+            circle: '圆形',
+            ellipse: '椭圆',
+            arrow: '箭头',
+            hint: '按住拖动绘制形状，松开完成'
         },
         eraser: {
             title: '橡皮',
@@ -97,6 +108,7 @@ window.translations = {
         english4line: '英语四线格',
         musicStaff: '五线谱',
         coordinate: '坐标系',
+        coordinateOriginHint: '在移动模式下双击选中坐标系中心可拖动移动',
         image: '上传图片',
         density: '密度',
         densityLabel: '密度：当前',

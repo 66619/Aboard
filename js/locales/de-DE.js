@@ -32,6 +32,7 @@ window.translations = {
         undo: 'Rückgängig',
         redo: 'Wiederholen',
         pen: 'Stift',
+        shape: 'Form',
         move: 'Verschieben',
         eraser: 'Radiergummi',
         clear: 'Löschen',
@@ -61,6 +62,16 @@ window.translations = {
             size: 'Größe',
             sizeLabel: 'Größe: Aktuell',
             sizePx: 'px'
+        },
+        shape: {
+            title: 'Form',
+            type: 'Formtyp',
+            line: 'Linie',
+            rectangle: 'Rechteck',
+            circle: 'Kreis',
+            ellipse: 'Ellipse',
+            arrow: 'Pfeil',
+            hint: 'Drücken und ziehen zum Zeichnen, loslassen zum Beenden'
         },
         eraser: {
             title: 'Radiergummi',
@@ -97,6 +108,7 @@ window.translations = {
         english4line: 'Englisch 4-Linien',
         musicStaff: 'Notensystem',
         coordinate: 'Koordinaten',
+        coordinateOriginHint: 'Doppelklicken Sie im Verschiebemodus, um den Koordinatenursprung auszuwählen und zu verschieben',
         image: 'Bild',
         opacity: 'Hintergrund-Deckkraft',
         opacityHint: 'Hintergrundtransparenz anpassen, 100% ist vollständig undurchsichtig',

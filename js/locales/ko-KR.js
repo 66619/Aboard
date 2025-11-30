@@ -32,6 +32,7 @@ window.translations = {
         undo: '실행 취소',
         redo: '다시 실행',
         pen: '펜',
+        shape: '도형',
         move: '이동',
         eraser: '지우개',
         clear: '지우기',
@@ -61,6 +62,16 @@ window.translations = {
             size: '크기',
             sizeLabel: '크기: 현재',
             sizePx: 'px'
+        },
+        shape: {
+            title: '도형',
+            type: '도형 유형',
+            line: '직선',
+            rectangle: '사각형',
+            circle: '원',
+            ellipse: '타원',
+            arrow: '화살표',
+            hint: '눌러서 드래그하여 도형 그리기, 놓으면 완성'
         },
         eraser: {
             title: '지우개',
@@ -97,6 +108,7 @@ window.translations = {
         english4line: '영어 4선',
         musicStaff: '오선보',
         coordinate: '좌표계',
+        coordinateOriginHint: '이동 모드에서 더블클릭하여 좌표 원점 선택 후 드래그하여 이동',
         image: '이미지',
         density: '밀도',
         densityLabel: '밀도: 현재',

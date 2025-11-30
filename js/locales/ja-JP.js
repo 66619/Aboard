@@ -32,6 +32,7 @@ window.translations = {
         undo: '元に戻す',
         redo: 'やり直す',
         pen: 'ペン',
+        shape: '図形',
         move: '移動',
         eraser: '消しゴム',
         clear: 'クリア',
@@ -61,6 +62,16 @@ window.translations = {
             size: 'サイズ',
             sizeLabel: 'サイズ：現在',
             sizePx: 'px'
+        },
+        shape: {
+            title: '図形',
+            type: '図形の種類',
+            line: '直線',
+            rectangle: '四角形',
+            circle: '円',
+            ellipse: '楕円',
+            arrow: '矢印',
+            hint: 'ドラッグして図形を描画、離して完成'
         },
         eraser: {
             title: '消しゴム',
@@ -97,6 +108,7 @@ window.translations = {
         english4line: '英語4線',
         musicStaff: '五線譜',
         coordinate: '座標系',
+        coordinateOriginHint: '移動モードでダブルクリックして座標原点を選択し、ドラッグして移動',
         image: '画像',
         density: '密度',
         densityLabel: '密度：現在',

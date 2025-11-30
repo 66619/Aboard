@@ -32,6 +32,7 @@ window.translations = {
         undo: 'Undo',
         redo: 'Redo',
         pen: 'Pen',
+        shape: 'Shape',
         move: 'Move',
         eraser: 'Eraser',
         clear: 'Clear',
@@ -61,6 +62,16 @@ window.translations = {
             size: 'Size',
             sizeLabel: 'Size: Current',
             sizePx: 'px'
+        },
+        shape: {
+            title: 'Shape',
+            type: 'Shape Type',
+            line: 'Line',
+            rectangle: 'Rectangle',
+            circle: 'Circle',
+            ellipse: 'Ellipse',
+            arrow: 'Arrow',
+            hint: 'Press and drag to draw shape, release to finish'
         },
         eraser: {
             title: 'Eraser',
@@ -97,6 +108,7 @@ window.translations = {
         english4line: 'English 4-Line',
         musicStaff: 'Music Staff',
         coordinate: 'Coordinate',
+        coordinateOriginHint: 'Double-click to select the coordinate origin in Move mode, then drag to move it',
         image: 'Upload Image',
         density: 'Density',
         densityLabel: 'Density: Current',
