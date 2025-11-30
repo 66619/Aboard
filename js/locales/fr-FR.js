@@ -32,6 +32,7 @@ window.translations = {
         undo: 'Annuler',
         redo: 'Rétablir',
         pen: 'Stylo',
+        shape: 'Forme',
         move: 'Déplacer',
         eraser: 'Gomme',
         clear: 'Effacer',
@@ -59,6 +60,16 @@ window.translations = {
             colorAndSize: 'Couleur et taille',
             colorPicker: 'Sélecteur de couleur'
         },
+        shape: {
+            title: 'Forme',
+            type: 'Type de forme',
+            line: 'Ligne',
+            rectangle: 'Rectangle',
+            circle: 'Cercle',
+            ellipse: 'Ellipse',
+            arrow: 'Flèche',
+            hint: 'Appuyez et glissez pour dessiner, relâchez pour terminer'
+        },
         eraser: {
             title: 'Gomme',
             type: 'Type de gomme',
@@ -75,6 +86,18 @@ window.translations = {
         },
         refresh: {
             warning: 'L\'actualisation effacera tout le contenu du canevas et ne pourra pas être récupéré. Êtes-vous sûr de vouloir actualiser ?'
+        },
+        lineStyle: {
+            title: 'Style de ligne',
+            solid: 'Plein',
+            dashed: 'Tirets',
+            dotted: 'Pointillé',
+            wavy: 'Ondulé',
+            double: 'Double',
+            triple: 'Triple',
+            dashDensity: 'Densité des tirets',
+            waveDensity: 'Densité des ondes',
+            lineSpacing: 'Espacement des lignes'
         }
     },
 
@@ -92,6 +115,7 @@ window.translations = {
         english4line: 'Ligne anglaise 4',
         musicStaff: 'Portée musicale',
         coordinate: 'Coordonnées',
+        coordinateOriginHint: 'Double-cliquez pour sélectionner l\'origine en mode Déplacer, puis faites glisser',
         image: 'Image',
         opacity: 'Opacité de l\'arrière-plan',
         opacityHint: 'Ajuster la transparence de l\'arrière-plan, 100% est complètement opaque',
@@ -335,6 +359,7 @@ window.translations = {
     // Feature Area
     features: {
         title: 'Fonctionnalités',
+        moreFeatures: 'Plus de fonctionnalités',
         time: 'Heure',
         timer: 'Minuteur'
     },

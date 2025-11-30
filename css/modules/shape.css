@@ -1,0 +1,197 @@
+/* Shape Tool CSS */
+/* Styles for shape drawing functionality */
+
+/* Shape preview canvas */
+#shape-preview-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 50;
+}
+
+/* More tools grid in more-config panel */
+.more-tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+    gap: 10px;
+    margin-top: 8px;
+}
+
+/* Shape config panel */
+#shape-config {
+    display: none;
+}
+
+#shape-config.active {
+    display: block;
+}
+
+/* Shape type buttons grid */
+.shape-type-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+}
+
+/* Shape type button */
+.shape-type-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 8px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 60px;
+}
+
+.shape-type-btn:hover {
+    border-color: #ccc;
+    background: #f5f5f5;
+}
+
+.shape-type-btn.active {
+    border-color: var(--theme-color, #007AFF);
+    background: rgba(0, 122, 255, 0.1);
+}
+
+.shape-type-btn svg {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
+    stroke: #333;
+}
+
+.shape-type-btn.active svg {
+    stroke: var(--theme-color, #007AFF);
+}
+
+.shape-type-btn span {
+    font-size: 11px;
+    color: #666;
+}
+
+.shape-type-btn.active span {
+    color: var(--theme-color, #007AFF);
+    font-weight: 500;
+}
+
+/* Line style grid */
+.line-style-grid,
+.pen-line-style-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-top: 8px;
+}
+
+/* Line style button */
+.line-style-btn,
+.pen-line-style-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 4px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 48px;
+}
+
+.line-style-btn:hover,
+.pen-line-style-btn:hover {
+    border-color: #ccc;
+    background: #f5f5f5;
+}
+
+.line-style-btn.active,
+.pen-line-style-btn.active {
+    border-color: var(--theme-color, #007AFF);
+    background: rgba(0, 122, 255, 0.1);
+}
+
+.line-style-btn svg,
+.pen-line-style-btn svg {
+    width: 40px;
+    height: 16px;
+    margin-bottom: 2px;
+    color: #333;
+}
+
+.line-style-btn.active svg,
+.pen-line-style-btn.active svg {
+    color: var(--theme-color, #007AFF);
+}
+
+.line-style-btn span,
+.pen-line-style-btn span {
+    font-size: 10px;
+    color: #666;
+}
+
+.line-style-btn.active span,
+.pen-line-style-btn.active span {
+    color: var(--theme-color, #007AFF);
+    font-weight: 500;
+}
+
+/* Line style settings */
+.line-style-settings,
+.pen-line-style-settings {
+    margin-top: 8px;
+    padding: 8px;
+    background: #f8f8f8;
+    border-radius: 6px;
+}
+
+.line-style-setting {
+    margin-bottom: 8px;
+}
+
+.line-style-setting:last-child {
+    margin-bottom: 0;
+}
+
+.line-style-setting label {
+    font-size: 11px;
+    color: #666;
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* Shape hint text */
+.shape-hint {
+    font-size: 11px;
+    color: #888;
+    margin-top: 8px;
+    padding: 8px;
+    background: #f5f5f5;
+    border-radius: 6px;
+    text-align: center;
+}
+
+/* Shape line preview indicator */
+.shape-drawing-indicator {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    background: rgba(0, 122, 255, 0.1);
+    border: 1px dashed var(--theme-color, #007AFF);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 11px;
+    color: var(--theme-color, #007AFF);
+    display: none;
+}
+
+.shape-drawing-indicator.visible {
+    display: block;
+}

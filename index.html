@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="css/modules/export.css">
     <link rel="stylesheet" href="css/modules/timer.css">
     <link rel="stylesheet" href="css/modules/teaching-tools.css">
+    <link rel="stylesheet" href="css/modules/shape.css">
 </head>
 <body>
     <!-- Zoom controls in top right corner -->
@@ -67,33 +68,33 @@
         <!-- Pen configuration -->
         <div id="pen-config" class="config-panel active">
             <div class="config-group">
-                <label>笔触类型</label>
+                <label data-i18n="tools.pen.type">Pen Type</label>
                 <div class="button-size-options pen-type-grid">
-                    <button class="pen-type-btn active" data-pen-type="normal">普通笔</button>
-                    <button class="pen-type-btn" data-pen-type="pencil">铅笔</button>
-                    <button class="pen-type-btn" data-pen-type="ballpoint">圆珠笔</button>
-                    <button class="pen-type-btn" data-pen-type="fountain">钢笔</button>
-                    <button class="pen-type-btn" data-pen-type="brush">毛笔</button>
+                    <button class="pen-type-btn active" data-pen-type="normal" data-i18n="tools.pen.normal">Normal</button>
+                    <button class="pen-type-btn" data-pen-type="pencil" data-i18n="tools.pen.pencil">Pencil</button>
+                    <button class="pen-type-btn" data-pen-type="ballpoint" data-i18n="tools.pen.ballpoint">Ballpoint</button>
+                    <button class="pen-type-btn" data-pen-type="fountain" data-i18n="tools.pen.fountain">Fountain</button>
+                    <button class="pen-type-btn" data-pen-type="brush" data-i18n="tools.pen.brush">Brush</button>
                 </div>
             </div>
             <div class="config-group">
-                <label>颜色与粗细</label>
+                <label data-i18n="tools.pen.colorAndSize">Color & Size</label>
                 <div class="color-picker-row">
                     <div class="color-picker-main">
-                        <button class="color-btn active" data-color="#000000" style="background-color: #000000;" title="黑色"></button>
-                        <button class="color-btn" data-color="#FF0000" style="background-color: #FF0000;" title="红色"></button>
-                        <button class="color-btn" data-color="#0000FF" style="background-color: #0000FF;" title="蓝色"></button>
-                        <button class="color-btn" data-color="#00FF00" style="background-color: #00FF00;" title="绿色"></button>
+                        <button class="color-btn active" data-color="#000000" style="background-color: #000000;" title="Black"></button>
+                        <button class="color-btn" data-color="#FF0000" style="background-color: #FF0000;" title="Red"></button>
+                        <button class="color-btn" data-color="#0000FF" style="background-color: #0000FF;" title="Blue"></button>
+                        <button class="color-btn" data-color="#00FF00" style="background-color: #00FF00;" title="Green"></button>
                     </div>
                     <div class="color-picker-main">
-                        <button class="color-btn" data-color="#FFFF00" style="background-color: #FFFF00; border: 1px solid #ccc;" title="黄色"></button>
-                        <button class="color-btn" data-color="#FF8800" style="background-color: #FF8800;" title="橙色"></button>
-                        <button class="color-btn" data-color="#8800FF" style="background-color: #8800FF;" title="紫色"></button>
-                        <button class="color-btn" data-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;" title="白色"></button>
+                        <button class="color-btn" data-color="#FFFF00" style="background-color: #FFFF00; border: 1px solid #ccc;" title="Yellow"></button>
+                        <button class="color-btn" data-color="#FF8800" style="background-color: #FF8800;" title="Orange"></button>
+                        <button class="color-btn" data-color="#8800FF" style="background-color: #8800FF;" title="Purple"></button>
+                        <button class="color-btn" data-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;" title="White"></button>
                     </div>
                 </div>
                 <div class="color-and-size-row">
-                    <label class="color-picker-icon-btn" for="custom-color-picker" title="取色器">
+                    <label class="color-picker-icon-btn" for="custom-color-picker" title="Color Picker">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
                             <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
@@ -101,26 +102,137 @@
                         <input type="color" id="custom-color-picker" class="custom-color-picker-input" value="#000000">
                     </label>
                     <div class="pen-size-inline">
-                        <label>粗细：当前 <span id="pen-size-value">5</span>px</label>
+                        <label><span data-i18n="tools.pen.size">Size</span>: <span id="pen-size-value">5</span>px</label>
                         <input type="range" id="pen-size-slider" min="1" max="50" value="5" class="slider slider-compact">
                     </div>
+                </div>
+            </div>
+            <div class="config-group">
+                <label data-i18n="tools.lineStyle.title">Line Style</label>
+                <div class="button-size-options pen-line-style-grid">
+                    <button class="pen-line-style-btn active" data-pen-line-style="solid">
+                        <svg width="40" height="16" viewBox="0 0 40 16">
+                            <line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <span data-i18n="tools.lineStyle.solid">Solid</span>
+                    </button>
+                    <button class="pen-line-style-btn" data-pen-line-style="dashed">
+                        <svg width="40" height="16" viewBox="0 0 40 16">
+                            <line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2" stroke-dasharray="6,3"/>
+                        </svg>
+                        <span data-i18n="tools.lineStyle.dashed">Dashed</span>
+                    </button>
+                    <button class="pen-line-style-btn" data-pen-line-style="dotted">
+                        <svg width="40" height="16" viewBox="0 0 40 16">
+                            <line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2" stroke-dasharray="2,4"/>
+                        </svg>
+                        <span data-i18n="tools.lineStyle.dotted">Dotted</span>
+                    </button>
+                </div>
+            </div>
+            <div id="pen-line-style-settings" class="config-group pen-line-style-settings" style="display: none;">
+                <div id="pen-dash-density-setting" class="line-style-setting" style="display: none;">
+                    <label><span data-i18n="tools.lineStyle.dashDensity">Dash Density</span>: <span id="pen-dash-density-value">10</span></label>
+                    <input type="range" id="pen-dash-density-slider" min="3" max="30" value="10" class="slider slider-compact">
                 </div>
             </div>
         </div>
 
 
 
-        <!-- Eraser configuration -->
-        <div id="eraser-config" class="config-panel">
+        <!-- Shape configuration -->
+        <div id="shape-config" class="config-panel">
             <div class="config-group">
-                <label>形状</label>
-                <div class="button-size-options eraser-shape-options">
-                    <button class="eraser-shape-btn active" data-eraser-shape="circle">圆形</button>
-                    <button class="eraser-shape-btn" data-eraser-shape="rectangle">方形</button>
+                <label data-i18n="tools.shape.type">Shape Type</label>
+                <div class="button-size-options shape-type-grid">
+                    <button class="shape-type-btn active" data-shape-type="line">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="19" x2="19" y2="5"></line>
+                        </svg>
+                        <span data-i18n="tools.shape.line">Line</span>
+                    </button>
+                    <button class="shape-type-btn" data-shape-type="rectangle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        </svg>
+                        <span data-i18n="tools.shape.rectangle">Rectangle</span>
+                    </button>
                 </div>
             </div>
             <div class="config-group">
-                <label>橡皮擦大小：当前 <span id="eraser-size-value">20</span>px</label>
+                <label data-i18n="tools.lineStyle.title">Line Style</label>
+                <div class="button-size-options line-style-grid">
+                    <button class="line-style-btn active" data-line-style="solid">
+                        <svg width="40" height="16" viewBox="0 0 40 16">
+                            <line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <span data-i18n="tools.lineStyle.solid">Solid</span>
+                    </button>
+                    <button class="line-style-btn" data-line-style="dashed">
+                        <svg width="40" height="16" viewBox="0 0 40 16">
+                            <line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2" stroke-dasharray="6,3"/>
+                        </svg>
+                        <span data-i18n="tools.lineStyle.dashed">Dashed</span>
+                    </button>
+                    <button class="line-style-btn" data-line-style="dotted">
+                        <svg width="40" height="16" viewBox="0 0 40 16">
+                            <line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2" stroke-dasharray="2,4"/>
+                        </svg>
+                        <span data-i18n="tools.lineStyle.dotted">Dotted</span>
+                    </button>
+                    <button class="line-style-btn" data-line-style="wavy">
+                        <svg width="40" height="16" viewBox="0 0 40 16">
+                            <path d="M2 8 Q6 4, 10 8 T18 8 T26 8 T34 8 Q38 12, 38 8" stroke="currentColor" stroke-width="2" fill="none"/>
+                        </svg>
+                        <span data-i18n="tools.lineStyle.wavy">Wavy</span>
+                    </button>
+                    <button class="line-style-btn" data-line-style="double">
+                        <svg width="40" height="16" viewBox="0 0 40 16">
+                            <line x1="2" y1="5" x2="38" y2="5" stroke="currentColor" stroke-width="1.5"/>
+                            <line x1="2" y1="11" x2="38" y2="11" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                        <span data-i18n="tools.lineStyle.double">Double</span>
+                    </button>
+                    <button class="line-style-btn" data-line-style="triple">
+                        <svg width="40" height="16" viewBox="0 0 40 16">
+                            <line x1="2" y1="3" x2="38" y2="3" stroke="currentColor" stroke-width="1"/>
+                            <line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="1"/>
+                            <line x1="2" y1="13" x2="38" y2="13" stroke="currentColor" stroke-width="1"/>
+                        </svg>
+                        <span data-i18n="tools.lineStyle.triple">Triple</span>
+                    </button>
+                </div>
+            </div>
+            <div id="line-style-settings" class="config-group line-style-settings" style="display: none;">
+                <div id="dash-density-setting" class="line-style-setting" style="display: none;">
+                    <label><span data-i18n="tools.lineStyle.dashDensity">Dash Density</span>: <span id="dash-density-value">10</span></label>
+                    <input type="range" id="dash-density-slider" min="3" max="30" value="10" class="slider slider-compact">
+                </div>
+                <div id="wave-density-setting" class="line-style-setting" style="display: none;">
+                    <label><span data-i18n="tools.lineStyle.waveDensity">Wave Density</span>: <span id="wave-density-value">10</span></label>
+                    <input type="range" id="wave-density-slider" min="5" max="30" value="10" class="slider slider-compact">
+                </div>
+                <div id="multi-line-settings" class="line-style-setting" style="display: none;">
+                    <label><span data-i18n="tools.lineStyle.lineSpacing">Line Spacing</span>: <span id="multi-line-spacing-value">4</span>px</label>
+                    <input type="range" id="multi-line-spacing-slider" min="2" max="20" value="4" class="slider slider-compact">
+                </div>
+            </div>
+            <div class="config-group">
+                <p class="shape-hint" data-i18n="tools.shape.hint">Press and drag to draw shape, release to finish</p>
+            </div>
+        </div>
+
+        <!-- Eraser configuration -->
+        <div id="eraser-config" class="config-panel">
+            <div class="config-group">
+                <label data-i18n="tools.eraser.shape">形状</label>
+                <div class="button-size-options eraser-shape-options">
+                    <button class="eraser-shape-btn active" data-eraser-shape="circle" data-i18n="tools.eraser.shapeCircle">圆形</button>
+                    <button class="eraser-shape-btn" data-eraser-shape="rectangle" data-i18n="tools.eraser.shapeRectangle">方形</button>
+                </div>
+            </div>
+            <div class="config-group">
+                <label><span data-i18n="tools.eraser.sizeLabel">橡皮擦大小：当前</span> <span id="eraser-size-value">20</span>px</label>
                 <input type="range" id="eraser-size-slider" min="10" max="50" value="20" class="slider">
             </div>
         </div>
@@ -192,12 +304,8 @@
             </div>
         </div>
 
-        <!-- More configuration -->
+        <!-- More configuration (placeholder) -->
         <div id="more-config" class="config-panel">
-            <div class="config-group">
-                <label>更多功能</label>
-                <p class="settings-hint" style="font-size: 12px; color: #666; margin-top: -4px;">其他工具和配置项</p>
-            </div>
         </div>
     </div>
 
@@ -246,23 +354,41 @@
         </button>
         
         <div class="config-group">
-            <label>小功能</label>
+            <label data-i18n="features.moreFeatures">More Features</label>
             <div class="more-features-grid">
-                <button id="time-display-feature-btn" class="feature-btn" title="时间显示">
+                <button id="more-shape-btn" class="feature-btn" title="Shape" data-i18n-title="toolbar.shape">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="19" x2="19" y2="5"></line>
+                        <circle cx="19" cy="5" r="2"></circle>
+                        <circle cx="5" cy="19" r="2"></circle>
+                    </svg>
+                    <span data-i18n="toolbar.shape">Shape</span>
+                </button>
+                <button id="more-teaching-tools-btn" class="feature-btn" title="Tools" data-i18n-title="toolbar.teachingTools">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="3,21 3,3 21,21"></polygon>
+                        <line x1="6" y1="18" x2="6" y2="6"></line>
+                        <line x1="9" y1="18" x2="9" y2="9"></line>
+                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                        <line x1="15" y1="18" x2="15" y2="15"></line>
+                    </svg>
+                    <span data-i18n="toolbar.teachingTools">Tools</span>
+                </button>
+                <button id="time-display-feature-btn" class="feature-btn" title="Time" data-i18n-title="features.time">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
                         <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
-                    <span>时间</span>
+                    <span data-i18n="features.time">Time</span>
                 </button>
-                <button id="timer-feature-btn" class="feature-btn" title="计时器">
+                <button id="timer-feature-btn" class="feature-btn" title="Timer" data-i18n-title="features.timer">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="13" r="8"></circle>
                         <path d="M12 9v4l2 2"></path>
                         <path d="M9 2h6"></path>
                         <path d="M12 2v2"></path>
                     </svg>
-                    <span>计时</span>
+                    <span data-i18n="features.timer">Timer</span>
                 </button>
             </div>
         </div>
@@ -852,7 +978,7 @@
                 <path d="M2 2l7.586 7.586"></path>
                 <circle cx="11" cy="11" r="2"></circle>
             </svg>
-            <span>笔</span>
+            <span data-i18n="toolbar.pen">笔</span>
         </button>
         <button id="pan-btn" class="tool-btn" data-tool="pan" title="移动画布 (Shift+拖动)">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -861,21 +987,21 @@
                 <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"></path>
                 <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"></path>
             </svg>
-            <span>移动</span>
+            <span data-i18n="toolbar.move">移动</span>
         </button>
         <button id="eraser-btn" class="tool-btn" data-tool="eraser" title="橡皮擦">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M20 20H7L3 16 12 7 17 12"></path>
                 <path d="M7 20l5-5"></path>
             </svg>
-            <span>橡皮</span>
+            <span data-i18n="toolbar.eraser">橡皮</span>
         </button>
         <button id="clear-btn" class="tool-btn" data-tool="clear" title="清空画布">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"></polyline>
                 <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
             </svg>
-            <span>清空</span>
+            <span data-i18n="toolbar.clear">清空</span>
         </button>
         <button id="background-btn" class="tool-btn" data-tool="background" title="背景">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -883,17 +1009,7 @@
                 <circle cx="8.5" cy="8.5" r="1.5"></circle>
                 <polyline points="21 15 16 10 5 21"></polyline>
             </svg>
-            <span>背景</span>
-        </button>
-        <button id="teaching-tools-btn" class="tool-btn" data-tool="teaching-tools" title="教具">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="3,21 3,3 21,21"></polygon>
-                <line x1="6" y1="18" x2="6" y2="6"></line>
-                <line x1="9" y1="18" x2="9" y2="9"></line>
-                <line x1="12" y1="18" x2="12" y2="12"></line>
-                <line x1="15" y1="18" x2="15" y2="15"></line>
-            </svg>
-            <span>教具</span>
+            <span data-i18n="toolbar.background">背景</span>
         </button>
         <button id="more-btn" class="tool-btn" data-tool="more" title="更多">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1333,6 +1449,7 @@
     <script src="js/modules/timer.js"></script>
     <script src="js/modules/edge-drawing.js"></script>
     <script src="js/modules/teaching-tools.js"></script>
+    <script src="js/modules/shape-drawing.js"></script>
     <script src="js/settings.js"></script>
     <script src="js/announcement.js"></script>
     <script src="js/export.js"></script>

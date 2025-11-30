@@ -32,6 +32,7 @@ window.translations = {
         undo: '실행 취소',
         redo: '다시 실행',
         pen: '펜',
+        shape: '도형',
         move: '이동',
         eraser: '지우개',
         clear: '지우기',
@@ -62,6 +63,16 @@ window.translations = {
             sizeLabel: '크기: 현재',
             sizePx: 'px'
         },
+        shape: {
+            title: '도형',
+            type: '도형 유형',
+            line: '직선',
+            rectangle: '사각형',
+            circle: '원',
+            ellipse: '타원',
+            arrow: '화살표',
+            hint: '눌러서 드래그하여 도형 그리기, 놓으면 완성'
+        },
         eraser: {
             title: '지우개',
             type: '지우개 유형',
@@ -80,6 +91,18 @@ window.translations = {
         },
         refresh: {
             warning: '새로 고침하면 캔버스 내용이 모두 지워지며 복구할 수 없습니다. 새로 고침하시겠습니까?'
+        },
+        lineStyle: {
+            title: '선 스타일',
+            solid: '실선',
+            dashed: '파선',
+            dotted: '점선',
+            wavy: '물결선',
+            double: '이중선',
+            triple: '삼중선',
+            dashDensity: '파선 밀도',
+            waveDensity: '물결 밀도',
+            lineSpacing: '선 간격'
         }
     },
 
@@ -97,6 +120,7 @@ window.translations = {
         english4line: '영어 4선',
         musicStaff: '오선보',
         coordinate: '좌표계',
+        coordinateOriginHint: '이동 모드에서 더블클릭하여 좌표 원점 선택 후 드래그하여 이동',
         image: '이미지',
         density: '밀도',
         densityLabel: '밀도: 현재',

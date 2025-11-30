@@ -32,6 +32,7 @@ window.translations = {
         undo: 'Undo',
         redo: 'Redo',
         pen: 'Pen',
+        shape: 'Shape',
         move: 'Move',
         eraser: 'Eraser',
         clear: 'Clear',
@@ -62,6 +63,16 @@ window.translations = {
             sizeLabel: 'Size: Current',
             sizePx: 'px'
         },
+        shape: {
+            title: 'Shape',
+            type: 'Shape Type',
+            line: 'Line',
+            rectangle: 'Rectangle',
+            circle: 'Circle',
+            ellipse: 'Ellipse',
+            arrow: 'Arrow',
+            hint: 'Press and drag to draw shape, release to finish'
+        },
         eraser: {
             title: 'Eraser',
             type: 'Eraser Type',
@@ -80,6 +91,18 @@ window.translations = {
         },
         refresh: {
             warning: 'Refreshing will clear all canvas content and cannot be recovered. Are you sure you want to refresh?'
+        },
+        lineStyle: {
+            title: 'Line Style',
+            solid: 'Solid',
+            dashed: 'Dashed',
+            dotted: 'Dotted',
+            wavy: 'Wavy',
+            double: 'Double',
+            triple: 'Triple',
+            dashDensity: 'Dash Density',
+            waveDensity: 'Wave Density',
+            lineSpacing: 'Line Spacing'
         }
     },
 
@@ -97,6 +120,7 @@ window.translations = {
         english4line: 'English 4-Line',
         musicStaff: 'Music Staff',
         coordinate: 'Coordinate',
+        coordinateOriginHint: 'Double-click to select the coordinate origin in Move mode, then drag to move it',
         image: 'Upload Image',
         density: 'Density',
         densityLabel: 'Density: Current',

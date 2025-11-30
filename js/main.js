@@ -31,6 +31,9 @@ class DrawingBoard {
         this.exportManager = new ExportManager(this.canvas, this.bgCanvas, this);
         this.teachingToolsManager = new TeachingToolsManager(this.canvas, this.ctx, this.historyManager);
         
+        // Initialize shape drawing manager
+        this.shapeDrawingManager = new ShapeDrawingManager(this.canvas, this.ctx, this.drawingEngine, this.historyManager);
+        
         // Initialize edge drawing manager for teaching tools
         this.edgeDrawingManager = new EdgeDrawingManager(this.teachingToolsManager, this.drawingEngine);
         
@@ -235,17 +238,21 @@ class DrawingBoard {
                 }
             }
             
-            // Check if clicking on coordinate origin point (in background mode)
-            if (this.drawingEngine.currentTool === 'background' && 
-                this.backgroundManager.backgroundPattern === 'coordinate') {
+            // Check if clicking on coordinate origin point (in background or pan mode)
+            // In pan mode, require double-click to select coordinate origin
+            if (this.backgroundManager.backgroundPattern === 'coordinate') {
                 const rect = this.bgCanvas.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
                 
                 if (this.backgroundManager.isPointNearCoordinateOrigin(x, y)) {
-                    this.isDraggingCoordinateOrigin = true;
-                    this.coordinateOriginDragStart = { x: e.clientX, y: e.clientY };
-                    return;
+                    if (this.drawingEngine.currentTool === 'background') {
+                        // In background mode, single click to drag
+                        this.isDraggingCoordinateOrigin = true;
+                        this.coordinateOriginDragStart = { x: e.clientX, y: e.clientY };
+                        return;
+                    }
+                    // In pan mode, we'll handle this in dblclick event
                 }
             }
             
@@ -257,6 +264,12 @@ class DrawingBoard {
             
             if (e.button === 1 || (e.button === 0 && e.shiftKey) || this.drawingEngine.currentTool === 'pan') {
                 this.drawingEngine.startPanning(e);
+            } else if (this.drawingEngine.currentTool === 'shape') {
+                // Handle shape drawing
+                if (this.teachingToolsManager && this.teachingToolsManager.isInteracting) {
+                    return;
+                }
+                this.shapeDrawingManager.startDrawing(e);
             } else if (this.drawingEngine.currentTool === 'pen' || this.drawingEngine.currentTool === 'eraser') {
                 // Don't start drawing if interacting with teaching tools
                 if (this.teachingToolsManager && this.teachingToolsManager.isInteracting) {
@@ -277,6 +290,9 @@ class DrawingBoard {
             } else if (this.drawingEngine.isPanning) {
                 this.drawingEngine.pan(e);
                 this.applyPanTransform();
+            } else if (this.shapeDrawingManager && this.shapeDrawingManager.isDrawing) {
+                // Handle shape drawing
+                this.shapeDrawingManager.draw(e);
             } else if (this.drawingEngine.isDrawing) {
                 this.drawingEngine.draw(e);
                 this.updateEraserCursor(e);
@@ -289,6 +305,24 @@ class DrawingBoard {
             this.stopDraggingCoordinateOrigin();
             this.handleDrawingComplete();
             this.drawingEngine.stopPanning();
+        });
+        
+        // Double-click handler for coordinate origin selection in pan mode
+        this.canvas.addEventListener('dblclick', (e) => {
+            // In pan mode, double-click to select coordinate origin
+            if (this.drawingEngine.currentTool === 'pan' && 
+                this.backgroundManager.backgroundPattern === 'coordinate') {
+                const rect = this.bgCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                if (this.backgroundManager.isPointNearCoordinateOrigin(x, y)) {
+                    this.isDraggingCoordinateOrigin = true;
+                    this.coordinateOriginDragStart = { x: e.clientX, y: e.clientY };
+                    // Visual feedback - change cursor
+                    this.canvas.style.cursor = 'move';
+                }
+            }
         });
         
         this.canvas.addEventListener('mouseenter', (e) => {
@@ -364,7 +398,10 @@ class DrawingBoard {
         document.getElementById('clear-btn').addEventListener('click', () => this.confirmClear());
         document.getElementById('settings-btn').addEventListener('click', () => this.openSettings());
         document.getElementById('more-btn').addEventListener('click', () => this.setTool('more'));
-        document.getElementById('teaching-tools-btn').addEventListener('click', () => this.teachingToolsManager.showModal());
+        
+        // Shape and Teaching Tools buttons in More menu
+        document.getElementById('more-shape-btn').addEventListener('click', () => this.setTool('shape'));
+        document.getElementById('more-teaching-tools-btn').addEventListener('click', () => this.teachingToolsManager.showModal());
         
         document.getElementById('config-close-btn').addEventListener('click', () => this.closeConfigPanel());
         document.getElementById('feature-close-btn').addEventListener('click', () => this.closeFeaturePanel());
@@ -604,6 +641,80 @@ class DrawingBoard {
             }
         });
         
+        // Shape type buttons
+        document.querySelectorAll('.shape-type-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const shapeType = e.target.closest('.shape-type-btn').dataset.shapeType;
+                this.shapeDrawingManager.setShape(shapeType);
+                document.querySelectorAll('.shape-type-btn').forEach(b => b.classList.remove('active'));
+                e.target.closest('.shape-type-btn').classList.add('active');
+            });
+        });
+        
+        // Shape line style buttons
+        document.querySelectorAll('.line-style-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const lineStyle = e.target.closest('.line-style-btn').dataset.lineStyle;
+                this.shapeDrawingManager.setLineStyle(lineStyle);
+                document.querySelectorAll('.line-style-btn').forEach(b => b.classList.remove('active'));
+                e.target.closest('.line-style-btn').classList.add('active');
+                
+                // Show/hide appropriate settings
+                this.updateLineStyleSettings(lineStyle);
+            });
+        });
+        
+        // Pen line style buttons
+        document.querySelectorAll('.pen-line-style-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const lineStyle = e.target.closest('.pen-line-style-btn').dataset.penLineStyle;
+                this.drawingEngine.setPenLineStyle(lineStyle);
+                document.querySelectorAll('.pen-line-style-btn').forEach(b => b.classList.remove('active'));
+                e.target.closest('.pen-line-style-btn').classList.add('active');
+                
+                // Show/hide pen dash density setting
+                this.updatePenLineStyleSettings(lineStyle);
+            });
+        });
+        
+        // Shape line style sliders
+        const dashDensitySlider = document.getElementById('dash-density-slider');
+        const dashDensityValue = document.getElementById('dash-density-value');
+        if (dashDensitySlider) {
+            dashDensitySlider.addEventListener('input', (e) => {
+                this.shapeDrawingManager.setDashDensity(parseInt(e.target.value));
+                dashDensityValue.textContent = e.target.value;
+            });
+        }
+        
+        const waveDensitySlider = document.getElementById('wave-density-slider');
+        const waveDensityValue = document.getElementById('wave-density-value');
+        if (waveDensitySlider) {
+            waveDensitySlider.addEventListener('input', (e) => {
+                this.shapeDrawingManager.setWaveDensity(parseInt(e.target.value));
+                waveDensityValue.textContent = e.target.value;
+            });
+        }
+        
+        const multiLineSpacingSlider = document.getElementById('multi-line-spacing-slider');
+        const multiLineSpacingValue = document.getElementById('multi-line-spacing-value');
+        if (multiLineSpacingSlider) {
+            multiLineSpacingSlider.addEventListener('input', (e) => {
+                this.shapeDrawingManager.setMultiLineSpacing(parseInt(e.target.value));
+                multiLineSpacingValue.textContent = e.target.value;
+            });
+        }
+        
+        // Pen dash density slider
+        const penDashDensitySlider = document.getElementById('pen-dash-density-slider');
+        const penDashDensityValue = document.getElementById('pen-dash-density-value');
+        if (penDashDensitySlider) {
+            penDashDensitySlider.addEventListener('input', (e) => {
+                this.drawingEngine.setPenDashDensity(parseInt(e.target.value));
+                penDashDensityValue.textContent = e.target.value;
+            });
+        }
+        
         // More config panel (time display checkboxes)
         const showDateCheckboxMore = document.getElementById('show-date-checkbox-more');
         const showTimeCheckboxMore = document.getElementById('show-time-checkbox-more');
@@ -619,6 +730,9 @@ class DrawingBoard {
                 if (isVisible) {
                     timeDisplayControls.style.display = 'none';
                     timeDisplayFeatureBtn.classList.remove('active');
+                    // Auto-switch to pen tool after closing time display settings
+                    this.closeFeaturePanel();
+                    this.switchToPen();
                 } else {
                     timeDisplayControls.style.display = 'flex';
                     timeDisplayFeatureBtn.classList.add('active');
@@ -635,6 +749,9 @@ class DrawingBoard {
         if (timerFeatureBtn) {
             timerFeatureBtn.addEventListener('click', () => {
                 this.timerManager.showSettingsModal();
+                // Auto-switch to pen tool after opening timer
+                this.closeFeaturePanel();
+                this.switchToPen();
             });
         }
         
@@ -1381,6 +1498,60 @@ class DrawingBoard {
         document.addEventListener('touchcancel', handleDragEnd);
     }
     
+    updateLineStyleSettings(lineStyle) {
+        const lineStyleSettings = document.getElementById('line-style-settings');
+        const dashDensitySetting = document.getElementById('dash-density-setting');
+        const waveDensitySetting = document.getElementById('wave-density-setting');
+        const multiLineSettings = document.getElementById('multi-line-settings');
+        
+        // Reset all settings
+        lineStyleSettings.style.display = 'none';
+        dashDensitySetting.style.display = 'none';
+        waveDensitySetting.style.display = 'none';
+        multiLineSettings.style.display = 'none';
+        
+        // Show relevant settings
+        switch(lineStyle) {
+            case 'dashed':
+            case 'dotted':
+                lineStyleSettings.style.display = 'block';
+                dashDensitySetting.style.display = 'flex';
+                break;
+            case 'wavy':
+                lineStyleSettings.style.display = 'block';
+                waveDensitySetting.style.display = 'flex';
+                break;
+            case 'double':
+            case 'triple':
+                lineStyleSettings.style.display = 'block';
+                multiLineSettings.style.display = 'flex';
+                break;
+        }
+    }
+    
+    updatePenLineStyleSettings(lineStyle) {
+        const penLineStyleSettings = document.getElementById('pen-line-style-settings');
+        const penDashDensitySetting = document.getElementById('pen-dash-density-setting');
+        
+        // Reset all settings
+        penLineStyleSettings.style.display = 'none';
+        penDashDensitySetting.style.display = 'none';
+        
+        // Show relevant settings
+        switch(lineStyle) {
+            case 'dashed':
+            case 'dotted':
+                penLineStyleSettings.style.display = 'block';
+                penDashDensitySetting.style.display = 'flex';
+                break;
+        }
+    }
+    
+    switchToPen() {
+        // Helper method to switch to pen tool
+        this.setTool('pen', false);
+    }
+    
     setTool(tool, showConfig = true) {
         this.drawingEngine.setTool(tool);
         if (tool === 'eraser') {
@@ -1396,7 +1567,7 @@ class DrawingBoard {
         document.getElementById('feature-area').classList.remove('show');
         
         // Show appropriate panel based on tool
-        if (showConfig && (tool === 'pen' || tool === 'eraser' || tool === 'background')) {
+        if (showConfig && (tool === 'pen' || tool === 'eraser' || tool === 'background' || tool === 'shape')) {
             document.getElementById('config-area').classList.add('show');
         } else if (tool === 'more') {
             document.getElementById('feature-area').classList.add('show');
@@ -1415,6 +1586,12 @@ class DrawingBoard {
     }
     
     handleDrawingComplete() {
+        // Handle shape drawing completion
+        if (this.drawingEngine.currentTool === 'shape') {
+            this.shapeDrawingManager.stopDrawing();
+            return;
+        }
+        
         if (this.drawingEngine.stopDrawing()) {
             this.historyManager.saveState();
             this.closeConfigPanel();
@@ -1542,6 +1719,10 @@ class DrawingBoard {
         if (tool === 'pen') {
             document.getElementById('pen-btn').classList.add('active');
             document.getElementById('pen-config').classList.add('active');
+            this.canvas.style.cursor = 'crosshair';
+        } else if (tool === 'shape') {
+            document.getElementById('more-btn').classList.add('active');
+            document.getElementById('shape-config').classList.add('active');
             this.canvas.style.cursor = 'crosshair';
         } else if (tool === 'pan') {
             document.getElementById('pan-btn').classList.add('active');
@@ -2294,7 +2475,13 @@ class DrawingBoard {
     }
     
     stopDraggingCoordinateOrigin() {
-        this.isDraggingCoordinateOrigin = false;
+        if (this.isDraggingCoordinateOrigin) {
+            this.isDraggingCoordinateOrigin = false;
+            // Restore cursor based on current tool
+            if (this.drawingEngine.currentTool === 'pan') {
+                this.canvas.style.cursor = 'grab';
+            }
+        }
     }
 }
 
