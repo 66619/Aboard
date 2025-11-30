@@ -84,18 +84,32 @@
     gap: 24px;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
+}
+
+/* 2x2 grid layout for current count display (2 rows) */
+.teaching-tools-current-row.teaching-tools-current-row-4 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px 24px;
+    justify-items: center;
 }
 
 .teaching-tool-current-item {
     display: flex;
     align-items: center;
     gap: 8px;
+    min-width: 180px;
+    justify-content: flex-start;
 }
 
 .teaching-tool-current-item span {
     font-size: 14px;
     color: #1976d2;
     font-weight: 500;
+    white-space: nowrap;
+    min-width: 90px;
+    text-align: right;
 }
 
 /* New section */
@@ -409,6 +423,10 @@
         grid-template-columns: repeat(2, 1fr);
     }
     
+    .teaching-tools-current-row.teaching-tools-current-row-4 {
+        grid-template-columns: repeat(2, auto);
+    }
+    
     .teaching-tool-item {
         min-width: 120px;
     }
@@ -432,6 +450,11 @@
     .teaching-tools-row.teaching-tools-row-4 {
         grid-template-columns: 1fr 1fr;
         gap: 8px;
+    }
+    
+    .teaching-tools-current-row.teaching-tools-current-row-4 {
+        grid-template-columns: repeat(2, auto);
+        gap: 12px;
     }
     
     .teaching-tool-item {
