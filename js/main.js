@@ -1470,37 +1470,6 @@ class DrawingBoard {
         document.addEventListener('touchcancel', handleDragEnd);
     }
     
-    updateLineStyleSettings(lineStyle) {
-        const lineStyleSettings = document.getElementById('line-style-settings');
-        const dashDensitySetting = document.getElementById('dash-density-setting');
-        const waveDensitySetting = document.getElementById('wave-density-setting');
-        const multiLineSettings = document.getElementById('multi-line-settings');
-        
-        // Reset all settings
-        lineStyleSettings.style.display = 'none';
-        dashDensitySetting.style.display = 'none';
-        waveDensitySetting.style.display = 'none';
-        multiLineSettings.style.display = 'none';
-        
-        // Show relevant settings
-        switch(lineStyle) {
-            case 'dashed':
-            case 'dotted':
-                lineStyleSettings.style.display = 'block';
-                dashDensitySetting.style.display = 'flex';
-                break;
-            case 'wavy':
-                lineStyleSettings.style.display = 'block';
-                waveDensitySetting.style.display = 'flex';
-                break;
-            case 'double':
-            case 'triple':
-                lineStyleSettings.style.display = 'block';
-                multiLineSettings.style.display = 'flex';
-                break;
-        }
-    }
-    
     updatePenLineStyleSettings(lineStyle) {
         const penLineStyleSettings = document.getElementById('pen-line-style-settings');
         const penDashDensitySetting = document.getElementById('pen-dash-density-setting');

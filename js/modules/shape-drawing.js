@@ -359,8 +359,6 @@ class ShapeDrawingManager {
             case 'multi':
                 this.drawMultiCircle(ctx, center, radius, this.multiLineCount);
                 break;
-                this.drawMultiCircle(ctx, center, radius, 3);
-                break;
             default:
                 // Solid, dashed, dotted - use standard arc
                 ctx.beginPath();
