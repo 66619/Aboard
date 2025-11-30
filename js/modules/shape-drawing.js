@@ -341,7 +341,7 @@ class ShapeDrawingManager {
         // Calculate wave parameters
         const waveLength = this.waveDensity;
         const waveAmplitude = this.drawingEngine.penSize * 1.5;
-        const waves = Math.max(1, Math.floor(length / waveLength));
+        const numSegments = Math.max(4, Math.floor(length / (waveLength / 2)));
         
         // Calculate perpendicular direction for wave offset
         const perpX = -dy / length;
@@ -350,35 +350,25 @@ class ShapeDrawingManager {
         ctx.beginPath();
         ctx.moveTo(start.x, start.y);
         
-        for (let i = 0; i <= waves * 2; i++) {
-            const t = i / (waves * 2);
+        // Draw smooth sine wave using quadratic curves
+        for (let i = 1; i <= numSegments; i++) {
+            const t = i / numSegments;
             const x = start.x + dx * t;
             const y = start.y + dy * t;
             
-            // Sine wave offset
-            const offset = Math.sin(i * Math.PI) * waveAmplitude * (i % 2 === 0 ? 1 : -1);
+            // Calculate wave offset using sine function
+            const waveOffset = Math.sin(t * Math.PI * (length / waveLength)) * waveAmplitude;
             
-            if (i === 0) {
-                ctx.moveTo(x, y);
-            } else {
-                const prevT = (i - 1) / (waves * 2);
-                const prevX = start.x + dx * prevT;
-                const prevY = start.y + dy * prevT;
-                const prevOffset = Math.sin((i - 1) * Math.PI) * waveAmplitude * ((i - 1) % 2 === 0 ? 1 : -1);
-                
-                // Use quadratic curve for smooth wave
-                const cpX = (prevX + x) / 2 + perpX * offset;
-                const cpY = (prevY + y) / 2 + perpY * offset;
-                
-                ctx.quadraticCurveTo(
-                    prevX + perpX * prevOffset,
-                    prevY + perpY * prevOffset,
-                    cpX,
-                    cpY
-                );
-            }
+            // Calculate control point for smooth curve
+            const prevT = (i - 0.5) / numSegments;
+            const cpX = start.x + dx * prevT + perpX * waveOffset;
+            const cpY = start.y + dy * prevT + perpY * waveOffset;
+            
+            ctx.quadraticCurveTo(cpX, cpY, x + perpX * waveOffset * 0.5, y + perpY * waveOffset * 0.5);
         }
         
+        // Draw final segment to end point
+        ctx.lineTo(end.x, end.y);
         ctx.stroke();
     }
     
