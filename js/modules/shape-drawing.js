@@ -58,17 +58,8 @@ class ShapeDrawingManager {
     }
     
     getPosition(e) {
-        const rect = this.canvas.getBoundingClientRect();
-        const scaleX = this.canvas.offsetWidth / rect.width;
-        const scaleY = this.canvas.offsetHeight / rect.height;
-        
-        let x = (e.clientX - rect.left) * scaleX;
-        let y = (e.clientY - rect.top) * scaleY;
-        
-        x = Math.max(0, Math.min(x, this.canvas.offsetWidth));
-        y = Math.max(0, Math.min(y, this.canvas.offsetHeight));
-        
-        return { x, y };
+        // Reuse drawingEngine's getPosition method for consistency
+        return this.drawingEngine.getPosition(e);
     }
     
     startDrawing(e) {
@@ -159,13 +150,6 @@ class ShapeDrawingManager {
             case 'line':
                 this.drawLine(this.previewCtx, this.startPoint, this.endPoint);
                 break;
-            // Future shapes can be added here
-            // case 'rectangle':
-            //     this.drawRectangle(this.previewCtx, this.startPoint, this.endPoint);
-            //     break;
-            // case 'circle':
-            //     this.drawCircle(this.previewCtx, this.startPoint, this.endPoint);
-            //     break;
         }
         
         this.previewCtx.setLineDash([]);
@@ -179,7 +163,6 @@ class ShapeDrawingManager {
             case 'line':
                 this.drawLine(this.ctx, this.startPoint, this.endPoint);
                 break;
-            // Future shapes can be added here
         }
         
         // Reset context
@@ -192,42 +175,6 @@ class ShapeDrawingManager {
         ctx.beginPath();
         ctx.moveTo(start.x, start.y);
         ctx.lineTo(end.x, end.y);
-        ctx.stroke();
-    }
-    
-    // Future shape drawing methods
-    drawRectangle(ctx, start, end) {
-        if (!start || !end) return;
-        
-        const width = end.x - start.x;
-        const height = end.y - start.y;
-        
-        ctx.beginPath();
-        ctx.strokeRect(start.x, start.y, width, height);
-    }
-    
-    drawCircle(ctx, start, end) {
-        if (!start || !end) return;
-        
-        const dx = end.x - start.x;
-        const dy = end.y - start.y;
-        const radius = Math.sqrt(dx * dx + dy * dy);
-        
-        ctx.beginPath();
-        ctx.arc(start.x, start.y, radius, 0, Math.PI * 2);
-        ctx.stroke();
-    }
-    
-    drawEllipse(ctx, start, end) {
-        if (!start || !end) return;
-        
-        const centerX = (start.x + end.x) / 2;
-        const centerY = (start.y + end.y) / 2;
-        const radiusX = Math.abs(end.x - start.x) / 2;
-        const radiusY = Math.abs(end.y - start.y) / 2;
-        
-        ctx.beginPath();
-        ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, Math.PI * 2);
         ctx.stroke();
     }
     
