@@ -85,12 +85,14 @@
 .shape-buttons-row {
     display: flex;
     gap: 8px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 .shape-buttons-row .open-line-style-btn {
     flex: 1;
-    min-width: 120px;
+    min-width: 100px;
+    width: auto;
+    margin-top: 0;
 }
 
 /* Line style grid */

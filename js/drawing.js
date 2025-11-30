@@ -277,10 +277,14 @@ class DrawingEngine {
             // Check if we should draw this segment (for dashed/dotted lines)
             const shouldDraw = this.shouldDrawDash(distance);
             
-            // Apply pen-specific drawing effects
-            if (this.penType === 'ballpoint') {
-                // Ballpoint pen: smooth ink flow with slight pressure variation
-                if (shouldDraw) {
+            // Apply pen-specific drawing effects with line style support
+            // All pen types now support multi-line, dashed, and dotted styles
+            if (shouldDraw) {
+                if (this.penLineStyle === 'multi') {
+                    // Draw multiple parallel lines for all pen types
+                    this.drawMultiLine(prevPoint, currPoint);
+                } else if (this.penType === 'ballpoint') {
+                    // Ballpoint pen: smooth ink flow with slight pressure variation
                     this.ctx.save();
                     const minWidth = this.penSize * 0.7;
                     const maxWidth = this.penSize * 1.2;
@@ -295,34 +299,21 @@ class DrawingEngine {
                     this.ctx.stroke();
                     this.ctx.restore();
                     this.setupDrawingContext();
-                }
-            } else if (this.penType === 'brush') {
-                // Brush pen: soft edges with ink spread effect like calligraphy
-                if (shouldDraw) {
+                } else if (this.penType === 'brush') {
+                    // Brush pen: soft edges with ink spread effect like calligraphy
                     this.drawBrushStroke(prevPoint, currPoint, distance);
-                }
-            } else if (this.penType === 'pencil') {
-                // Pencil: grainy texture with lighter strokes
-                if (shouldDraw) {
+                } else if (this.penType === 'pencil') {
+                    // Pencil: grainy texture with lighter strokes
                     this.drawPencilStroke(prevPoint, currPoint, distance);
-                }
-            } else if (this.penType === 'fountain') {
-                // Fountain pen: variable line width with elegant flow
-                if (shouldDraw) {
+                } else if (this.penType === 'fountain') {
+                    // Fountain pen: variable line width with elegant flow
                     this.drawFountainStroke(prevPoint, currPoint, distance);
-                }
-            } else {
-                // Normal pen: consistent line width with dashed/dotted/multi-line support
-                if (shouldDraw) {
-                    if (this.penLineStyle === 'multi') {
-                        // Draw multiple parallel lines
-                        this.drawMultiLine(prevPoint, currPoint);
-                    } else {
-                        this.ctx.beginPath();
-                        this.ctx.moveTo(prevPoint.x, prevPoint.y);
-                        this.ctx.lineTo(currPoint.x, currPoint.y);
-                        this.ctx.stroke();
-                    }
+                } else {
+                    // Normal pen: consistent line width
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(prevPoint.x, prevPoint.y);
+                    this.ctx.lineTo(currPoint.x, currPoint.y);
+                    this.ctx.stroke();
                 }
             }
             
