@@ -36,6 +36,7 @@ window.translations = {
         eraser: '橡皮',
         clear: '清空',
         background: '背景',
+        teachingTools: '教具',
         more: '更多',
         settings: '設置',
         export: '匯出畫布',
@@ -346,6 +347,25 @@ window.translations = {
         moreFeatures: '更多功能',
         time: '時間',
         timer: '計時'
+    },
+
+    // Teaching Tools
+    teachingTools: {
+        title: '教具',
+        ruler: '直尺',
+        rulerStyle1: '直尺 1',
+        rulerStyle2: '直尺 2',
+        setSquare: '三角板',
+        setSquare60: '三角板 60°',
+        setSquare45: '三角板 45°',
+        hint: '提示：單擊移動，雙擊調整大小、旋轉和刪除',
+        insertHint: '選擇要插入的教具數量',
+        currentOnCanvas: '畫布上當前數量',
+        addNew: '新增',
+        rotate: '旋轉',
+        resize: '調整大小',
+        delete: '刪除',
+        drawAlongEdge: '沿邊緣畫線'
     },
 
     // Time Display

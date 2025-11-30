@@ -36,6 +36,7 @@ window.translations = {
         eraser: 'Radiergummi',
         clear: 'Löschen',
         background: 'Hintergrund',
+        teachingTools: 'Werkzeuge',
         more: 'Mehr',
         settings: 'Einstellungen',
         export: 'Leinwand exportieren',
@@ -372,6 +373,25 @@ window.translations = {
         moreFeatures: 'Weitere Funktionen',
         time: 'Zeit',
         timer: 'Timer'
+    },
+
+    // Teaching Tools
+    teachingTools: {
+        title: 'Lehrmittel',
+        ruler: 'Lineal',
+        rulerStyle1: 'Lineal 1',
+        rulerStyle2: 'Lineal 2',
+        setSquare: 'Geodreieck',
+        setSquare60: 'Geodreieck 60°',
+        setSquare45: 'Geodreieck 45°',
+        hint: 'Hinweis: Einfacher Klick zum Verschieben, Doppelklick zum Größe ändern, Drehen oder Löschen',
+        insertHint: 'Wählen Sie die Anzahl der einzufügenden Werkzeuge',
+        currentOnCanvas: 'Aktuelle Anzahl auf der Leinwand',
+        addNew: 'Neu hinzufügen',
+        rotate: 'Drehen',
+        resize: 'Größe ändern',
+        delete: 'Löschen',
+        drawAlongEdge: 'Entlang der Kante zeichnen'
     },
 
     // Time Display
