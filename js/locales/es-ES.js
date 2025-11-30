@@ -36,6 +36,7 @@ window.translations = {
         eraser: 'Borrador',
         clear: 'Borrar',
         background: 'Fondo',
+        teachingTools: 'Herramientas',
         more: 'Más',
         settings: 'Configuración',
         export: 'Exportar lienzo',
@@ -71,6 +72,9 @@ window.translations = {
             title: 'Borrar lienzo',
             confirm: 'Confirmar borrado',
             message: '¿Está seguro de que desea borrar el lienzo? Esta acción no se puede deshacer.'
+        },
+        refresh: {
+            warning: 'Al actualizar se borrará todo el contenido del lienzo y no se podrá recuperar. ¿Está seguro de que desea actualizar?'
         }
     },
 
@@ -333,6 +337,25 @@ window.translations = {
         title: 'Características',
         time: 'Hora',
         timer: 'Temporizador'
+    },
+
+    // Teaching Tools
+    teachingTools: {
+        title: 'Herramientas didácticas',
+        ruler: 'Regla',
+        rulerStyle1: 'Regla 1',
+        rulerStyle2: 'Regla 2',
+        setSquare: 'Escuadra',
+        setSquare60: 'Escuadra 60°',
+        setSquare45: 'Escuadra 45°',
+        hint: 'Sugerencia: Clic simple para mover, doble clic para cambiar tamaño, rotar o eliminar',
+        insertHint: 'Seleccione la cantidad de herramientas a insertar',
+        currentOnCanvas: 'Cantidad actual en el lienzo',
+        addNew: 'Agregar nuevo',
+        rotate: 'Rotar',
+        resize: 'Cambiar tamaño',
+        delete: 'Eliminar',
+        drawAlongEdge: 'Dibujar a lo largo del borde'
     },
 
     // Time Display

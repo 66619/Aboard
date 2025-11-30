@@ -36,6 +36,7 @@ window.translations = {
         eraser: 'Eraser',
         clear: 'Clear',
         background: 'Background',
+        teachingTools: 'Tools',
         more: 'More',
         settings: 'Settings',
         export: 'Export Canvas',
@@ -76,6 +77,9 @@ window.translations = {
             title: 'Clear Canvas',
             confirm: 'Confirm Clear',
             message: 'Are you sure you want to clear the canvas? This action cannot be undone.'
+        },
+        refresh: {
+            warning: 'Refreshing will clear all canvas content and cannot be recovered. Are you sure you want to refresh?'
         }
     },
 
@@ -343,6 +347,25 @@ window.translations = {
         moreFeatures: 'More Features',
         time: 'Time',
         timer: 'Timer'
+    },
+
+    // Teaching Tools
+    teachingTools: {
+        title: 'Teaching Tools',
+        ruler: 'Ruler',
+        rulerStyle1: 'Ruler 1',
+        rulerStyle2: 'Ruler 2',
+        setSquare: 'Set Square',
+        setSquare60: 'Set Square 60°',
+        setSquare45: 'Set Square 45°',
+        hint: 'Hint: Single-click to move, double-click to resize, rotate, or delete',
+        insertHint: 'Select the number of tools to insert',
+        currentOnCanvas: 'Current on canvas',
+        addNew: 'Add New',
+        rotate: 'Rotate',
+        resize: 'Resize',
+        delete: 'Delete',
+        drawAlongEdge: 'Draw along edge'
     },
 
     // Time Display

@@ -36,6 +36,7 @@ window.translations = {
         eraser: '消しゴム',
         clear: 'クリア',
         background: '背景',
+        teachingTools: '教具',
         more: 'もっと',
         settings: '設定',
         export: 'キャンバスをエクスポート',
@@ -76,6 +77,9 @@ window.translations = {
             title: 'キャンバスをクリア',
             confirm: 'クリアを確認',
             message: 'キャンバスをクリアしてもよろしいですか？この操作は元に戻せません。'
+        },
+        refresh: {
+            warning: '更新するとキャンバスの内容がすべてクリアされ、復元できません。更新してもよろしいですか？'
         }
     },
 
@@ -328,6 +332,25 @@ window.translations = {
         moreFeatures: 'その他の機能',
         time: '時刻',
         timer: 'タイマー'
+    },
+
+    // Teaching Tools
+    teachingTools: {
+        title: '教具',
+        ruler: '定規',
+        rulerStyle1: '定規 1',
+        rulerStyle2: '定規 2',
+        setSquare: '三角定規',
+        setSquare60: '三角定規 60°',
+        setSquare45: '三角定規 45°',
+        hint: 'ヒント：シングルクリックで移動、ダブルクリックでサイズ変更、回転、削除',
+        insertHint: '挿入する教具の数を選択',
+        currentOnCanvas: 'キャンバス上の現在の数',
+        addNew: '新規追加',
+        rotate: '回転',
+        resize: 'サイズ変更',
+        delete: '削除',
+        drawAlongEdge: 'エッジに沿って描画'
     },
 
     // Time Display

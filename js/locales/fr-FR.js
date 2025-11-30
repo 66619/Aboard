@@ -36,6 +36,7 @@ window.translations = {
         eraser: 'Gomme',
         clear: 'Effacer',
         background: 'Arrière-plan',
+        teachingTools: 'Outils',
         more: 'Plus',
         settings: 'Paramètres',
         export: 'Exporter le canevas',
@@ -71,6 +72,9 @@ window.translations = {
             title: 'Effacer le canevas',
             confirm: 'Confirmer l\'effacement',
             message: 'Êtes-vous sûr de vouloir effacer le canevas ? Cette action ne peut pas être annulée.'
+        },
+        refresh: {
+            warning: 'L\'actualisation effacera tout le contenu du canevas et ne pourra pas être récupéré. Êtes-vous sûr de vouloir actualiser ?'
         }
     },
 
@@ -333,6 +337,25 @@ window.translations = {
         title: 'Fonctionnalités',
         time: 'Heure',
         timer: 'Minuteur'
+    },
+
+    // Teaching Tools
+    teachingTools: {
+        title: 'Outils pédagogiques',
+        ruler: 'Règle',
+        rulerStyle1: 'Règle 1',
+        rulerStyle2: 'Règle 2',
+        setSquare: 'Équerre',
+        setSquare60: 'Équerre 60°',
+        setSquare45: 'Équerre 45°',
+        hint: 'Astuce : Clic simple pour déplacer, double-clic pour redimensionner, pivoter ou supprimer',
+        insertHint: 'Sélectionnez le nombre d\'outils à insérer',
+        currentOnCanvas: 'Nombre actuel sur le canevas',
+        addNew: 'Ajouter nouveau',
+        rotate: 'Pivoter',
+        resize: 'Redimensionner',
+        delete: 'Supprimer',
+        drawAlongEdge: 'Tracer le long du bord'
     },
 
     // Time Display

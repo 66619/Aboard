@@ -36,6 +36,7 @@ window.translations = {
         eraser: '지우개',
         clear: '지우기',
         background: '배경',
+        teachingTools: '교구',
         more: '더보기',
         settings: '설정',
         export: '캔버스 내보내기',
@@ -76,6 +77,9 @@ window.translations = {
             title: '캔버스 지우기',
             confirm: '지우기 확인',
             message: '캔버스를 지우시겠습니까? 이 작업은 취소할 수 없습니다.'
+        },
+        refresh: {
+            warning: '새로 고침하면 캔버스 내용이 모두 지워지며 복구할 수 없습니다. 새로 고침하시겠습니까?'
         }
     },
 
@@ -328,6 +332,25 @@ window.translations = {
         moreFeatures: '더 많은 기능',
         time: '시간',
         timer: '타이머'
+    },
+
+    // Teaching Tools
+    teachingTools: {
+        title: '교구',
+        ruler: '자',
+        rulerStyle1: '자 1',
+        rulerStyle2: '자 2',
+        setSquare: '삼각자',
+        setSquare60: '삼각자 60°',
+        setSquare45: '삼각자 45°',
+        hint: '힌트: 단일 클릭으로 이동, 더블클릭하여 크기 조절, 회전 또는 삭제',
+        insertHint: '삽입할 교구 수를 선택하세요',
+        currentOnCanvas: '캔버스의 현재 수량',
+        addNew: '새로 추가',
+        rotate: '회전',
+        resize: '크기 조절',
+        delete: '삭제',
+        drawAlongEdge: '가장자리를 따라 그리기'
     },
 
     // Time Display

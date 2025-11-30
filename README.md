@@ -1,17 +1,57 @@
-![Aboard](https://socialify.git.ci/lifeafter619/Aboard/image?custom_description=%E4%B8%80%E4%B8%AA%E7%AE%80%E7%BA%A6%E7%9A%84%E7%BD%91%E9%A1%B5%E7%99%BD%E6%9D%BF%EF%BC%8C%E6%9B%B4%E9%80%82%E5%90%88%E8%80%81%E5%B8%88%E4%BD%93%E8%B4%A8%0A%F0%9D%93%99%F0%9D%93%BE%F0%9D%93%BC%F0%9D%93%BD+%F0%9D%93%AA+%F0%9D%93%AB%F0%9D%93%B8%F0%9D%93%AA%F0%9D%93%BB%F0%9D%93%AD.&description=1&forks=1&issues=1&language=1&name=1&owner=1&pattern=Brick+Wall&pulls=1&stargazers=1&theme=Light)
+![Aboard](https://socialify.git.ci/lifeafter619/Aboard/image?custom_description=%E4%B8%80%E4%B8%AA%E7%AE%80%E7%BA%A6%E7%9A%84web%E7%99%BD%E6%9D%BF%EF%BC%8C%E6%9B%B4%E9%80%82%E5%90%88%E8%80%81%E5%B8%88%E4%BD%93%E8%B4%A8+%0A%F0%9D%93%99%F0%9D%93%BE%F0%9D%93%BC%F0%9D%93%BD+%F0%9D%93%AA+%F0%9D%93%AB%F0%9D%93%B8%F0%9D%93%AA%F0%9D%93%BB%F0%9D%93%AD+%F0%9D%93%AF%F0%9D%93%B8%F0%9D%93%BB+%F0%9D%93%BD%F0%9D%93%AE%F0%9D%93%AA%F0%9D%93%AC%F0%9D%93%B1%F0%9D%93%AE%F0%9D%93%BB%F0%9D%93%BC.&description=1&font=Bitter&forks=1&issues=1&language=1&name=1&owner=1&pattern=Brick+Wall&pulls=1&stargazers=1&theme=Auto)
 
-# Aboard
+# Aboard or.... 一个白板
 
 <div align="center">
 
-**[简体中文](README.md)** | **[繁體中文](README.zh-TW.md)** | **[English](README.en.md)**
+**[简体中文](README.md)** | **[繁體中文](public/README.zh-TW.md)** | **[English](public/README.en.md)**
 
 </div>
 
-> 一个简约优雅的网页白板应用，专为教学和演示设计 | 𝓙𝓾𝓼𝓽 𝓪 𝓫𝓸𝓪𝓻𝓭.
+> **只想做一个足够简单的白板。**  |   𝓙𝓾𝓼𝓽 𝓪 𝓫𝓸𝓪𝓻𝓭.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
+# 摘要
+**大一小登的AI-Agent项目**，目标是想做一个**功能简单、部署简单，使用极其简单且符合直觉**的白板，主要是为**国内的初高中一体机教学使用设计**
+
+由于本人实际开发能力薄弱，所以本项目大量运用了**AI-Agent技术**（就是调用GitHub Agent功能来帮助我开发和高效推进功能的实现），所以代码可能没有“人味”，也可能存在**相当多不合理的bug和开发方式**，**望大佬您轻喷**
+
+您可以在下面的**Demo链接**中快速体验本项目，也可以前往**我的博客**看看我做这个项目的前因后果。
+
+**如果大佬您觉得好的话，请给我点个star🌟吧~~~大学生真的很需要这个**
+
+```mermaid
+graph LR
+    A[Aboard Project]
+    A --> D[在线Demo]
+    A --> E[博客文章]
+    
+    click D "https://aboard.pp.ua" "在线演示"
+    click E "https://66619.eu.org/article/aboard" "技术文章"
+```
+## 当前分支和部署版本
+
+```mermaid
+graph LR
+    A[Aboard Project]
+    A --> B[main分支]
+    A --> C[dev/preview分支]
+    A --> D[dev/stable分支]
+    A --> E[copilot/xxx分支]
+    B --> F[branch Demo/主版本]
+    C --> G[branch Demo/最新测试版]
+    D --> H[branch Demo/稳定测试版]
+    E --> I[PR中Vercel提供临时链接]
+
+    click F "https://aboard.pp.ua" "主"
+    click G "https://dev-aboard.619.pp.ua" "最新测试"
+    click H "https://dev.aboard.pp.ua" "最新测试"
+```
+
+<details>
+  <summary>这里面是AI写的功能介绍，挺详细的，可以打开看看啦</summary>
+  
 ## ✨ 特色功能
 
 ### 🎨 多样化绘图工具
@@ -25,6 +65,29 @@
 - **自定义背景**：支持上传图片作为背景，可调节大小和位置
 - **背景样式**：8种预设背景颜色 + 自定义颜色，可调节透明度和图案深浅
 
+### 📏 教具功能
+- **直尺工具**：支持两种样式（直尺 1 和直尺 2），可在画布上插入直尺，支持四边（上下左右）沿边缘画直线
+- **三角板工具**：支持两种类型
+  - **60°三角板**（√3:1宽高比）：基于30-60-90度直角三角形
+  - **45°三角板**（1:1宽高比）：基于45-45-90度等腰直角三角形
+- **智能尺寸**：教具按照图片原有比例插入，并自动缩放至画布面积的约20%
+- **沿边缘画线**：三角板的三条边（上边、左边、斜边）均支持沿边缘画直线，可画出完整三角形
+- **自由绘图区**：三角板的右下区域（斜边以下）允许用户自由绘图，不会触发单击和双击判定
+- **自由操作**：支持拖动移动位置、旋转角度、调整大小
+- **缩放适配**：教具在画布缩放后仍能正确移动、调整大小和显示，不会异常放大或位置偏移
+- **Word风格控件**：双击教具显示8个调整控制点（四角+四边）
+- **触控支持**：支持双指缩放和旋转教具，不影响画布缩放
+- **多实例支持**：可同时插入多把直尺和三角板
+- **双击控制**：双击教具调出控制面板，方便调整
+- **独立数量控制**：画布上当前数量按每种教具类型（直尺1、直尺2、三角板60°、三角板45°）分别显示和控制，分两排显示避免拥挤
+
+### 🖊️ 笔触差异化
+- **普通笔**：标准书写笔触，粗细一致
+- **圆珠笔**：根据书写速度模拟压力，平滑的墨水流动效果
+- **毛笔**：带有毛边效果和笔锋感觉，模拟真实毛笔书写体验，墨水晕染效果
+- **铅笔**：灰色质感带颗粒纹理，模拟真实铅笔痕迹
+- **钢笔**：优雅的变宽笔触，根据方向和速度变化线条粗细
+
 ### 📄 分页画布模式
 - **分页模式**：支持多页管理，适合课堂演示和教学
   - 预设尺寸：A4、A3、B5（横向/竖向），16:9、4:3宽屏
@@ -34,9 +97,11 @@
 ### 🎯 智能交互体验
 - **选择工具**：可选择和操作画布上的笔迹和图片，支持复制和删除
 - **移动画布**：拖动工具或按住Shift键拖动画布
-- **智能缩放**：Ctrl+滚轮缩放画布，缩放中心跟随鼠标位置
+- **智能缩放**：Ctrl+滚轮缩放画布，缩放中心跟随鼠标位置，支持50%-500%缩放范围
+- **初始画布大小**：首次打开或刷新后，画布自动调整为浏览器窗口的80%大小
 - **撤销/重做**：支持最多50步历史记录（Ctrl+Z / Ctrl+Y）
 - **全屏模式**：专注创作，沉浸体验（F11）
+- **刷新保护**：刷新页面时会弹出警告提示，防止误操作导致画布内容丢失
 
 ### ⏱️ 计时器功能
 - **正计时模式**：支持设置起始时间，从指定时间开始计时
@@ -91,6 +156,54 @@
 - **多页管理**：分页模式下支持多页切换和管理
   - 智能分页按钮：仅1页时显示"+"图标添加页面，多页时显示翻页箭头
   - 指定页面导出支持选择单页或多页
+</details>
+
+## 功能总结
+目前Aboard已经能满足基本的批注和使用需求，我将分部分来介绍本项目实现的功能：
+
+## 1.工具栏
+
+这里是本项目的核心功能聚集地，和大部分软件一样，其默认出现在底部，但可以被自由拖动，靠边框能实现吸附，能随浏览器窗口底部自己移动（事实上，本项目的框体均具有以上属性，我认为还是很友好的）
+
+工具栏中有最常见的功能：撤销重做、笔、移动画布、橡皮、清空、背景、更多功能和设置
+
+**撤销重做**~~~~所见即所得，最多支持50步
+
+**笔**~~~~支持随意画，可选择“笔触类型”（可能在大屏上有区别，我用笔记本写写画画感觉没啥区别qwq），笔的颜色、粗细，也支持了取色器取色
+
+**移动**~~~~变成小手来移动画布
+
+**橡皮**~~~~能擦除笔迹，可选择形状和大小
+
+**清空**~~~~所见即所得，会清空画布的所有笔迹（目前看可以通过撤销来还原，但我仍然不建议尝试…..）
+
+**背景**~~~~可选择背景颜色，支持取色器取色（可在设置--背景中调整背景的透明度啥的），支持设置背景图案，我设置了贴合中国课堂的常见背景需求，且背景是支持分页独立配置的！！！
+
+选择后可调整密度，便于调整点/线间宽度，也可以自己上传图片作为背景，~~可拖动调节大小~~（该功能有bug，未来会移除，请点击右边的铅笔图标，拖动蓝色框和相关控件来更改位置、大小、方向）
+
+**更多**~~~~我打算做小功能，目前放了“时间”和“计时”两个小功能，都能独立设置调整，您可以自己探索：）
+
+**小功能**这块，我觉得我做的挺好的🤣，也花费了很多时间来调试和补充设置相关功能，力求满足所有需求
+
+**设置**~~~~一些更高级的选项就在设置中啦，您可以根据需求自行调节，让Aboard更高地为您服务
+
+## 2.控制按钮区域
+
+他们默认出现在右上角，设置中可以调整显示的位置~（在我的设定中，这些按钮的显示位置是固定的，无法被拖动）
+
+**下载按钮⏬**~~~~是导出画布的功能，目前做的较为完善啦~~您可以自行探索
+
+**+/-和缩放比例**~~~~用于调节画布大小，触控屏上支持双指缩放，和绝大多数软件逻辑相同，这里的加减和输入比例是为了方便更多用户
+
+**全屏按钮**~~~~点一下会网页全屏，可沉浸式使用Aboard
+
+**翻页组件**~~~~简单基本但细节满满，所见即所得
+
+**时间显示组件**~~~~对应更多中的“时间”选项，默认开启来提醒老师时间，更多功能可在“时间显示选项”里的设置按钮里调节（这一块做的很用心哒）
+
+功能目前实现的就这些，虽然看着不多，但**每一块我都花了很多心思**，写起来简单，使用起来也简单，唯独实现起来不简单，希望您能多多体验下啦！！！
+
+**具体的Bug统计和To-Do List请参见我的博客文章**
 
 ## 🚀 快速开始
 
@@ -109,16 +222,14 @@
 4. 点击 Save，等待部署完成
 5. 访问 `https://你的用户名.github.io/Aboard`
 
-或使用 GitHub Actions 自动部署：
-[![GitHub Pages](https://img.shields.io/badge/Deploy%20to-GitHub%20Pages-blue?logo=github)](https://github.com/lifeafter619/Aboard/settings/pages)
 
 #### 部署到 Cloudflare Pages
 
 [![Deploy to Cloudflare Pages](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/lifeafter619/Aboard)
 
-点击上方按钮即可快速部署到 Cloudflare Pages，享受全球CDN加速。
+点击上方按钮即可快速部署到 Cloudflare Pages，享受赛博活佛的全球CDN加速。
 
-### 本地服务器
+### 本地服务器（不建议直接运行html文件）
 如果需要完整功能（如加载公告），建议使用HTTP服务器运行：
 
 ```bash
@@ -143,7 +254,7 @@ php -S localhost:8080
 | 选择工具 | 点击底部工具栏相应按钮 |
 | 改变颜色/粗细 | 点击工具按钮，在弹出的属性面板中调节 |
 | 撤销/重做 | Ctrl+Z / Ctrl+Y 或点击右上角按钮 |
-| 缩放画布 | Ctrl+滚轮 或点击右上角缩放按钮 |
+| 缩放画布 | Ctrl+滚轮 或点击右上角缩放按钮（50%-500%） |
 | 移动画布 | 点击"移动"工具或按住Shift键拖动 |
 | 全屏 | F11 或点击全屏按钮 |
 | 清空画布 | 点击"清空"按钮（有确认提示） |
@@ -196,6 +307,7 @@ php -S localhost:8080
 ```
 Aboard/
 ├── index.html              # 主HTML文件
+├── LICENSE                 # MIT许可证文件
 ├── announcements.json      # 公告内容配置
 ├── css/
 │   ├── style.css          # 主样式表
@@ -203,7 +315,8 @@ Aboard/
 │       ├── timer.css      # 计时器样式
 │       ├── time-display.css # 时间显示样式
 │       ├── export.css     # 导出功能样式
-│       └── feature-area.css # 功能区样式
+│       ├── feature-area.css # 功能区样式
+│       └── teaching-tools.css # 教具功能样式
 ├── js/
 │   ├── drawing.js         # 绘图引擎模块
 │   ├── history.js         # 历史记录管理模块
@@ -215,16 +328,41 @@ Aboard/
 │   ├── announcement.js    # 公告管理模块
 │   ├── export.js          # 导出功能模块
 │   ├── time-display.js    # 时间显示模块
+│   ├── collapsible.js     # 可折叠面板模块
+│   ├── shape-insertion.js # 形状插入模块
+│   ├── text-insertion.js  # 文本插入模块
+│   ├── locales/           # 国际化语言文件
+│   │   ├── zh-CN.js       # 简体中文
+│   │   ├── zh-TW.js       # 繁体中文
+│   │   ├── en-US.js       # 英文
+│   │   ├── ja-JP.js       # 日语
+│   │   ├── ko-KR.js       # 韩语
+│   │   ├── fr-FR.js       # 法语
+│   │   ├── de-DE.js       # 德语
+│   │   └── es-ES.js       # 西班牙语
 │   ├── modules/
 │   │   ├── timer.js       # 计时器模块
-│   │   └── time-display-controls.js # 时间显示控制
+│   │   ├── time-display-controls.js # 时间显示控制
+│   │   ├── time-display-settings.js # 时间显示设置
+│   │   ├── edge-drawing.js # 边缘绘制模块（沿教具边缘画线）
+│   │   ├── teaching-tools.js # 教具功能模块
+│   │   └── i18n.js        # 国际化核心模块
 │   └── main.js            # 主应用入口
+├── img/                    # 图片资源目录
+│   ├── ruler_1.png        # 直尺样式1
+│   ├── ruler_2.png        # 直尺样式2
+│   ├── set_square_1.png   # 60°三角板（√3:1宽高比）
+│   └── set_square_2.png   # 45°三角板（1:1宽高比）
+├── public/                 # 公开文档目录
+│   ├── README.en.md       # 英文版README
+│   └── README.zh-TW.md    # 繁体中文版README
 ├── sounds/                 # 提示音文件夹
 │   ├── class-bell.MP3     # 上课铃声
 │   ├── exam-end.MP3       # 考试结束音
 │   ├── gentle-alarm.MP3   # 柔和提示音
-│   └── digital-beep.MP3   # 数字提示音
-└── README.md              # 项目文档
+│   ├── digital-beep.MP3   # 数字提示音
+│   └── README.md          # 音频文件说明
+└── README.md              # 项目文档（简体中文）
 ```
 
 ## 🏗️ 架构设计
@@ -241,6 +379,8 @@ Aboard/
 - **TimerManager** - 计时器管理，支持多实例计时器
 - **TimeDisplayManager** - 时间显示管理，处理日期时间显示
 - **ExportManager** - 导出管理，处理画布导出功能
+- **TeachingToolsManager** - 教具管理，处理直尺和三角板的插入、移动、旋转和缩放
+- **EdgeDrawingManager** - 边缘绘制管理，处理沿教具边缘画线功能
 - **DrawingBoard** - 主应用类，集成所有模块并协调交互
 
 ### 性能优化
@@ -280,7 +420,10 @@ Aboard/
 
 ## 🌟 致谢
 
-感谢所有贡献者和使用者！如果这个项目对你有帮助，欢迎给个Star⭐
+感谢所有贡献者和使用者！如果这个项目对您有帮助，欢迎给个Star⭐，这样就对我很有帮助了
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=lifeafter619/Aboard&type=date&legend=top-left)](https://www.star-history.com/#lifeafter619/Aboard&type=date&legend=top-left)
 
 ---
 
