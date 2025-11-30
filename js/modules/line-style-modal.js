@@ -97,7 +97,7 @@ class LineStyleModal {
                             <!-- Multi-line Spacing Setting -->
                             <div class="line-style-modal-setting" id="modal-line-spacing-setting" style="display: none;">
                                 <label><span data-i18n="tools.lineStyle.lineSpacing">Line Spacing</span>: <span id="modal-line-spacing-value">4</span>px</label>
-                                <input type="range" id="modal-line-spacing-slider" min="2" max="20" value="4" class="slider">
+                                <input type="range" id="modal-line-spacing-slider" min="3" max="25" value="4" class="slider">
                             </div>
                         </div>
                         
