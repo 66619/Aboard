@@ -106,6 +106,13 @@ window.translations = {
         }
     },
 
+    // Line Style Modal
+    lineStyleModal: {
+        title: '线条样式设置',
+        openSettings: '更多设置',
+        preview: '预览'
+    },
+
     // Background
     background: {
         title: '背景',

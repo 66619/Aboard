@@ -34,6 +34,9 @@ class DrawingBoard {
         // Initialize shape drawing manager
         this.shapeDrawingManager = new ShapeDrawingManager(this.canvas, this.ctx, this.drawingEngine, this.historyManager);
         
+        // Initialize line style modal for both pen and shape tools
+        this.lineStyleModal = new LineStyleModal(this.drawingEngine, this.shapeDrawingManager);
+        
         // Initialize edge drawing manager for teaching tools
         this.edgeDrawingManager = new EdgeDrawingManager(this.teachingToolsManager, this.drawingEngine);
         
@@ -712,6 +715,21 @@ class DrawingBoard {
             penDashDensitySlider.addEventListener('input', (e) => {
                 this.drawingEngine.setPenDashDensity(parseInt(e.target.value));
                 penDashDensityValue.textContent = e.target.value;
+            });
+        }
+        
+        // Line style settings buttons (open modal)
+        const penLineStyleSettingsBtn = document.getElementById('pen-line-style-settings-btn');
+        if (penLineStyleSettingsBtn) {
+            penLineStyleSettingsBtn.addEventListener('click', () => {
+                this.lineStyleModal.show('pen');
+            });
+        }
+        
+        const shapeLineStyleSettingsBtn = document.getElementById('shape-line-style-settings-btn');
+        if (shapeLineStyleSettingsBtn) {
+            shapeLineStyleSettingsBtn.addEventListener('click', () => {
+                this.lineStyleModal.show('shape');
             });
         }
         

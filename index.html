@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="css/modules/timer.css">
     <link rel="stylesheet" href="css/modules/teaching-tools.css">
     <link rel="stylesheet" href="css/modules/shape.css">
+    <link rel="stylesheet" href="css/modules/line-style-modal.css">
 </head>
 <body>
     <!-- Zoom controls in top right corner -->
@@ -129,11 +130,19 @@
                         <span data-i18n="tools.lineStyle.dotted">Dotted</span>
                     </button>
                 </div>
+                <!-- Button to open line style settings modal -->
+                <button id="pen-line-style-settings-btn" class="open-line-style-btn" title="Line Style Settings">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v6m0 6v6M5.6 5.6l4.2 4.2m4.2 4.2l4.2 4.2M1 12h6m6 0h6M5.6 18.4l4.2-4.2m4.2-4.2l4.2-4.2"></path>
+                    </svg>
+                    <span data-i18n="lineStyleModal.openSettings">More Settings</span>
+                </button>
             </div>
             <div id="pen-line-style-settings" class="config-group pen-line-style-settings" style="display: none;">
                 <div id="pen-dash-density-setting" class="line-style-setting" style="display: none;">
                     <label><span data-i18n="tools.lineStyle.dashDensity">Dash Density</span>: <span id="pen-dash-density-value">10</span></label>
-                    <input type="range" id="pen-dash-density-slider" min="3" max="30" value="10" class="slider slider-compact">
+                    <input type="range" id="pen-dash-density-slider" min="5" max="40" value="10" class="slider slider-compact">
                 </div>
             </div>
         </div>
@@ -156,6 +165,12 @@
                             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                         </svg>
                         <span data-i18n="tools.shape.rectangle">Rectangle</span>
+                    </button>
+                    <button class="shape-type-btn" data-shape-type="circle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="9"></circle>
+                        </svg>
+                        <span data-i18n="tools.shape.circle">Circle</span>
                     </button>
                 </div>
             </div>
@@ -202,11 +217,19 @@
                         <span data-i18n="tools.lineStyle.triple">Triple</span>
                     </button>
                 </div>
+                <!-- Button to open line style settings modal -->
+                <button id="shape-line-style-settings-btn" class="open-line-style-btn" title="Line Style Settings">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v6m0 6v6M5.6 5.6l4.2 4.2m4.2 4.2l4.2 4.2M1 12h6m6 0h6M5.6 18.4l4.2-4.2m4.2-4.2l4.2-4.2"></path>
+                    </svg>
+                    <span data-i18n="lineStyleModal.openSettings">More Settings</span>
+                </button>
             </div>
             <div id="line-style-settings" class="config-group line-style-settings" style="display: none;">
                 <div id="dash-density-setting" class="line-style-setting" style="display: none;">
                     <label><span data-i18n="tools.lineStyle.dashDensity">Dash Density</span>: <span id="dash-density-value">10</span></label>
-                    <input type="range" id="dash-density-slider" min="3" max="30" value="10" class="slider slider-compact">
+                    <input type="range" id="dash-density-slider" min="5" max="40" value="10" class="slider slider-compact">
                 </div>
                 <div id="wave-density-setting" class="line-style-setting" style="display: none;">
                     <label><span data-i18n="tools.lineStyle.waveDensity">Wave Density</span>: <span id="wave-density-value">10</span></label>
@@ -214,7 +237,7 @@
                 </div>
                 <div id="multi-line-settings" class="line-style-setting" style="display: none;">
                     <label><span data-i18n="tools.lineStyle.lineSpacing">Line Spacing</span>: <span id="multi-line-spacing-value">4</span>px</label>
-                    <input type="range" id="multi-line-spacing-slider" min="2" max="20" value="4" class="slider slider-compact">
+                    <input type="range" id="multi-line-spacing-slider" min="3" max="25" value="4" class="slider slider-compact">
                 </div>
             </div>
             <div class="config-group">
@@ -1450,6 +1473,7 @@
     <script src="js/modules/edge-drawing.js"></script>
     <script src="js/modules/teaching-tools.js"></script>
     <script src="js/modules/shape-drawing.js"></script>
+    <script src="js/modules/line-style-modal.js"></script>
     <script src="js/settings.js"></script>
     <script src="js/announcement.js"></script>
     <script src="js/export.js"></script>

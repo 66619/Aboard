@@ -249,6 +249,9 @@ class ShapeDrawingManager {
             case 'rectangle':
                 this.drawRectangleWithStyle(this.previewCtx, this.startPoint, this.endPoint);
                 break;
+            case 'circle':
+                this.drawCircleWithStyle(this.previewCtx, this.startPoint, this.endPoint);
+                break;
         }
         
         // Reset line dash
@@ -264,6 +267,9 @@ class ShapeDrawingManager {
                 break;
             case 'rectangle':
                 this.drawRectangleWithStyle(this.ctx, this.startCanvasPoint, this.endCanvasPoint);
+                break;
+            case 'circle':
+                this.drawCircleWithStyle(this.ctx, this.startCanvasPoint, this.endCanvasPoint);
                 break;
         }
         
@@ -317,6 +323,94 @@ class ShapeDrawingManager {
                 ctx.rect(x, y, width, height);
                 ctx.stroke();
                 break;
+        }
+    }
+    
+    /**
+     * Draw circle with various line styles
+     * Circle is drawn from center point outward to edge (radius)
+     */
+    drawCircleWithStyle(ctx, center, edge) {
+        if (!center || !edge) return;
+        
+        // Calculate radius from center to edge point
+        const dx = edge.x - center.x;
+        const dy = edge.y - center.y;
+        const radius = Math.sqrt(dx * dx + dy * dy);
+        
+        if (radius < 2) return;
+        
+        switch(this.lineStyle) {
+            case 'wavy':
+                this.drawWavyCircle(ctx, center, radius);
+                break;
+            case 'double':
+                this.drawMultiCircle(ctx, center, radius, 2);
+                break;
+            case 'triple':
+                this.drawMultiCircle(ctx, center, radius, 3);
+                break;
+            default:
+                // Solid, dashed, dotted - use standard arc
+                ctx.beginPath();
+                ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
+                ctx.stroke();
+                break;
+        }
+    }
+    
+    /**
+     * Draw wavy circle using bezier curves
+     */
+    drawWavyCircle(ctx, center, radius) {
+        const waveAmplitude = this.drawingEngine.penSize * 1.2;
+        const numWaves = Math.max(12, Math.floor(radius * Math.PI * 2 / this.waveDensity));
+        
+        ctx.beginPath();
+        
+        for (let i = 0; i <= numWaves; i++) {
+            const angle = (i / numWaves) * Math.PI * 2;
+            const nextAngle = ((i + 1) / numWaves) * Math.PI * 2;
+            
+            // Alternate wave amplitude
+            const waveOffset = (i % 2 === 0) ? waveAmplitude : -waveAmplitude;
+            const currentRadius = radius + waveOffset;
+            
+            const x = center.x + Math.cos(angle) * currentRadius;
+            const y = center.y + Math.sin(angle) * currentRadius;
+            
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                // Calculate control point
+                const midAngle = (angle + ((i - 1) / numWaves) * Math.PI * 2) / 2;
+                const prevWaveOffset = ((i - 1) % 2 === 0) ? waveAmplitude : -waveAmplitude;
+                const midRadius = radius + (waveOffset + prevWaveOffset) / 2;
+                const cpX = center.x + Math.cos(midAngle) * midRadius;
+                const cpY = center.y + Math.sin(midAngle) * midRadius;
+                
+                ctx.quadraticCurveTo(cpX, cpY, x, y);
+            }
+        }
+        
+        ctx.closePath();
+        ctx.stroke();
+    }
+    
+    /**
+     * Draw multiple concentric circles (for double/triple line style)
+     */
+    drawMultiCircle(ctx, center, radius, count) {
+        const totalSpacing = (count - 1) * this.multiLineSpacing;
+        const startOffset = -totalSpacing / 2;
+        
+        for (let i = 0; i < count; i++) {
+            const offset = startOffset + i * this.multiLineSpacing;
+            const circleRadius = Math.max(1, radius + offset);
+            
+            ctx.beginPath();
+            ctx.arc(center.x, center.y, circleRadius, 0, Math.PI * 2);
+            ctx.stroke();
         }
     }
     

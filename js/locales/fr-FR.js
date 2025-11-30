@@ -101,6 +101,13 @@ window.translations = {
         }
     },
 
+    // Line Style Modal
+    lineStyleModal: {
+        title: 'Paramètres de style de ligne',
+        openSettings: 'Plus de paramètres',
+        preview: 'Aperçu'
+    },
+
     // Background
     background: {
         title: 'Arrière-plan',
