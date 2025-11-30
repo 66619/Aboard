@@ -57,6 +57,7 @@ window.translations = {
             ballpoint: 'Stylo à bille',
             fountain: 'Stylo-plume',
             brush: 'Pinceau',
+            color: 'Couleur',
             colorAndSize: 'Couleur et taille',
             colorPicker: 'Sélecteur de couleur'
         },
@@ -68,7 +69,8 @@ window.translations = {
             circle: 'Cercle',
             ellipse: 'Ellipse',
             arrow: 'Flèche',
-            hint: 'Appuyez et glissez pour dessiner, relâchez pour terminer'
+            hint: 'Appuyez et glissez pour dessiner, relâchez pour terminer',
+            lineProperties: 'Propriétés de ligne'
         },
         eraser: {
             title: 'Gomme',

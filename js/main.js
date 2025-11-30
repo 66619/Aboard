@@ -1495,17 +1495,16 @@ class DrawingBoard {
     }
     
     showShapeColorSizeModal() {
-        // Create or show a simple modal for shape color and size settings
-        // This uses the same color and size controls as the pen tool
+        // Create or show a modal for shape line properties including pen type
         let modal = document.getElementById('shape-color-size-modal');
         
         if (!modal) {
-            // Create modal HTML dynamically
+            // Create modal HTML dynamically with pen type selection
             const modalHTML = `
                 <div id="shape-color-size-modal" class="modal">
                     <div class="modal-content line-style-modal-content">
                         <div class="line-style-modal-header">
-                            <h2 data-i18n="tools.pen.colorAndSize">Color & Size</h2>
+                            <h2 data-i18n="tools.shape.lineProperties">Line Properties</h2>
                             <button id="shape-color-size-modal-close" class="line-style-modal-close" title="Close">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -1514,8 +1513,21 @@ class DrawingBoard {
                             </button>
                         </div>
                         <div class="line-style-modal-body">
+                            <!-- Pen Type Selection -->
                             <div class="line-style-modal-group">
-                                <label data-i18n="tools.pen.colorAndSize">Color & Size</label>
+                                <label data-i18n="tools.pen.type">Pen Type</label>
+                                <div class="button-size-options pen-type-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                                    <button class="shape-pen-type-btn active" data-shape-pen-type="normal" data-i18n="tools.pen.normal">Normal</button>
+                                    <button class="shape-pen-type-btn" data-shape-pen-type="pencil" data-i18n="tools.pen.pencil">Pencil</button>
+                                    <button class="shape-pen-type-btn" data-shape-pen-type="ballpoint" data-i18n="tools.pen.ballpoint">Ballpoint</button>
+                                    <button class="shape-pen-type-btn" data-shape-pen-type="fountain" data-i18n="tools.pen.fountain">Fountain</button>
+                                    <button class="shape-pen-type-btn" data-shape-pen-type="brush" data-i18n="tools.pen.brush">Brush</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Color Selection -->
+                            <div class="line-style-modal-group">
+                                <label data-i18n="tools.pen.color">Color</label>
                                 <div class="color-picker-row">
                                     <div class="color-picker-main">
                                         <button class="shape-color-btn" data-shape-color="#000000" style="background-color: #000000;" title="Black"></button>
@@ -1530,19 +1542,19 @@ class DrawingBoard {
                                         <button class="shape-color-btn" data-shape-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;" title="White"></button>
                                     </div>
                                 </div>
-                                <div class="color-and-size-row" style="margin-top: 12px;">
-                                    <label class="color-picker-icon-btn" for="shape-custom-color-picker" title="Color Picker">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
-                                            <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
-                                        </svg>
-                                        <input type="color" id="shape-custom-color-picker" class="custom-color-picker-input" value="#000000">
-                                    </label>
-                                    <div class="pen-size-inline">
-                                        <label><span data-i18n="tools.pen.size">Size</span>: <span id="shape-size-value">5</span>px</label>
-                                        <input type="range" id="shape-size-slider" min="1" max="50" value="5" class="slider slider-compact">
-                                    </div>
-                                </div>
+                                <label class="color-picker-icon-btn" for="shape-custom-color-picker" title="Color Picker" style="margin-top: 8px;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
+                                        <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
+                                    </svg>
+                                    <input type="color" id="shape-custom-color-picker" class="custom-color-picker-input" value="#000000">
+                                </label>
+                            </div>
+                            
+                            <!-- Size Selection -->
+                            <div class="line-style-modal-group">
+                                <label><span data-i18n="tools.pen.size">Size</span>: <span id="shape-size-value">5</span>px</label>
+                                <input type="range" id="shape-size-slider" min="1" max="50" value="5" class="slider">
                             </div>
                         </div>
                         <div class="line-style-modal-footer">
@@ -1561,10 +1573,14 @@ class DrawingBoard {
         // Load current values from drawingEngine
         const currentColor = this.drawingEngine.currentColor || '#000000';
         const currentSize = this.drawingEngine.penSize || 5;
+        const currentPenType = this.drawingEngine.penType || 'normal';
         
         // Update UI to reflect current settings
         document.querySelectorAll('.shape-color-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.shapeColor === currentColor);
+        });
+        document.querySelectorAll('.shape-pen-type-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.shapePenType === currentPenType);
         });
         const colorPicker = document.getElementById('shape-custom-color-picker');
         if (colorPicker) colorPicker.value = currentColor;
@@ -1596,6 +1612,14 @@ class DrawingBoard {
             }
         });
         
+        // Pen type buttons
+        document.querySelectorAll('.shape-pen-type-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.shape-pen-type-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+        
         // Color buttons
         document.querySelectorAll('.shape-color-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -1625,6 +1649,10 @@ class DrawingBoard {
         
         // Apply button
         document.getElementById('shape-color-size-modal-apply').addEventListener('click', () => {
+            // Get selected pen type
+            const activePenTypeBtn = document.querySelector('.shape-pen-type-btn.active');
+            const penType = activePenTypeBtn ? activePenTypeBtn.dataset.shapePenType : 'normal';
+            
             // Get selected color
             const activeColorBtn = document.querySelector('.shape-color-btn.active');
             const colorPicker = document.getElementById('shape-custom-color-picker');
@@ -1634,19 +1662,23 @@ class DrawingBoard {
             const size = parseInt(document.getElementById('shape-size-slider').value);
             
             // Apply to drawing engine (shapes use the same properties as pen)
+            this.drawingEngine.setPenType(penType);
             this.drawingEngine.setColor(color);
             this.drawingEngine.setPenSize(size);
             
             // Also update the main pen UI to stay in sync
+            document.querySelectorAll('.pen-type-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.penType === penType);
+            });
             document.querySelectorAll('.color-btn[data-color]').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.color === color);
             });
             const mainColorPicker = document.getElementById('custom-color-picker');
             if (mainColorPicker) mainColorPicker.value = color;
             const penSizeSlider = document.getElementById('pen-size-slider');
-            const penSizeValue = document.getElementById('pen-size-value');
+            const penSizeValueEl = document.getElementById('pen-size-value');
             if (penSizeSlider) penSizeSlider.value = size;
-            if (penSizeValue) penSizeValue.textContent = size;
+            if (penSizeValueEl) penSizeValueEl.textContent = size;
             
             modal.classList.remove('show');
         });

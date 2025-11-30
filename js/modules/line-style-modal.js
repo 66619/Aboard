@@ -277,11 +277,21 @@ class LineStyleModal {
     
     updatePreview() {
         const ctx = this.previewCtx;
-        const width = this.previewCanvas.width;
-        const height = this.previewCanvas.height;
+        const dpr = window.devicePixelRatio || 1;
+        
+        // Set canvas size for high DPI displays
+        const cssWidth = 320;
+        const cssHeight = 80;
+        this.previewCanvas.width = cssWidth * dpr;
+        this.previewCanvas.height = cssHeight * dpr;
+        this.previewCanvas.style.width = cssWidth + 'px';
+        this.previewCanvas.style.height = cssHeight + 'px';
+        
+        // Scale context for DPR
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         
         // Clear canvas
-        ctx.clearRect(0, 0, width, height);
+        ctx.clearRect(0, 0, cssWidth, cssHeight);
         
         // Get current settings
         const lineStyle = this.getCurrentLineStyle();
@@ -290,20 +300,20 @@ class LineStyleModal {
         const lineCount = parseInt(document.getElementById('modal-line-count-slider').value);
         const lineSpacing = parseInt(document.getElementById('modal-line-spacing-slider').value);
         
-        // Get pen size from drawing engine - use exact size without limiting
+        // Get pen size from drawing engine - use exact size (1:1 matching with actual drawing)
         const penSize = this.currentMode === 'pen' 
             ? (this.drawingEngine.penSize || 5)
             : (this.shapeDrawingManager.drawingEngine.penSize || 5);
         
-        // Setup context with actual pen size (no limiting)
+        // Setup context with exact pen size (1:1 with actual drawing)
         ctx.strokeStyle = '#333333';
         ctx.lineWidth = penSize;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         
         const startX = 30;
-        const endX = width - 30;
-        const centerY = height / 2;
+        const endX = cssWidth - 30;
+        const centerY = cssHeight / 2;
         
         // Draw based on style
         ctx.setLineDash([]);

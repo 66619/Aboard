@@ -57,6 +57,7 @@ window.translations = {
             ballpoint: '볼펜',
             fountain: '만년필',
             brush: '붓',
+            color: '색상',
             colorAndSize: '색상 및 크기',
             colorPicker: '색상 선택기',
             size: '크기',
@@ -71,7 +72,8 @@ window.translations = {
             circle: '원',
             ellipse: '타원',
             arrow: '화살표',
-            hint: '눌러서 드래그하여 도형 그리기, 놓으면 완성'
+            hint: '눌러서 드래그하여 도형 그리기, 놓으면 완성',
+            lineProperties: '선 속성'
         },
         eraser: {
             title: '지우개',

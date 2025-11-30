@@ -57,6 +57,7 @@ window.translations = {
             ballpoint: 'Ballpoint',
             fountain: 'Fountain Pen',
             brush: 'Brush',
+            color: 'Color',
             colorAndSize: 'Color & Size',
             colorPicker: 'Color Picker',
             size: 'Size',
@@ -71,7 +72,8 @@ window.translations = {
             circle: 'Circle',
             ellipse: 'Ellipse',
             arrow: 'Arrow',
-            hint: 'Press and drag to draw shape, release to finish'
+            hint: 'Press and drag to draw shape, release to finish',
+            lineProperties: 'Line Properties'
         },
         eraser: {
             title: 'Eraser',

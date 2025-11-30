@@ -25,6 +25,11 @@ class DrawingEngine {
         this.accumulatedDistance = 0;
         this.isInDash = true; // Track if we're in dash or gap phase
         
+        // Multi-line tracking for smooth corners
+        this.multiLineLastPerpX = 0;
+        this.multiLineLastPerpY = 0;
+        this.multiLineLastPoints = null; // Store last offset points for each line
+        
         // Drawing buffer
         this.points = [];
         this.lastPoint = null;
@@ -191,6 +196,11 @@ class DrawingEngine {
         this.accumulatedDistance = 0;
         this.isInDash = true;
         
+        // Reset multi-line tracking
+        this.multiLineLastPerpX = 0;
+        this.multiLineLastPerpY = 0;
+        this.multiLineLastPoints = null;
+        
         // Check for edge snapping when pen tool is active
         if (this.currentTool === 'pen' && this.edgeDrawingManager) {
             const processed = this.edgeDrawingManager.processDrawingPoint(pos.x, pos.y);
@@ -324,6 +334,7 @@ class DrawingEngine {
     
     /**
      * Draw multiple parallel lines for multi-line style
+     * Uses smoothed perpendiculars to avoid discontinuities at corners
      * @param {Object} prevPoint - Previous point with x, y coordinates
      * @param {Object} currPoint - Current point with x, y coordinates
      */
@@ -331,7 +342,7 @@ class DrawingEngine {
         const count = this.penMultiLineCount;
         const spacing = this.penMultiLineSpacing;
         
-        // Calculate perpendicular direction
+        // Calculate current perpendicular direction
         const dx = currPoint.x - prevPoint.x;
         const dy = currPoint.y - prevPoint.y;
         const length = Math.sqrt(dx * dx + dy * dy);
@@ -339,25 +350,61 @@ class DrawingEngine {
         // Skip drawing if points are identical (length is 0) to avoid division by zero
         if (length === 0) return;
         
-        // Perpendicular unit vector
-        const perpX = -dy / length;
-        const perpY = dx / length;
+        // Perpendicular unit vector for current segment
+        let perpX = -dy / length;
+        let perpY = dx / length;
+        
+        // Smooth the perpendicular with the previous one to avoid sudden direction changes
+        if (this.multiLineLastPerpX !== 0 || this.multiLineLastPerpY !== 0) {
+            // Blend current and previous perpendicular (80% current, 20% previous)
+            const blendFactor = 0.8;
+            perpX = perpX * blendFactor + this.multiLineLastPerpX * (1 - blendFactor);
+            perpY = perpY * blendFactor + this.multiLineLastPerpY * (1 - blendFactor);
+            
+            // Normalize after blending
+            const perpLen = Math.sqrt(perpX * perpX + perpY * perpY);
+            if (perpLen > 0) {
+                perpX /= perpLen;
+                perpY /= perpLen;
+            }
+        }
         
         // Total width of multi-line
         const totalWidth = (count - 1) * spacing;
         const startOffset = -totalWidth / 2;
         
-        // Draw each line
+        // Calculate current offset points
+        const currentPoints = [];
         for (let i = 0; i < count; i++) {
             const offset = startOffset + i * spacing;
-            const offsetX = perpX * offset;
-            const offsetY = perpY * offset;
+            currentPoints.push({
+                x: currPoint.x + perpX * offset,
+                y: currPoint.y + perpY * offset
+            });
+        }
+        
+        // Draw each line, connecting to previous points if available
+        for (let i = 0; i < count; i++) {
+            const offset = startOffset + i * spacing;
             
             this.ctx.beginPath();
-            this.ctx.moveTo(prevPoint.x + offsetX, prevPoint.y + offsetY);
-            this.ctx.lineTo(currPoint.x + offsetX, currPoint.y + offsetY);
+            
+            if (this.multiLineLastPoints && this.multiLineLastPoints[i]) {
+                // Connect from previous point for smooth lines
+                this.ctx.moveTo(this.multiLineLastPoints[i].x, this.multiLineLastPoints[i].y);
+            } else {
+                // First segment - start from prevPoint with offset
+                this.ctx.moveTo(prevPoint.x + perpX * offset, prevPoint.y + perpY * offset);
+            }
+            
+            this.ctx.lineTo(currentPoints[i].x, currentPoints[i].y);
             this.ctx.stroke();
         }
+        
+        // Store current perpendicular and points for next segment
+        this.multiLineLastPerpX = perpX;
+        this.multiLineLastPerpY = perpY;
+        this.multiLineLastPoints = currentPoints;
     }
     
     /**

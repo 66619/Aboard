@@ -57,6 +57,7 @@ window.translations = {
             ballpoint: 'Kugelschreiber',
             fountain: 'Füllfederhalter',
             brush: 'Pinsel',
+            color: 'Farbe',
             colorAndSize: 'Farbe & Größe',
             colorPicker: 'Farbwähler',
             size: 'Größe',
@@ -71,7 +72,8 @@ window.translations = {
             circle: 'Kreis',
             ellipse: 'Ellipse',
             arrow: 'Pfeil',
-            hint: 'Drücken und ziehen zum Zeichnen, loslassen zum Beenden'
+            hint: 'Drücken und ziehen zum Zeichnen, loslassen zum Beenden',
+            lineProperties: 'Linieneigenschaften'
         },
         eraser: {
             title: 'Radiergummi',

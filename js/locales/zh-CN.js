@@ -57,6 +57,7 @@ window.translations = {
             ballpoint: '圆珠笔',
             fountain: '钢笔',
             brush: '毛笔',
+            color: '颜色',
             colorAndSize: '颜色与粗细',
             colorPicker: '取色器',
             size: '粗细',
@@ -71,7 +72,8 @@ window.translations = {
             circle: '圆形',
             ellipse: '椭圆',
             arrow: '箭头',
-            hint: '按住拖动绘制形状，松开完成'
+            hint: '按住拖动绘制形状，松开完成',
+            lineProperties: '线条属性'
         },
         eraser: {
             title: '橡皮',

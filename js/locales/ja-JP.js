@@ -57,6 +57,7 @@ window.translations = {
             ballpoint: 'ボールペン',
             fountain: '万年筆',
             brush: 'ブラシ',
+            color: '色',
             colorAndSize: '色とサイズ',
             colorPicker: 'カラーピッカー',
             size: 'サイズ',
@@ -71,7 +72,8 @@ window.translations = {
             circle: '円',
             ellipse: '楕円',
             arrow: '矢印',
-            hint: 'ドラッグして図形を描画、離して完成'
+            hint: 'ドラッグして図形を描画、離して完成',
+            lineProperties: '線の属性'
         },
         eraser: {
             title: '消しゴム',
