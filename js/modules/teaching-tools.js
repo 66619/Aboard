@@ -10,6 +10,9 @@ class TeachingToolsManager {
         // Scale factor reference (will be set by main.js)
         this.canvasScaleFactor = 1.0;
         
+        // Callback for when tools are inserted
+        this.onToolsInserted = null;
+        
         // Tools on canvas
         this.tools = [];
         this.selectedTool = null;
@@ -904,6 +907,11 @@ class TeachingToolsManager {
         }
         
         this.redrawTools();
+        
+        // Trigger callback when tools are inserted
+        if (this.onToolsInserted && typeof this.onToolsInserted === 'function') {
+            this.onToolsInserted();
+        }
     }
     
     addTool(tool) {

@@ -31,6 +31,12 @@ class DrawingBoard {
         this.exportManager = new ExportManager(this.canvas, this.bgCanvas, this);
         this.teachingToolsManager = new TeachingToolsManager(this.canvas, this.ctx, this.historyManager);
         
+        // Set callback for teaching tools insertion to auto-switch to pen
+        this.teachingToolsManager.onToolsInserted = () => {
+            this.closeFeaturePanel();
+            this.switchToPen();
+        };
+        
         // Initialize shape drawing manager
         this.shapeDrawingManager = new ShapeDrawingManager(this.canvas, this.ctx, this.drawingEngine, this.historyManager);
         
@@ -1661,26 +1667,20 @@ class DrawingBoard {
         
         this.updateUI();
         
-        // Hide both config-area and feature-area by default
+        // Hide config-area by default (but don't always hide feature-area)
         document.getElementById('config-area').classList.remove('show');
-        document.getElementById('feature-area').classList.remove('show');
         
         // Show appropriate panel based on tool
         if (showConfig && (tool === 'pen' || tool === 'eraser' || tool === 'background' || tool === 'shape')) {
             document.getElementById('config-area').classList.add('show');
+            // Don't close feature-area when selecting shape - allow multiple panels to be open
+            if (tool !== 'shape') {
+                document.getElementById('feature-area').classList.remove('show');
+            }
         } else if (tool === 'more') {
             document.getElementById('feature-area').classList.add('show');
-            
-            // Update More config panel state
-            const showDateCheckboxMore = document.getElementById('show-date-checkbox-more');
-            const showTimeCheckboxMore = document.getElementById('show-time-checkbox-more');
-            
-            if (showDateCheckboxMore) {
-                showDateCheckboxMore.checked = this.timeDisplayManager.showDate;
-            }
-            if (showTimeCheckboxMore) {
-                showTimeCheckboxMore.checked = this.timeDisplayManager.showTime;
-            }
+        } else {
+            document.getElementById('feature-area').classList.remove('show');
         }
     }
     

@@ -177,6 +177,13 @@ class LineStyleModal {
     
     show(mode = 'pen') {
         this.currentMode = mode;
+        
+        // Hide wavy line option for pen mode (pen doesn't support wavy)
+        const wavyBtn = document.querySelector('#modal-line-style-grid .line-style-type-btn[data-modal-line-style="wavy"]');
+        if (wavyBtn) {
+            wavyBtn.style.display = mode === 'pen' ? 'none' : 'flex';
+        }
+        
         this.loadCurrentSettings();
         this.modal.classList.add('show');
         this.updatePreview();
@@ -198,8 +205,8 @@ class LineStyleModal {
             lineStyle = this.drawingEngine.penLineStyle || 'solid';
             dashDensity = this.drawingEngine.penDashDensity || 10;
             waveDensity = 10;
-            lineSpacing = 10;
-            lineCount = 2;
+            lineSpacing = this.drawingEngine.penMultiLineSpacing || 10;
+            lineCount = this.drawingEngine.penMultiLineCount || 2;
         } else {
             lineStyle = this.shapeDrawingManager.lineStyle || 'solid';
             dashDensity = this.shapeDrawingManager.dashDensity || 10;
@@ -283,14 +290,14 @@ class LineStyleModal {
         const lineCount = parseInt(document.getElementById('modal-line-count-slider').value);
         const lineSpacing = parseInt(document.getElementById('modal-line-spacing-slider').value);
         
-        // Get pen size from drawing engine
+        // Get pen size from drawing engine - use exact size without limiting
         const penSize = this.currentMode === 'pen' 
             ? (this.drawingEngine.penSize || 5)
             : (this.shapeDrawingManager.drawingEngine.penSize || 5);
         
-        // Setup context with actual pen size
+        // Setup context with actual pen size (no limiting)
         ctx.strokeStyle = '#333333';
-        ctx.lineWidth = Math.min(penSize, 8); // Limit preview line width
+        ctx.lineWidth = penSize;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         
@@ -383,6 +390,8 @@ class LineStyleModal {
             // Apply to pen tool
             this.drawingEngine.setPenLineStyle(lineStyle);
             this.drawingEngine.setPenDashDensity(dashDensity);
+            this.drawingEngine.setPenMultiLineCount(lineCount);
+            this.drawingEngine.setPenMultiLineSpacing(lineSpacing);
             
             // Update pen button style
             this.updatePenButtonStyle(lineStyle);

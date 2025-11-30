@@ -18,6 +18,8 @@ class DrawingEngine {
         // Line style settings for pen
         this.penLineStyle = localStorage.getItem('penLineStyle') || 'solid';
         this.penDashDensity = parseInt(localStorage.getItem('penDashDensity')) || 10;
+        this.penMultiLineCount = parseInt(localStorage.getItem('penMultiLineCount')) || 2;
+        this.penMultiLineSpacing = parseInt(localStorage.getItem('penMultiLineSpacing')) || 10;
         
         // Accumulated distance for dashed line drawing
         this.accumulatedDistance = 0;
@@ -64,6 +66,16 @@ class DrawingEngine {
         localStorage.setItem('penDashDensity', this.penDashDensity);
     }
     
+    setPenMultiLineCount(count) {
+        this.penMultiLineCount = Math.max(2, Math.min(10, count));
+        localStorage.setItem('penMultiLineCount', this.penMultiLineCount);
+    }
+    
+    setPenMultiLineSpacing(spacing) {
+        this.penMultiLineSpacing = Math.max(5, Math.min(50, spacing));
+        localStorage.setItem('penMultiLineSpacing', this.penMultiLineSpacing);
+    }
+    
     getPosition(e) {
         const rect = this.canvas.getBoundingClientRect();
         // Adjust for canvas scale (CSS transform)
@@ -92,7 +104,7 @@ class DrawingEngine {
      * Returns true if we should draw, false if we're in a gap
      */
     shouldDrawDash(distance) {
-        if (this.penLineStyle === 'solid') {
+        if (this.penLineStyle === 'solid' || this.penLineStyle === 'multi') {
             return true;
         }
         
@@ -290,18 +302,58 @@ class DrawingEngine {
                     this.drawFountainStroke(prevPoint, currPoint, distance);
                 }
             } else {
-                // Normal pen: consistent line width with dashed/dotted support
+                // Normal pen: consistent line width with dashed/dotted/multi-line support
                 if (shouldDraw) {
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(prevPoint.x, prevPoint.y);
-                    this.ctx.lineTo(currPoint.x, currPoint.y);
-                    this.ctx.stroke();
+                    if (this.penLineStyle === 'multi') {
+                        // Draw multiple parallel lines
+                        this.drawMultiLine(prevPoint, currPoint);
+                    } else {
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(prevPoint.x, prevPoint.y);
+                        this.ctx.lineTo(currPoint.x, currPoint.y);
+                        this.ctx.stroke();
+                    }
                 }
             }
             
             this.lastPoint = currPoint;
         } else {
             this.lastPoint = pos;
+        }
+    }
+    
+    /**
+     * Draw multiple parallel lines for multi-line style
+     */
+    drawMultiLine(prevPoint, currPoint) {
+        const count = this.penMultiLineCount;
+        const spacing = this.penMultiLineSpacing;
+        
+        // Calculate perpendicular direction
+        const dx = currPoint.x - prevPoint.x;
+        const dy = currPoint.y - prevPoint.y;
+        const length = Math.sqrt(dx * dx + dy * dy);
+        
+        if (length === 0) return;
+        
+        // Perpendicular unit vector
+        const perpX = -dy / length;
+        const perpY = dx / length;
+        
+        // Total width of multi-line
+        const totalWidth = (count - 1) * spacing;
+        const startOffset = -totalWidth / 2;
+        
+        // Draw each line
+        for (let i = 0; i < count; i++) {
+            const offset = startOffset + i * spacing;
+            const offsetX = perpX * offset;
+            const offsetY = perpY * offset;
+            
+            this.ctx.beginPath();
+            this.ctx.moveTo(prevPoint.x + offsetX, prevPoint.y + offsetY);
+            this.ctx.lineTo(currPoint.x + offsetX, currPoint.y + offsetY);
+            this.ctx.stroke();
         }
     }
     
