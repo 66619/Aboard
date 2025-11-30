@@ -324,6 +324,8 @@ class DrawingEngine {
     
     /**
      * Draw multiple parallel lines for multi-line style
+     * @param {Object} prevPoint - Previous point with x, y coordinates
+     * @param {Object} currPoint - Current point with x, y coordinates
      */
     drawMultiLine(prevPoint, currPoint) {
         const count = this.penMultiLineCount;
@@ -334,6 +336,7 @@ class DrawingEngine {
         const dy = currPoint.y - prevPoint.y;
         const length = Math.sqrt(dx * dx + dy * dy);
         
+        // Skip drawing if points are identical (length is 0) to avoid division by zero
         if (length === 0) return;
         
         // Perpendicular unit vector
