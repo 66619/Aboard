@@ -347,6 +347,7 @@ window.translations = {
     // Feature Area
     features: {
         title: 'Fonctionnalités',
+        moreFeatures: 'Plus de fonctionnalités',
         time: 'Heure',
         timer: 'Minuteur'
     },

@@ -392,14 +392,16 @@ class DrawingBoard {
         
         // Toolbar buttons
         document.getElementById('pen-btn').addEventListener('click', () => this.setTool('pen'));
-        document.getElementById('shape-btn').addEventListener('click', () => this.setTool('shape'));
         document.getElementById('pan-btn').addEventListener('click', () => this.setTool('pan'));
         document.getElementById('eraser-btn').addEventListener('click', () => this.setTool('eraser'));
         document.getElementById('background-btn').addEventListener('click', () => this.setTool('background'));
         document.getElementById('clear-btn').addEventListener('click', () => this.confirmClear());
         document.getElementById('settings-btn').addEventListener('click', () => this.openSettings());
         document.getElementById('more-btn').addEventListener('click', () => this.setTool('more'));
-        document.getElementById('teaching-tools-btn').addEventListener('click', () => this.teachingToolsManager.showModal());
+        
+        // Shape and Teaching Tools buttons in More menu
+        document.getElementById('more-shape-btn').addEventListener('click', () => this.setTool('shape'));
+        document.getElementById('more-teaching-tools-btn').addEventListener('click', () => this.teachingToolsManager.showModal());
         
         document.getElementById('config-close-btn').addEventListener('click', () => this.closeConfigPanel());
         document.getElementById('feature-close-btn').addEventListener('click', () => this.closeFeaturePanel());
@@ -1585,7 +1587,7 @@ class DrawingBoard {
             document.getElementById('pen-config').classList.add('active');
             this.canvas.style.cursor = 'crosshair';
         } else if (tool === 'shape') {
-            document.getElementById('shape-btn').classList.add('active');
+            document.getElementById('more-btn').classList.add('active');
             document.getElementById('shape-config').classList.add('active');
             this.canvas.style.cursor = 'crosshair';
         } else if (tool === 'pan') {
