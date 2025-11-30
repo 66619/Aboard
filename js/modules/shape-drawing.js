@@ -15,12 +15,63 @@ class ShapeDrawingManager {
         this.startPoint = null;
         this.endPoint = null;
         
+        // Line style settings
+        this.lineStyle = 'solid'; // solid, dashed, dotted, wavy, double, triple
+        this.dashDensity = 10; // Dash segment length
+        this.waveDensity = 10; // Wave frequency
+        this.multiLineCount = 2; // Number of lines for multi-line styles
+        this.multiLineSpacing = 4; // Spacing between multiple lines
+        
         // Preview layer (optional canvas overlay for live preview)
         this.previewCanvas = null;
         this.previewCtx = null;
         
         // Create preview canvas for live shape preview
         this.createPreviewCanvas();
+        
+        // Load saved settings
+        this.loadSettings();
+    }
+    
+    loadSettings() {
+        this.lineStyle = localStorage.getItem('shapeLineStyle') || 'solid';
+        this.dashDensity = parseInt(localStorage.getItem('shapeDashDensity')) || 10;
+        this.waveDensity = parseInt(localStorage.getItem('shapeWaveDensity')) || 10;
+        this.multiLineCount = parseInt(localStorage.getItem('shapeMultiLineCount')) || 2;
+        this.multiLineSpacing = parseInt(localStorage.getItem('shapeMultiLineSpacing')) || 4;
+    }
+    
+    saveSettings() {
+        localStorage.setItem('shapeLineStyle', this.lineStyle);
+        localStorage.setItem('shapeDashDensity', this.dashDensity);
+        localStorage.setItem('shapeWaveDensity', this.waveDensity);
+        localStorage.setItem('shapeMultiLineCount', this.multiLineCount);
+        localStorage.setItem('shapeMultiLineSpacing', this.multiLineSpacing);
+    }
+    
+    setLineStyle(style) {
+        this.lineStyle = style;
+        this.saveSettings();
+    }
+    
+    setDashDensity(density) {
+        this.dashDensity = Math.max(3, Math.min(30, density));
+        this.saveSettings();
+    }
+    
+    setWaveDensity(density) {
+        this.waveDensity = Math.max(5, Math.min(30, density));
+        this.saveSettings();
+    }
+    
+    setMultiLineCount(count) {
+        this.multiLineCount = Math.max(2, Math.min(5, count));
+        this.saveSettings();
+    }
+    
+    setMultiLineSpacing(spacing) {
+        this.multiLineSpacing = Math.max(2, Math.min(20, spacing));
+        this.saveSettings();
     }
     
     createPreviewCanvas() {
@@ -39,17 +90,24 @@ class ShapeDrawingManager {
     }
     
     syncPreviewCanvas() {
-        // Sync preview canvas size with main canvas
+        // Sync preview canvas size with main canvas position and size on screen
         const rect = this.canvas.getBoundingClientRect();
         const dpr = window.devicePixelRatio || 1;
         
+        // Set canvas buffer size
         this.previewCanvas.width = rect.width * dpr;
         this.previewCanvas.height = rect.height * dpr;
+        
+        // Set CSS size to match the main canvas display size
         this.previewCanvas.style.width = rect.width + 'px';
         this.previewCanvas.style.height = rect.height + 'px';
+        
+        // Position exactly over the main canvas
         this.previewCanvas.style.left = rect.left + 'px';
         this.previewCanvas.style.top = rect.top + 'px';
         
+        // Reset transform and scale for DPR
+        this.previewCtx.setTransform(1, 0, 0, 1, 0, 0);
         this.previewCtx.scale(dpr, dpr);
     }
     
@@ -58,14 +116,26 @@ class ShapeDrawingManager {
     }
     
     getPosition(e) {
-        // Reuse drawingEngine's getPosition method for consistency
+        // Get position relative to the canvas bounding rect (screen coordinates)
+        const rect = this.canvas.getBoundingClientRect();
+        return {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        };
+    }
+    
+    getCanvasPosition(e) {
+        // Get position in canvas coordinate space for drawing on main canvas
         return this.drawingEngine.getPosition(e);
     }
     
     startDrawing(e) {
         this.isDrawing = true;
+        // Store both screen position (for preview) and canvas position (for final drawing)
         this.startPoint = this.getPosition(e);
+        this.startCanvasPoint = this.getCanvasPosition(e);
         this.endPoint = this.startPoint;
+        this.endCanvasPoint = this.startCanvasPoint;
         
         // Sync and show preview canvas
         this.syncPreviewCanvas();
@@ -76,6 +146,7 @@ class ShapeDrawingManager {
         if (!this.isDrawing || !this.startPoint) return;
         
         this.endPoint = this.getPosition(e);
+        this.endCanvasPoint = this.getCanvasPosition(e);
         
         // Clear preview and draw current shape preview
         this.clearPreview();
@@ -85,8 +156,8 @@ class ShapeDrawingManager {
     stopDrawing() {
         if (!this.isDrawing) return;
         
-        // Draw final shape on main canvas
-        if (this.startPoint && this.endPoint) {
+        // Draw final shape on main canvas using canvas coordinates
+        if (this.startCanvasPoint && this.endCanvasPoint) {
             this.drawFinalShape();
             
             // Save to history
@@ -99,6 +170,8 @@ class ShapeDrawingManager {
         this.isDrawing = false;
         this.startPoint = null;
         this.endPoint = null;
+        this.startCanvasPoint = null;
+        this.endCanvasPoint = null;
         
         // Hide preview canvas
         this.clearPreview();
@@ -107,16 +180,19 @@ class ShapeDrawingManager {
     
     clearPreview() {
         const dpr = window.devicePixelRatio || 1;
-        this.previewCtx.clearRect(0, 0, this.previewCanvas.width / dpr, this.previewCanvas.height / dpr);
+        this.previewCtx.setTransform(1, 0, 0, 1, 0, 0);
+        this.previewCtx.clearRect(0, 0, this.previewCanvas.width, this.previewCanvas.height);
+        this.previewCtx.scale(dpr, dpr);
     }
     
-    setupDrawingContext(ctx) {
+    setupDrawingContext(ctx, isPreview = false) {
         // Use same properties as pen tool
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.globalCompositeOperation = 'source-over';
         ctx.strokeStyle = this.drawingEngine.currentColor;
         ctx.lineWidth = this.drawingEngine.penSize;
+        ctx.fillStyle = 'transparent';
         
         // Apply pen type effects
         switch(this.drawingEngine.penType) {
@@ -138,35 +214,110 @@ class ShapeDrawingManager {
                 ctx.globalAlpha = 1.0;
                 break;
         }
+        
+        // Apply line style
+        this.applyLineStyle(ctx);
+    }
+    
+    applyLineStyle(ctx) {
+        ctx.setLineDash([]);
+        
+        switch(this.lineStyle) {
+            case 'dashed':
+                ctx.setLineDash([this.dashDensity, this.dashDensity / 2]);
+                break;
+            case 'dotted':
+                ctx.setLineDash([2, this.dashDensity / 2]);
+                break;
+            case 'solid':
+            case 'wavy':
+            case 'double':
+            case 'triple':
+            default:
+                ctx.setLineDash([]);
+                break;
+        }
     }
     
     drawShapePreview() {
-        this.setupDrawingContext(this.previewCtx);
-        
-        // Draw dashed preview line
-        this.previewCtx.setLineDash([5, 5]);
+        this.setupDrawingContext(this.previewCtx, true);
         
         switch(this.currentShape) {
             case 'line':
-                this.drawLine(this.previewCtx, this.startPoint, this.endPoint);
+                this.drawLineWithStyle(this.previewCtx, this.startPoint, this.endPoint);
+                break;
+            case 'rectangle':
+                this.drawRectangleWithStyle(this.previewCtx, this.startPoint, this.endPoint);
                 break;
         }
         
+        // Reset line dash
         this.previewCtx.setLineDash([]);
     }
     
     drawFinalShape() {
-        this.setupDrawingContext(this.ctx);
-        this.ctx.setLineDash([]); // Solid line for final shape
+        this.setupDrawingContext(this.ctx, false);
         
         switch(this.currentShape) {
             case 'line':
-                this.drawLine(this.ctx, this.startPoint, this.endPoint);
+                this.drawLineWithStyle(this.ctx, this.startCanvasPoint, this.endCanvasPoint);
+                break;
+            case 'rectangle':
+                this.drawRectangleWithStyle(this.ctx, this.startCanvasPoint, this.endCanvasPoint);
                 break;
         }
         
         // Reset context
         this.ctx.globalAlpha = 1.0;
+        this.ctx.setLineDash([]);
+    }
+    
+    drawLineWithStyle(ctx, start, end) {
+        if (!start || !end) return;
+        
+        switch(this.lineStyle) {
+            case 'wavy':
+                this.drawWavyLine(ctx, start, end);
+                break;
+            case 'double':
+                this.drawMultiLine(ctx, start, end, 2);
+                break;
+            case 'triple':
+                this.drawMultiLine(ctx, start, end, 3);
+                break;
+            default:
+                this.drawLine(ctx, start, end);
+                break;
+        }
+    }
+    
+    drawRectangleWithStyle(ctx, start, end) {
+        if (!start || !end) return;
+        
+        const x = Math.min(start.x, end.x);
+        const y = Math.min(start.y, end.y);
+        const width = Math.abs(end.x - start.x);
+        const height = Math.abs(end.y - start.y);
+        
+        switch(this.lineStyle) {
+            case 'wavy':
+                // Draw wavy rectangle (4 wavy lines)
+                this.drawWavyLine(ctx, {x: x, y: y}, {x: x + width, y: y}); // top
+                this.drawWavyLine(ctx, {x: x + width, y: y}, {x: x + width, y: y + height}); // right
+                this.drawWavyLine(ctx, {x: x + width, y: y + height}, {x: x, y: y + height}); // bottom
+                this.drawWavyLine(ctx, {x: x, y: y + height}, {x: x, y: y}); // left
+                break;
+            case 'double':
+            case 'triple':
+                const count = this.lineStyle === 'double' ? 2 : 3;
+                this.drawMultiRectangle(ctx, x, y, width, height, count);
+                break;
+            default:
+                ctx.beginPath();
+                ctx.rect(x, y, width, height);
+                ctx.stroke();
+                break;
+        }
     }
     
     drawLine(ctx, start, end) {
@@ -176,6 +327,101 @@ class ShapeDrawingManager {
         ctx.moveTo(start.x, start.y);
         ctx.lineTo(end.x, end.y);
         ctx.stroke();
+    }
+    
+    drawWavyLine(ctx, start, end) {
+        if (!start || !end) return;
+        
+        const dx = end.x - start.x;
+        const dy = end.y - start.y;
+        const length = Math.sqrt(dx * dx + dy * dy);
+        
+        if (length === 0) return;
+        
+        // Calculate wave parameters
+        const waveLength = this.waveDensity;
+        const waveAmplitude = this.drawingEngine.penSize * 1.5;
+        const waves = Math.max(1, Math.floor(length / waveLength));
+        
+        // Calculate perpendicular direction for wave offset
+        const perpX = -dy / length;
+        const perpY = dx / length;
+        
+        ctx.beginPath();
+        ctx.moveTo(start.x, start.y);
+        
+        for (let i = 0; i <= waves * 2; i++) {
+            const t = i / (waves * 2);
+            const x = start.x + dx * t;
+            const y = start.y + dy * t;
+            
+            // Sine wave offset
+            const offset = Math.sin(i * Math.PI) * waveAmplitude * (i % 2 === 0 ? 1 : -1);
+            
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                const prevT = (i - 1) / (waves * 2);
+                const prevX = start.x + dx * prevT;
+                const prevY = start.y + dy * prevT;
+                const prevOffset = Math.sin((i - 1) * Math.PI) * waveAmplitude * ((i - 1) % 2 === 0 ? 1 : -1);
+                
+                // Use quadratic curve for smooth wave
+                const cpX = (prevX + x) / 2 + perpX * offset;
+                const cpY = (prevY + y) / 2 + perpY * offset;
+                
+                ctx.quadraticCurveTo(
+                    prevX + perpX * prevOffset,
+                    prevY + perpY * prevOffset,
+                    cpX,
+                    cpY
+                );
+            }
+        }
+        
+        ctx.stroke();
+    }
+    
+    drawMultiLine(ctx, start, end, count) {
+        if (!start || !end) return;
+        
+        const dx = end.x - start.x;
+        const dy = end.y - start.y;
+        const length = Math.sqrt(dx * dx + dy * dy);
+        
+        if (length === 0) return;
+        
+        // Calculate perpendicular direction
+        const perpX = -dy / length;
+        const perpY = dx / length;
+        
+        const totalWidth = (count - 1) * this.multiLineSpacing;
+        const startOffset = -totalWidth / 2;
+        
+        for (let i = 0; i < count; i++) {
+            const offset = startOffset + i * this.multiLineSpacing;
+            ctx.beginPath();
+            ctx.moveTo(start.x + perpX * offset, start.y + perpY * offset);
+            ctx.lineTo(end.x + perpX * offset, end.y + perpY * offset);
+            ctx.stroke();
+        }
+    }
+    
+    drawMultiRectangle(ctx, x, y, width, height, count) {
+        const totalOffset = (count - 1) * this.multiLineSpacing;
+        const startOffset = -totalOffset / 2;
+        
+        for (let i = 0; i < count; i++) {
+            const offset = startOffset + i * this.multiLineSpacing;
+            ctx.beginPath();
+            ctx.rect(
+                x - offset,
+                y - offset,
+                width + offset * 2,
+                height + offset * 2
+            );
+            ctx.stroke();
+        }
     }
     
     // Cleanup

@@ -91,6 +91,18 @@ window.translations = {
         },
         refresh: {
             warning: '새로 고침하면 캔버스 내용이 모두 지워지며 복구할 수 없습니다. 새로 고침하시겠습니까?'
+        },
+        lineStyle: {
+            title: '선 스타일',
+            solid: '실선',
+            dashed: '파선',
+            dotted: '점선',
+            wavy: '물결선',
+            double: '이중선',
+            triple: '삼중선',
+            dashDensity: '파선 밀도',
+            waveDensity: '물결 밀도',
+            lineSpacing: '선 간격'
         }
     },
 

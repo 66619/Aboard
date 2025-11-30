@@ -641,6 +641,80 @@ class DrawingBoard {
             }
         });
         
+        // Shape type buttons
+        document.querySelectorAll('.shape-type-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const shapeType = e.target.closest('.shape-type-btn').dataset.shapeType;
+                this.shapeDrawingManager.setShape(shapeType);
+                document.querySelectorAll('.shape-type-btn').forEach(b => b.classList.remove('active'));
+                e.target.closest('.shape-type-btn').classList.add('active');
+            });
+        });
+        
+        // Shape line style buttons
+        document.querySelectorAll('.line-style-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const lineStyle = e.target.closest('.line-style-btn').dataset.lineStyle;
+                this.shapeDrawingManager.setLineStyle(lineStyle);
+                document.querySelectorAll('.line-style-btn').forEach(b => b.classList.remove('active'));
+                e.target.closest('.line-style-btn').classList.add('active');
+                
+                // Show/hide appropriate settings
+                this.updateLineStyleSettings(lineStyle);
+            });
+        });
+        
+        // Pen line style buttons
+        document.querySelectorAll('.pen-line-style-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const lineStyle = e.target.closest('.pen-line-style-btn').dataset.penLineStyle;
+                this.drawingEngine.setPenLineStyle(lineStyle);
+                document.querySelectorAll('.pen-line-style-btn').forEach(b => b.classList.remove('active'));
+                e.target.closest('.pen-line-style-btn').classList.add('active');
+                
+                // Show/hide pen dash density setting
+                this.updatePenLineStyleSettings(lineStyle);
+            });
+        });
+        
+        // Shape line style sliders
+        const dashDensitySlider = document.getElementById('dash-density-slider');
+        const dashDensityValue = document.getElementById('dash-density-value');
+        if (dashDensitySlider) {
+            dashDensitySlider.addEventListener('input', (e) => {
+                this.shapeDrawingManager.setDashDensity(parseInt(e.target.value));
+                dashDensityValue.textContent = e.target.value;
+            });
+        }
+        
+        const waveDensitySlider = document.getElementById('wave-density-slider');
+        const waveDensityValue = document.getElementById('wave-density-value');
+        if (waveDensitySlider) {
+            waveDensitySlider.addEventListener('input', (e) => {
+                this.shapeDrawingManager.setWaveDensity(parseInt(e.target.value));
+                waveDensityValue.textContent = e.target.value;
+            });
+        }
+        
+        const multiLineSpacingSlider = document.getElementById('multi-line-spacing-slider');
+        const multiLineSpacingValue = document.getElementById('multi-line-spacing-value');
+        if (multiLineSpacingSlider) {
+            multiLineSpacingSlider.addEventListener('input', (e) => {
+                this.shapeDrawingManager.setMultiLineSpacing(parseInt(e.target.value));
+                multiLineSpacingValue.textContent = e.target.value;
+            });
+        }
+        
+        // Pen dash density slider
+        const penDashDensitySlider = document.getElementById('pen-dash-density-slider');
+        const penDashDensityValue = document.getElementById('pen-dash-density-value');
+        if (penDashDensitySlider) {
+            penDashDensitySlider.addEventListener('input', (e) => {
+                this.drawingEngine.setPenDashDensity(parseInt(e.target.value));
+                penDashDensityValue.textContent = e.target.value;
+            });
+        }
+        
         // More config panel (time display checkboxes)
         const showDateCheckboxMore = document.getElementById('show-date-checkbox-more');
         const showTimeCheckboxMore = document.getElementById('show-time-checkbox-more');
@@ -656,6 +730,9 @@ class DrawingBoard {
                 if (isVisible) {
                     timeDisplayControls.style.display = 'none';
                     timeDisplayFeatureBtn.classList.remove('active');
+                    // Auto-switch to pen tool after closing time display settings
+                    this.closeFeaturePanel();
+                    this.switchToPen();
                 } else {
                     timeDisplayControls.style.display = 'flex';
                     timeDisplayFeatureBtn.classList.add('active');
@@ -672,6 +749,9 @@ class DrawingBoard {
         if (timerFeatureBtn) {
             timerFeatureBtn.addEventListener('click', () => {
                 this.timerManager.showSettingsModal();
+                // Auto-switch to pen tool after opening timer
+                this.closeFeaturePanel();
+                this.switchToPen();
             });
         }
         
@@ -1416,6 +1496,60 @@ class DrawingBoard {
         document.addEventListener('touchmove', handleDragMove, { passive: false });
         document.addEventListener('touchend', handleDragEnd);
         document.addEventListener('touchcancel', handleDragEnd);
+    }
+    
+    updateLineStyleSettings(lineStyle) {
+        const lineStyleSettings = document.getElementById('line-style-settings');
+        const dashDensitySetting = document.getElementById('dash-density-setting');
+        const waveDensitySetting = document.getElementById('wave-density-setting');
+        const multiLineSettings = document.getElementById('multi-line-settings');
+        
+        // Reset all settings
+        lineStyleSettings.style.display = 'none';
+        dashDensitySetting.style.display = 'none';
+        waveDensitySetting.style.display = 'none';
+        multiLineSettings.style.display = 'none';
+        
+        // Show relevant settings
+        switch(lineStyle) {
+            case 'dashed':
+            case 'dotted':
+                lineStyleSettings.style.display = 'block';
+                dashDensitySetting.style.display = 'flex';
+                break;
+            case 'wavy':
+                lineStyleSettings.style.display = 'block';
+                waveDensitySetting.style.display = 'flex';
+                break;
+            case 'double':
+            case 'triple':
+                lineStyleSettings.style.display = 'block';
+                multiLineSettings.style.display = 'flex';
+                break;
+        }
+    }
+    
+    updatePenLineStyleSettings(lineStyle) {
+        const penLineStyleSettings = document.getElementById('pen-line-style-settings');
+        const penDashDensitySetting = document.getElementById('pen-dash-density-setting');
+        
+        // Reset all settings
+        penLineStyleSettings.style.display = 'none';
+        penDashDensitySetting.style.display = 'none';
+        
+        // Show relevant settings
+        switch(lineStyle) {
+            case 'dashed':
+            case 'dotted':
+                penLineStyleSettings.style.display = 'block';
+                penDashDensitySetting.style.display = 'flex';
+                break;
+        }
+    }
+    
+    switchToPen() {
+        // Helper method to switch to pen tool
+        this.setTool('pen', false);
     }
     
     setTool(tool, showConfig = true) {

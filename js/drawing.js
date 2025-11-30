@@ -15,6 +15,10 @@ class DrawingEngine {
         this.eraserShape = localStorage.getItem('eraserShape') || 'circle';
         this.currentTool = 'pen';
         
+        // Line style settings for pen
+        this.penLineStyle = localStorage.getItem('penLineStyle') || 'solid';
+        this.penDashDensity = parseInt(localStorage.getItem('penDashDensity')) || 10;
+        
         // Drawing buffer
         this.points = [];
         this.lastPoint = null;
@@ -46,6 +50,16 @@ class DrawingEngine {
         this.edgeDrawingManager = edgeDrawingManager;
     }
     
+    setPenLineStyle(style) {
+        this.penLineStyle = style;
+        localStorage.setItem('penLineStyle', style);
+    }
+    
+    setPenDashDensity(density) {
+        this.penDashDensity = Math.max(3, Math.min(30, density));
+        localStorage.setItem('penDashDensity', this.penDashDensity);
+    }
+    
     getPosition(e) {
         const rect = this.canvas.getBoundingClientRect();
         // Adjust for canvas scale (CSS transform)
@@ -61,6 +75,23 @@ class DrawingEngine {
         y = Math.max(0, Math.min(y, this.canvas.offsetHeight));
         
         return { x, y };
+    }
+    
+    applyLineStyle() {
+        this.ctx.setLineDash([]);
+        
+        switch(this.penLineStyle) {
+            case 'dashed':
+                this.ctx.setLineDash([this.penDashDensity, this.penDashDensity / 2]);
+                break;
+            case 'dotted':
+                this.ctx.setLineDash([2, this.penDashDensity / 2]);
+                break;
+            case 'solid':
+            default:
+                this.ctx.setLineDash([]);
+                break;
+        }
     }
     
     setupDrawingContext() {
@@ -90,11 +121,15 @@ class DrawingEngine {
                     this.ctx.globalAlpha = 1.0;
                     break;
             }
+            
+            // Apply line style
+            this.applyLineStyle();
         } else if (this.currentTool === 'eraser') {
             this.ctx.globalCompositeOperation = 'destination-out';
             this.ctx.strokeStyle = 'rgba(0,0,0,1)';
             this.ctx.lineWidth = this.eraserSize;
             this.ctx.globalAlpha = 1.0;
+            this.ctx.setLineDash([]); // Always solid for eraser
             
             // Set line cap/join based on eraser shape
             if (this.eraserShape === 'rectangle') {

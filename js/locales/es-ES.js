@@ -86,6 +86,18 @@ window.translations = {
         },
         refresh: {
             warning: 'Al actualizar se borrará todo el contenido del lienzo y no se podrá recuperar. ¿Está seguro de que desea actualizar?'
+        },
+        lineStyle: {
+            title: 'Estilo de línea',
+            solid: 'Sólido',
+            dashed: 'Discontinuo',
+            dotted: 'Punteado',
+            wavy: 'Ondulado',
+            double: 'Doble',
+            triple: 'Triple',
+            dashDensity: 'Densidad de guiones',
+            waveDensity: 'Densidad de ondas',
+            lineSpacing: 'Espaciado de líneas'
         }
     },
 

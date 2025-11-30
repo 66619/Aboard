@@ -86,6 +86,18 @@ window.translations = {
         },
         refresh: {
             warning: 'L\'actualisation effacera tout le contenu du canevas et ne pourra pas être récupéré. Êtes-vous sûr de vouloir actualiser ?'
+        },
+        lineStyle: {
+            title: 'Style de ligne',
+            solid: 'Plein',
+            dashed: 'Tirets',
+            dotted: 'Pointillé',
+            wavy: 'Ondulé',
+            double: 'Double',
+            triple: 'Triple',
+            dashDensity: 'Densité des tirets',
+            waveDensity: 'Densité des ondes',
+            lineSpacing: 'Espacement des lignes'
         }
     },
 

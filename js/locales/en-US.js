@@ -91,6 +91,18 @@ window.translations = {
         },
         refresh: {
             warning: 'Refreshing will clear all canvas content and cannot be recovered. Are you sure you want to refresh?'
+        },
+        lineStyle: {
+            title: 'Line Style',
+            solid: 'Solid',
+            dashed: 'Dashed',
+            dotted: 'Dotted',
+            wavy: 'Wavy',
+            double: 'Double',
+            triple: 'Triple',
+            dashDensity: 'Dash Density',
+            waveDensity: 'Wave Density',
+            lineSpacing: 'Line Spacing'
         }
     },
 

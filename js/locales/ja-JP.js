@@ -91,6 +91,18 @@ window.translations = {
         },
         refresh: {
             warning: '更新するとキャンバスの内容がすべてクリアされ、復元できません。更新してもよろしいですか？'
+        },
+        lineStyle: {
+            title: '線種',
+            solid: '実線',
+            dashed: '破線',
+            dotted: '点線',
+            wavy: '波線',
+            double: '二重線',
+            triple: '三重線',
+            dashDensity: '破線の密度',
+            waveDensity: '波の密度',
+            lineSpacing: '線の間隔'
         }
     },
 

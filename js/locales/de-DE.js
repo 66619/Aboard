@@ -91,6 +91,18 @@ window.translations = {
         },
         refresh: {
             warning: 'Beim Aktualisieren wird der gesamte Inhalt der Leinwand gelöscht und kann nicht wiederhergestellt werden. Möchten Sie wirklich aktualisieren?'
+        },
+        lineStyle: {
+            title: 'Linienstil',
+            solid: 'Durchgehend',
+            dashed: 'Gestrichelt',
+            dotted: 'Gepunktet',
+            wavy: 'Wellig',
+            double: 'Doppelt',
+            triple: 'Dreifach',
+            dashDensity: 'Strichdichte',
+            waveDensity: 'Wellendichte',
+            lineSpacing: 'Linienabstand'
         }
     },
 

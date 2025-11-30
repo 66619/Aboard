@@ -91,6 +91,18 @@ window.translations = {
         },
         refresh: {
             warning: '刷新後畫布內容將清空且無法恢復，確定要刷新嗎？'
+        },
+        lineStyle: {
+            title: '線條樣式',
+            solid: '實線',
+            dashed: '虛線',
+            dotted: '點線',
+            wavy: '波浪線',
+            double: '雙線',
+            triple: '三線',
+            dashDensity: '虛線密度',
+            waveDensity: '波浪密度',
+            lineSpacing: '線條間距'
         }
     },
 
