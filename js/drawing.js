@@ -18,6 +18,17 @@ class DrawingEngine {
         // Line style settings for pen
         this.penLineStyle = localStorage.getItem('penLineStyle') || 'solid';
         this.penDashDensity = parseInt(localStorage.getItem('penDashDensity')) || 10;
+        this.penMultiLineCount = parseInt(localStorage.getItem('penMultiLineCount')) || 2;
+        this.penMultiLineSpacing = parseInt(localStorage.getItem('penMultiLineSpacing')) || 10;
+        
+        // Accumulated distance for dashed line drawing
+        this.accumulatedDistance = 0;
+        this.isInDash = true; // Track if we're in dash or gap phase
+        
+        // Multi-line tracking for smooth corners
+        this.multiLineLastPerpX = 0;
+        this.multiLineLastPerpY = 0;
+        this.multiLineLastPoints = null; // Store last offset points for each line
         
         // Drawing buffer
         this.points = [];
@@ -60,6 +71,16 @@ class DrawingEngine {
         localStorage.setItem('penDashDensity', this.penDashDensity);
     }
     
+    setPenMultiLineCount(count) {
+        this.penMultiLineCount = Math.max(2, Math.min(10, count));
+        localStorage.setItem('penMultiLineCount', this.penMultiLineCount);
+    }
+    
+    setPenMultiLineSpacing(spacing) {
+        this.penMultiLineSpacing = Math.max(5, Math.min(50, spacing));
+        localStorage.setItem('penMultiLineSpacing', this.penMultiLineSpacing);
+    }
+    
     getPosition(e) {
         const rect = this.canvas.getBoundingClientRect();
         // Adjust for canvas scale (CSS transform)
@@ -78,20 +99,45 @@ class DrawingEngine {
     }
     
     applyLineStyle() {
+        // For freehand drawing, we don't use setLineDash anymore
+        // Instead, we handle dash/dot patterns in the draw() method
         this.ctx.setLineDash([]);
-        
-        switch(this.penLineStyle) {
-            case 'dashed':
-                this.ctx.setLineDash([this.penDashDensity, this.penDashDensity / 2]);
-                break;
-            case 'dotted':
-                this.ctx.setLineDash([2, this.penDashDensity / 2]);
-                break;
-            case 'solid':
-            default:
-                this.ctx.setLineDash([]);
-                break;
+    }
+    
+    /**
+     * Check if current point should be drawn based on dash pattern
+     * Returns true if we should draw, false if we're in a gap
+     */
+    shouldDrawDash(distance) {
+        if (this.penLineStyle === 'solid' || this.penLineStyle === 'multi') {
+            return true;
         }
+        
+        // Get dash and gap lengths based on style and density
+        let dashLength, gapLength;
+        
+        if (this.penLineStyle === 'dashed') {
+            // Dash density controls the length of dashes
+            dashLength = this.penDashDensity;
+            gapLength = this.penDashDensity * 0.6;
+        } else if (this.penLineStyle === 'dotted') {
+            // Dotted: small dots with gaps controlled by density
+            dashLength = this.penSize * 1.5;
+            gapLength = this.penDashDensity * 0.8;
+        } else {
+            return true; // Default to solid
+        }
+        
+        const cycleLength = dashLength + gapLength;
+        
+        // Add distance to accumulated
+        this.accumulatedDistance += distance;
+        
+        // Check where we are in the cycle
+        const positionInCycle = this.accumulatedDistance % cycleLength;
+        
+        // Return true if we're in the dash phase
+        return positionInCycle < dashLength;
     }
     
     setupDrawingContext() {
@@ -146,6 +192,15 @@ class DrawingEngine {
         this.isDrawing = true;
         let pos = this.getPosition(e);
         
+        // Reset accumulated distance for dashed line drawing
+        this.accumulatedDistance = 0;
+        this.isInDash = true;
+        
+        // Reset multi-line tracking
+        this.multiLineLastPerpX = 0;
+        this.multiLineLastPerpY = 0;
+        this.multiLineLastPoints = null;
+        
         // Check for edge snapping when pen tool is active
         if (this.currentTool === 'pen' && this.edgeDrawingManager) {
             const processed = this.edgeDrawingManager.processDrawingPoint(pos.x, pos.y);
@@ -167,10 +222,17 @@ class DrawingEngine {
         
         this.setupDrawingContext();
         
-        this.ctx.beginPath();
-        this.ctx.moveTo(pos.x, pos.y);
-        this.ctx.lineTo(pos.x, pos.y);
-        this.ctx.stroke();
+        // For dashed/dotted lines, draw initial dot
+        if (this.penLineStyle === 'dotted' || this.penLineStyle === 'dashed') {
+            this.ctx.beginPath();
+            this.ctx.arc(pos.x, pos.y, this.penSize / 2, 0, Math.PI * 2);
+            this.ctx.fill();
+        } else {
+            this.ctx.beginPath();
+            this.ctx.moveTo(pos.x, pos.y);
+            this.ctx.lineTo(pos.x, pos.y);
+            this.ctx.stroke();
+        }
     }
     
     draw(e) {
@@ -212,45 +274,128 @@ class DrawingEngine {
             const dy = currPoint.y - prevPoint.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
             
-            // Apply pen-specific drawing effects
-            if (this.penType === 'ballpoint') {
-                // Ballpoint pen: smooth ink flow with slight pressure variation
-                // Creates clean lines with subtle thickness changes
-                this.ctx.save();
-                const minWidth = this.penSize * 0.7;
-                const maxWidth = this.penSize * 1.2;
-                const speedFactor = Math.min(distance / 8, 1);
-                const lineWidth = maxWidth - (speedFactor * (maxWidth - minWidth));
-                this.ctx.lineWidth = lineWidth;
-                this.ctx.globalAlpha = 0.95;
-                
-                this.ctx.beginPath();
-                this.ctx.moveTo(prevPoint.x, prevPoint.y);
-                this.ctx.lineTo(currPoint.x, currPoint.y);
-                this.ctx.stroke();
-                this.ctx.restore();
-                this.setupDrawingContext();
-            } else if (this.penType === 'brush') {
-                // Brush pen: soft edges with ink spread effect like calligraphy
-                this.drawBrushStroke(prevPoint, currPoint, distance);
-            } else if (this.penType === 'pencil') {
-                // Pencil: grainy texture with lighter strokes
-                this.drawPencilStroke(prevPoint, currPoint, distance);
-            } else if (this.penType === 'fountain') {
-                // Fountain pen: variable line width with elegant flow
-                this.drawFountainStroke(prevPoint, currPoint, distance);
-            } else {
-                // Normal pen: consistent line width
-                this.ctx.beginPath();
-                this.ctx.moveTo(prevPoint.x, prevPoint.y);
-                this.ctx.lineTo(currPoint.x, currPoint.y);
-                this.ctx.stroke();
+            // Check if we should draw this segment (for dashed/dotted lines)
+            const shouldDraw = this.shouldDrawDash(distance);
+            
+            // Apply pen-specific drawing effects with line style support
+            // All pen types now support multi-line, dashed, and dotted styles
+            if (shouldDraw) {
+                if (this.penLineStyle === 'multi') {
+                    // Draw multiple parallel lines for all pen types
+                    this.drawMultiLine(prevPoint, currPoint);
+                } else if (this.penType === 'ballpoint') {
+                    // Ballpoint pen: smooth ink flow with slight pressure variation
+                    this.ctx.save();
+                    const minWidth = this.penSize * 0.7;
+                    const maxWidth = this.penSize * 1.2;
+                    const speedFactor = Math.min(distance / 8, 1);
+                    const lineWidth = maxWidth - (speedFactor * (maxWidth - minWidth));
+                    this.ctx.lineWidth = lineWidth;
+                    this.ctx.globalAlpha = 0.95;
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(prevPoint.x, prevPoint.y);
+                    this.ctx.lineTo(currPoint.x, currPoint.y);
+                    this.ctx.stroke();
+                    this.ctx.restore();
+                    this.setupDrawingContext();
+                } else if (this.penType === 'brush') {
+                    // Brush pen: soft edges with ink spread effect like calligraphy
+                    this.drawBrushStroke(prevPoint, currPoint, distance);
+                } else if (this.penType === 'pencil') {
+                    // Pencil: grainy texture with lighter strokes
+                    this.drawPencilStroke(prevPoint, currPoint, distance);
+                } else if (this.penType === 'fountain') {
+                    // Fountain pen: variable line width with elegant flow
+                    this.drawFountainStroke(prevPoint, currPoint, distance);
+                } else {
+                    // Normal pen: consistent line width
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(prevPoint.x, prevPoint.y);
+                    this.ctx.lineTo(currPoint.x, currPoint.y);
+                    this.ctx.stroke();
+                }
             }
             
             this.lastPoint = currPoint;
         } else {
             this.lastPoint = pos;
         }
+    }
+    
+    /**
+     * Draw multiple parallel lines for multi-line style
+     * Uses smoothed perpendiculars to avoid discontinuities at corners
+     * @param {Object} prevPoint - Previous point with x, y coordinates
+     * @param {Object} currPoint - Current point with x, y coordinates
+     */
+    drawMultiLine(prevPoint, currPoint) {
+        const count = this.penMultiLineCount;
+        const spacing = this.penMultiLineSpacing;
+        
+        // Calculate current perpendicular direction
+        const dx = currPoint.x - prevPoint.x;
+        const dy = currPoint.y - prevPoint.y;
+        const length = Math.sqrt(dx * dx + dy * dy);
+        
+        // Skip drawing if points are identical (length is 0) to avoid division by zero
+        if (length === 0) return;
+        
+        // Perpendicular unit vector for current segment
+        let perpX = -dy / length;
+        let perpY = dx / length;
+        
+        // Smooth the perpendicular with the previous one to avoid sudden direction changes
+        if (this.multiLineLastPerpX !== 0 || this.multiLineLastPerpY !== 0) {
+            // Blend current and previous perpendicular (80% current, 20% previous)
+            const blendFactor = 0.8;
+            perpX = perpX * blendFactor + this.multiLineLastPerpX * (1 - blendFactor);
+            perpY = perpY * blendFactor + this.multiLineLastPerpY * (1 - blendFactor);
+            
+            // Normalize after blending
+            const perpLen = Math.sqrt(perpX * perpX + perpY * perpY);
+            if (perpLen > 0) {
+                perpX /= perpLen;
+                perpY /= perpLen;
+            }
+        }
+        
+        // Total width of multi-line
+        const totalWidth = (count - 1) * spacing;
+        const startOffset = -totalWidth / 2;
+        
+        // Calculate current offset points
+        const currentPoints = [];
+        for (let i = 0; i < count; i++) {
+            const offset = startOffset + i * spacing;
+            currentPoints.push({
+                x: currPoint.x + perpX * offset,
+                y: currPoint.y + perpY * offset
+            });
+        }
+        
+        // Draw each line, connecting to previous points if available
+        for (let i = 0; i < count; i++) {
+            const offset = startOffset + i * spacing;
+            
+            this.ctx.beginPath();
+            
+            if (this.multiLineLastPoints && this.multiLineLastPoints[i]) {
+                // Connect from previous point for smooth lines
+                this.ctx.moveTo(this.multiLineLastPoints[i].x, this.multiLineLastPoints[i].y);
+            } else {
+                // First segment - start from prevPoint with offset
+                this.ctx.moveTo(prevPoint.x + perpX * offset, prevPoint.y + perpY * offset);
+            }
+            
+            this.ctx.lineTo(currentPoints[i].x, currentPoints[i].y);
+            this.ctx.stroke();
+        }
+        
+        // Store current perpendicular and points for next segment
+        this.multiLineLastPerpX = perpX;
+        this.multiLineLastPerpY = perpY;
+        this.multiLineLastPoints = currentPoints;
     }
     
     /**

@@ -57,6 +57,7 @@ window.translations = {
             ballpoint: '圓珠筆',
             fountain: '鋼筆',
             brush: '毛筆',
+            color: '顏色',
             colorAndSize: '顏色与粗细',
             colorPicker: '取色器',
             size: '粗细',
@@ -71,7 +72,8 @@ window.translations = {
             circle: '圓形',
             ellipse: '橢圓',
             arrow: '箭頭',
-            hint: '按住拖動繪製形狀，鬆開完成'
+            hint: '按住拖動繪製形狀，鬆開完成',
+            lineProperties: '線條屬性'
         },
         eraser: {
             title: '橡皮',
@@ -100,10 +102,27 @@ window.translations = {
             wavy: '波浪線',
             double: '雙線',
             triple: '三線',
+            multiLine: '多線',
             dashDensity: '虛線密度',
             waveDensity: '波浪密度',
-            lineSpacing: '線條間距'
+            lineSpacing: '線條間距',
+            lineCount: '線條數量'
         }
+    },
+
+    // Line Style Modal
+    lineStyleModal: {
+        title: '線條樣式設定',
+        openSettings: '更多設定',
+        preview: '預覽'
+    },
+
+    // Time Display
+    timeDisplay: {
+        options: '時間顯示選項',
+        showDate: '顯示日期',
+        showTime: '顯示時間',
+        settings: '設定'
     },
 
     // Background

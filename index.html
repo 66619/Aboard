@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="css/modules/timer.css">
     <link rel="stylesheet" href="css/modules/teaching-tools.css">
     <link rel="stylesheet" href="css/modules/shape.css">
+    <link rel="stylesheet" href="css/modules/line-style-modal.css">
 </head>
 <body>
     <!-- Zoom controls in top right corner -->
@@ -76,6 +77,13 @@
                     <button class="pen-type-btn" data-pen-type="fountain" data-i18n="tools.pen.fountain">Fountain</button>
                     <button class="pen-type-btn" data-pen-type="brush" data-i18n="tools.pen.brush">Brush</button>
                 </div>
+                <!-- Line Style button below pen type -->
+                <button id="pen-line-style-settings-btn" class="open-line-style-btn" title="Line Style">
+                    <svg width="40" height="16" viewBox="0 0 40 16">
+                        <line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <span data-i18n="tools.lineStyle.title">Line Style</span>
+                </button>
             </div>
             <div class="config-group">
                 <label data-i18n="tools.pen.colorAndSize">Color & Size</label>
@@ -107,35 +115,6 @@
                     </div>
                 </div>
             </div>
-            <div class="config-group">
-                <label data-i18n="tools.lineStyle.title">Line Style</label>
-                <div class="button-size-options pen-line-style-grid">
-                    <button class="pen-line-style-btn active" data-pen-line-style="solid">
-                        <svg width="40" height="16" viewBox="0 0 40 16">
-                            <line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2"/>
-                        </svg>
-                        <span data-i18n="tools.lineStyle.solid">Solid</span>
-                    </button>
-                    <button class="pen-line-style-btn" data-pen-line-style="dashed">
-                        <svg width="40" height="16" viewBox="0 0 40 16">
-                            <line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2" stroke-dasharray="6,3"/>
-                        </svg>
-                        <span data-i18n="tools.lineStyle.dashed">Dashed</span>
-                    </button>
-                    <button class="pen-line-style-btn" data-pen-line-style="dotted">
-                        <svg width="40" height="16" viewBox="0 0 40 16">
-                            <line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2" stroke-dasharray="2,4"/>
-                        </svg>
-                        <span data-i18n="tools.lineStyle.dotted">Dotted</span>
-                    </button>
-                </div>
-            </div>
-            <div id="pen-line-style-settings" class="config-group pen-line-style-settings" style="display: none;">
-                <div id="pen-dash-density-setting" class="line-style-setting" style="display: none;">
-                    <label><span data-i18n="tools.lineStyle.dashDensity">Dash Density</span>: <span id="pen-dash-density-value">10</span></label>
-                    <input type="range" id="pen-dash-density-slider" min="3" max="30" value="10" class="slider slider-compact">
-                </div>
-            </div>
         </div>
 
 
@@ -157,65 +136,30 @@
                         </svg>
                         <span data-i18n="tools.shape.rectangle">Rectangle</span>
                     </button>
-                </div>
-            </div>
-            <div class="config-group">
-                <label data-i18n="tools.lineStyle.title">Line Style</label>
-                <div class="button-size-options line-style-grid">
-                    <button class="line-style-btn active" data-line-style="solid">
-                        <svg width="40" height="16" viewBox="0 0 40 16">
-                            <line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2"/>
+                    <button class="shape-type-btn" data-shape-type="circle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="9"></circle>
                         </svg>
-                        <span data-i18n="tools.lineStyle.solid">Solid</span>
-                    </button>
-                    <button class="line-style-btn" data-line-style="dashed">
-                        <svg width="40" height="16" viewBox="0 0 40 16">
-                            <line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2" stroke-dasharray="6,3"/>
-                        </svg>
-                        <span data-i18n="tools.lineStyle.dashed">Dashed</span>
-                    </button>
-                    <button class="line-style-btn" data-line-style="dotted">
-                        <svg width="40" height="16" viewBox="0 0 40 16">
-                            <line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2" stroke-dasharray="2,4"/>
-                        </svg>
-                        <span data-i18n="tools.lineStyle.dotted">Dotted</span>
-                    </button>
-                    <button class="line-style-btn" data-line-style="wavy">
-                        <svg width="40" height="16" viewBox="0 0 40 16">
-                            <path d="M2 8 Q6 4, 10 8 T18 8 T26 8 T34 8 Q38 12, 38 8" stroke="currentColor" stroke-width="2" fill="none"/>
-                        </svg>
-                        <span data-i18n="tools.lineStyle.wavy">Wavy</span>
-                    </button>
-                    <button class="line-style-btn" data-line-style="double">
-                        <svg width="40" height="16" viewBox="0 0 40 16">
-                            <line x1="2" y1="5" x2="38" y2="5" stroke="currentColor" stroke-width="1.5"/>
-                            <line x1="2" y1="11" x2="38" y2="11" stroke="currentColor" stroke-width="1.5"/>
-                        </svg>
-                        <span data-i18n="tools.lineStyle.double">Double</span>
-                    </button>
-                    <button class="line-style-btn" data-line-style="triple">
-                        <svg width="40" height="16" viewBox="0 0 40 16">
-                            <line x1="2" y1="3" x2="38" y2="3" stroke="currentColor" stroke-width="1"/>
-                            <line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="1"/>
-                            <line x1="2" y1="13" x2="38" y2="13" stroke="currentColor" stroke-width="1"/>
-                        </svg>
-                        <span data-i18n="tools.lineStyle.triple">Triple</span>
+                        <span data-i18n="tools.shape.circle">Circle</span>
                     </button>
                 </div>
             </div>
-            <div id="line-style-settings" class="config-group line-style-settings" style="display: none;">
-                <div id="dash-density-setting" class="line-style-setting" style="display: none;">
-                    <label><span data-i18n="tools.lineStyle.dashDensity">Dash Density</span>: <span id="dash-density-value">10</span></label>
-                    <input type="range" id="dash-density-slider" min="3" max="30" value="10" class="slider slider-compact">
-                </div>
-                <div id="wave-density-setting" class="line-style-setting" style="display: none;">
-                    <label><span data-i18n="tools.lineStyle.waveDensity">Wave Density</span>: <span id="wave-density-value">10</span></label>
-                    <input type="range" id="wave-density-slider" min="5" max="30" value="10" class="slider slider-compact">
-                </div>
-                <div id="multi-line-settings" class="line-style-setting" style="display: none;">
-                    <label><span data-i18n="tools.lineStyle.lineSpacing">Line Spacing</span>: <span id="multi-line-spacing-value">4</span>px</label>
-                    <input type="range" id="multi-line-spacing-slider" min="2" max="20" value="4" class="slider slider-compact">
-                </div>
+            <div class="config-group shape-buttons-row">
+                <!-- Line Properties button (first) -->
+                <button id="shape-color-size-btn" class="open-line-style-btn" title="Line Properties">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                        <circle cx="12" cy="12" r="4" fill="currentColor"/>
+                    </svg>
+                    <span data-i18n="tools.shape.lineProperties">Line Properties</span>
+                </button>
+                <!-- Line Style button (second) -->
+                <button id="shape-line-style-settings-btn" class="open-line-style-btn" title="Line Style">
+                    <svg width="40" height="16" viewBox="0 0 40 16">
+                        <line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <span data-i18n="tools.lineStyle.title">Line Style</span>
+                </button>
             </div>
             <div class="config-group">
                 <p class="shape-hint" data-i18n="tools.shape.hint">Press and drag to draw shape, release to finish</p>
@@ -320,24 +264,25 @@
         </button>
         
         <div class="config-group">
-            <label>时间显示选项</label>
+            <label data-i18n="timeDisplay.options">Time Display Options</label>
             <div class="time-display-options-row">
                 <div class="time-display-checkboxes">
                     <label class="checkbox-label">
                         <input type="checkbox" id="show-date-checkbox-area">
-                        <span>显示日期</span>
+                        <span data-i18n="timeDisplay.showDate">Show Date</span>
                     </label>
                     <label class="checkbox-label" style="margin-top: 8px;">
                         <input type="checkbox" id="show-time-checkbox-area">
-                        <span>显示时间</span>
+                        <span data-i18n="timeDisplay.showTime">Show Time</span>
                     </label>
                 </div>
                 <!-- Settings button for time display area - positioned to the right of checkboxes -->
-                <button id="time-display-area-settings-btn" class="time-display-settings-icon-btn" title="设置">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button id="time-display-area-settings-btn" class="time-display-settings-btn-with-text" title="Settings">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="3"></circle>
                         <path d="M12 1v6m0 6v6M5.6 5.6l4.2 4.2m4.2 4.2l4.2 4.2M1 12h6m6 0h6M5.6 18.4l4.2-4.2m4.2-4.2l4.2-4.2"></path>
                     </svg>
+                    <span data-i18n="timeDisplay.settings">Settings</span>
                 </button>
             </div>
         </div>
@@ -1450,6 +1395,7 @@
     <script src="js/modules/edge-drawing.js"></script>
     <script src="js/modules/teaching-tools.js"></script>
     <script src="js/modules/shape-drawing.js"></script>
+    <script src="js/modules/line-style-modal.js"></script>
     <script src="js/settings.js"></script>
     <script src="js/announcement.js"></script>
     <script src="js/export.js"></script>

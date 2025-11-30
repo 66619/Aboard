@@ -57,6 +57,7 @@ window.translations = {
             ballpoint: '볼펜',
             fountain: '만년필',
             brush: '붓',
+            color: '색상',
             colorAndSize: '색상 및 크기',
             colorPicker: '색상 선택기',
             size: '크기',
@@ -71,7 +72,8 @@ window.translations = {
             circle: '원',
             ellipse: '타원',
             arrow: '화살표',
-            hint: '눌러서 드래그하여 도형 그리기, 놓으면 완성'
+            hint: '눌러서 드래그하여 도형 그리기, 놓으면 완성',
+            lineProperties: '선 속성'
         },
         eraser: {
             title: '지우개',
@@ -100,10 +102,27 @@ window.translations = {
             wavy: '물결선',
             double: '이중선',
             triple: '삼중선',
+            multiLine: '다중선',
             dashDensity: '파선 밀도',
             waveDensity: '물결 밀도',
-            lineSpacing: '선 간격'
+            lineSpacing: '선 간격',
+            lineCount: '선 개수'
         }
+    },
+
+    // Line Style Modal
+    lineStyleModal: {
+        title: '선 스타일 설정',
+        openSettings: '더 많은 설정',
+        preview: '미리보기'
+    },
+
+    // Time Display
+    timeDisplay: {
+        options: '시간 표시 옵션',
+        showDate: '날짜 표시',
+        showTime: '시간 표시',
+        settings: '설정'
     },
 
     // Background

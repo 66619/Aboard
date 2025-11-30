@@ -57,6 +57,7 @@ window.translations = {
             ballpoint: 'ボールペン',
             fountain: '万年筆',
             brush: 'ブラシ',
+            color: '色',
             colorAndSize: '色とサイズ',
             colorPicker: 'カラーピッカー',
             size: 'サイズ',
@@ -71,7 +72,8 @@ window.translations = {
             circle: '円',
             ellipse: '楕円',
             arrow: '矢印',
-            hint: 'ドラッグして図形を描画、離して完成'
+            hint: 'ドラッグして図形を描画、離して完成',
+            lineProperties: '線の属性'
         },
         eraser: {
             title: '消しゴム',
@@ -100,10 +102,27 @@ window.translations = {
             wavy: '波線',
             double: '二重線',
             triple: '三重線',
+            multiLine: '多重線',
             dashDensity: '破線の密度',
             waveDensity: '波の密度',
-            lineSpacing: '線の間隔'
+            lineSpacing: '線の間隔',
+            lineCount: '線の数'
         }
+    },
+
+    // Line Style Modal
+    lineStyleModal: {
+        title: '線種設定',
+        openSettings: '詳細設定',
+        preview: 'プレビュー'
+    },
+
+    // Time Display
+    timeDisplay: {
+        options: '時刻表示オプション',
+        showDate: '日付を表示',
+        showTime: '時刻を表示',
+        settings: '設定'
     },
 
     // Background

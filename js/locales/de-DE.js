@@ -57,6 +57,7 @@ window.translations = {
             ballpoint: 'Kugelschreiber',
             fountain: 'Füllfederhalter',
             brush: 'Pinsel',
+            color: 'Farbe',
             colorAndSize: 'Farbe & Größe',
             colorPicker: 'Farbwähler',
             size: 'Größe',
@@ -71,7 +72,8 @@ window.translations = {
             circle: 'Kreis',
             ellipse: 'Ellipse',
             arrow: 'Pfeil',
-            hint: 'Drücken und ziehen zum Zeichnen, loslassen zum Beenden'
+            hint: 'Drücken und ziehen zum Zeichnen, loslassen zum Beenden',
+            lineProperties: 'Linieneigenschaften'
         },
         eraser: {
             title: 'Radiergummi',
@@ -100,10 +102,27 @@ window.translations = {
             wavy: 'Wellig',
             double: 'Doppelt',
             triple: 'Dreifach',
+            multiLine: 'Mehrfachlinien',
             dashDensity: 'Strichdichte',
             waveDensity: 'Wellendichte',
-            lineSpacing: 'Linienabstand'
+            lineSpacing: 'Linienabstand',
+            lineCount: 'Linienanzahl'
         }
+    },
+
+    // Line Style Modal
+    lineStyleModal: {
+        title: 'Linienstil-Einstellungen',
+        openSettings: 'Weitere Einstellungen',
+        preview: 'Vorschau'
+    },
+
+    // Time Display
+    timeDisplay: {
+        options: 'Zeitanzeigeoptionen',
+        showDate: 'Datum anzeigen',
+        showTime: 'Uhrzeit anzeigen',
+        settings: 'Einstellungen'
     },
 
     // Background

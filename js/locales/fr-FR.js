@@ -57,6 +57,7 @@ window.translations = {
             ballpoint: 'Stylo à bille',
             fountain: 'Stylo-plume',
             brush: 'Pinceau',
+            color: 'Couleur',
             colorAndSize: 'Couleur et taille',
             colorPicker: 'Sélecteur de couleur'
         },
@@ -68,7 +69,8 @@ window.translations = {
             circle: 'Cercle',
             ellipse: 'Ellipse',
             arrow: 'Flèche',
-            hint: 'Appuyez et glissez pour dessiner, relâchez pour terminer'
+            hint: 'Appuyez et glissez pour dessiner, relâchez pour terminer',
+            lineProperties: 'Propriétés de ligne'
         },
         eraser: {
             title: 'Gomme',
@@ -95,10 +97,27 @@ window.translations = {
             wavy: 'Ondulé',
             double: 'Double',
             triple: 'Triple',
+            multiLine: 'Multi-lignes',
             dashDensity: 'Densité des tirets',
             waveDensity: 'Densité des ondes',
-            lineSpacing: 'Espacement des lignes'
+            lineSpacing: 'Espacement des lignes',
+            lineCount: 'Nombre de lignes'
         }
+    },
+
+    // Line Style Modal
+    lineStyleModal: {
+        title: 'Paramètres de style de ligne',
+        openSettings: 'Plus de paramètres',
+        preview: 'Aperçu'
+    },
+
+    // Time Display
+    timeDisplay: {
+        options: 'Options d\'affichage de l\'heure',
+        showDate: 'Afficher la date',
+        showTime: 'Afficher l\'heure',
+        settings: 'Paramètres'
     },
 
     // Background

@@ -57,6 +57,7 @@ window.translations = {
             ballpoint: 'Ballpoint',
             fountain: 'Fountain Pen',
             brush: 'Brush',
+            color: 'Color',
             colorAndSize: 'Color & Size',
             colorPicker: 'Color Picker',
             size: 'Size',
@@ -71,7 +72,8 @@ window.translations = {
             circle: 'Circle',
             ellipse: 'Ellipse',
             arrow: 'Arrow',
-            hint: 'Press and drag to draw shape, release to finish'
+            hint: 'Press and drag to draw shape, release to finish',
+            lineProperties: 'Line Properties'
         },
         eraser: {
             title: 'Eraser',
@@ -100,10 +102,27 @@ window.translations = {
             wavy: 'Wavy',
             double: 'Double',
             triple: 'Triple',
+            multiLine: 'Multi-line',
             dashDensity: 'Dash Density',
             waveDensity: 'Wave Density',
-            lineSpacing: 'Line Spacing'
+            lineSpacing: 'Line Spacing',
+            lineCount: 'Line Count'
         }
+    },
+
+    // Line Style Modal
+    lineStyleModal: {
+        title: 'Line Style Settings',
+        openSettings: 'More Settings',
+        preview: 'Preview'
+    },
+
+    // Time Display
+    timeDisplay: {
+        options: 'Time Display Options',
+        showDate: 'Show Date',
+        showTime: 'Show Time',
+        settings: 'Settings'
     },
 
     // Background
