@@ -95,9 +95,11 @@ window.translations = {
             wavy: 'Ondulé',
             double: 'Double',
             triple: 'Triple',
+            multiLine: 'Multi-lignes',
             dashDensity: 'Densité des tirets',
             waveDensity: 'Densité des ondes',
-            lineSpacing: 'Espacement des lignes'
+            lineSpacing: 'Espacement des lignes',
+            lineCount: 'Nombre de lignes'
         }
     },
 
@@ -106,6 +108,14 @@ window.translations = {
         title: 'Paramètres de style de ligne',
         openSettings: 'Plus de paramètres',
         preview: 'Aperçu'
+    },
+
+    // Time Display
+    timeDisplay: {
+        options: 'Options d\'affichage de l\'heure',
+        showDate: 'Afficher la date',
+        showTime: 'Afficher l\'heure',
+        settings: 'Paramètres'
     },
 
     // Background

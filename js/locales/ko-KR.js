@@ -100,9 +100,11 @@ window.translations = {
             wavy: '물결선',
             double: '이중선',
             triple: '삼중선',
+            multiLine: '다중선',
             dashDensity: '파선 밀도',
             waveDensity: '물결 밀도',
-            lineSpacing: '선 간격'
+            lineSpacing: '선 간격',
+            lineCount: '선 개수'
         }
     },
 
@@ -111,6 +113,14 @@ window.translations = {
         title: '선 스타일 설정',
         openSettings: '더 많은 설정',
         preview: '미리보기'
+    },
+
+    // Time Display
+    timeDisplay: {
+        options: '시간 표시 옵션',
+        showDate: '날짜 표시',
+        showTime: '시간 표시',
+        settings: '설정'
     },
 
     // Background

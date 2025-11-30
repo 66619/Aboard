@@ -100,9 +100,11 @@ window.translations = {
             wavy: 'Wavy',
             double: 'Double',
             triple: 'Triple',
+            multiLine: 'Multi-line',
             dashDensity: 'Dash Density',
             waveDensity: 'Wave Density',
-            lineSpacing: 'Line Spacing'
+            lineSpacing: 'Line Spacing',
+            lineCount: 'Line Count'
         }
     },
 
@@ -111,6 +113,14 @@ window.translations = {
         title: 'Line Style Settings',
         openSettings: 'More Settings',
         preview: 'Preview'
+    },
+
+    // Time Display
+    timeDisplay: {
+        options: 'Time Display Options',
+        showDate: 'Show Date',
+        showTime: 'Show Time',
+        settings: 'Settings'
     },
 
     // Background

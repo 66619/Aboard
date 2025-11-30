@@ -55,7 +55,7 @@ class ShapeDrawingManager {
     }
     
     setDashDensity(density) {
-        this.dashDensity = Math.max(3, Math.min(30, density));
+        this.dashDensity = Math.max(5, Math.min(40, density));
         this.saveSettings();
     }
     
@@ -65,12 +65,12 @@ class ShapeDrawingManager {
     }
     
     setMultiLineCount(count) {
-        this.multiLineCount = Math.max(2, Math.min(5, count));
+        this.multiLineCount = Math.max(2, Math.min(10, count));
         this.saveSettings();
     }
     
     setMultiLineSpacing(spacing) {
-        this.multiLineSpacing = Math.max(2, Math.min(20, spacing));
+        this.multiLineSpacing = Math.max(5, Math.min(50, spacing));
         this.saveSettings();
     }
     
@@ -291,6 +291,9 @@ class ShapeDrawingManager {
             case 'triple':
                 this.drawMultiLine(ctx, start, end, 3);
                 break;
+            case 'multi':
+                this.drawMultiLine(ctx, start, end, this.multiLineCount);
+                break;
             default:
                 this.drawLine(ctx, start, end);
                 break;
@@ -317,6 +320,9 @@ class ShapeDrawingManager {
             case 'triple':
                 const count = this.lineStyle === 'double' ? 2 : 3;
                 this.drawMultiRectangle(ctx, x, y, width, height, count);
+                break;
+            case 'multi':
+                this.drawMultiRectangle(ctx, x, y, width, height, this.multiLineCount);
                 break;
             default:
                 ctx.beginPath();
@@ -348,6 +354,11 @@ class ShapeDrawingManager {
                 this.drawMultiCircle(ctx, center, radius, 2);
                 break;
             case 'triple':
+                this.drawMultiCircle(ctx, center, radius, 3);
+                break;
+            case 'multi':
+                this.drawMultiCircle(ctx, center, radius, this.multiLineCount);
+                break;
                 this.drawMultiCircle(ctx, center, radius, 3);
                 break;
             default:

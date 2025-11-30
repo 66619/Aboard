@@ -62,20 +62,12 @@ class LineStyleModal {
                                     </svg>
                                     <span data-i18n="tools.lineStyle.wavy">Wavy</span>
                                 </button>
-                                <button class="line-style-type-btn" data-modal-line-style="double">
+                                <button class="line-style-type-btn" data-modal-line-style="multi">
                                     <svg viewBox="0 0 50 20">
                                         <line x1="2" y1="6" x2="48" y2="6" stroke="currentColor" stroke-width="1.5"/>
                                         <line x1="2" y1="14" x2="48" y2="14" stroke="currentColor" stroke-width="1.5"/>
                                     </svg>
-                                    <span data-i18n="tools.lineStyle.double">Double</span>
-                                </button>
-                                <button class="line-style-type-btn" data-modal-line-style="triple">
-                                    <svg viewBox="0 0 50 20">
-                                        <line x1="2" y1="4" x2="48" y2="4" stroke="currentColor" stroke-width="1"/>
-                                        <line x1="2" y1="10" x2="48" y2="10" stroke="currentColor" stroke-width="1"/>
-                                        <line x1="2" y1="16" x2="48" y2="16" stroke="currentColor" stroke-width="1"/>
-                                    </svg>
-                                    <span data-i18n="tools.lineStyle.triple">Triple</span>
+                                    <span data-i18n="tools.lineStyle.multiLine">Multi-line</span>
                                 </button>
                             </div>
                         </div>
@@ -94,10 +86,16 @@ class LineStyleModal {
                                 <input type="range" id="modal-wave-density-slider" min="5" max="30" value="10" class="slider">
                             </div>
                             
+                            <!-- Multi-line Count Setting -->
+                            <div class="line-style-modal-setting" id="modal-line-count-setting" style="display: none;">
+                                <label><span data-i18n="tools.lineStyle.lineCount">Line Count</span>: <span id="modal-line-count-value">2</span></label>
+                                <input type="range" id="modal-line-count-slider" min="2" max="10" value="2" class="slider">
+                            </div>
+                            
                             <!-- Multi-line Spacing Setting -->
                             <div class="line-style-modal-setting" id="modal-line-spacing-setting" style="display: none;">
-                                <label><span data-i18n="tools.lineStyle.lineSpacing">Line Spacing</span>: <span id="modal-line-spacing-value">4</span>px</label>
-                                <input type="range" id="modal-line-spacing-slider" min="3" max="25" value="4" class="slider">
+                                <label><span data-i18n="tools.lineStyle.lineSpacing">Line Spacing</span>: <span id="modal-line-spacing-value">10</span>px</label>
+                                <input type="range" id="modal-line-spacing-slider" min="5" max="50" value="10" class="slider">
                             </div>
                         </div>
                         
@@ -166,6 +164,11 @@ class LineStyleModal {
             this.updatePreview();
         });
         
+        document.getElementById('modal-line-count-slider').addEventListener('input', (e) => {
+            document.getElementById('modal-line-count-value').textContent = e.target.value;
+            this.updatePreview();
+        });
+        
         document.getElementById('modal-line-spacing-slider').addEventListener('input', (e) => {
             document.getElementById('modal-line-spacing-value').textContent = e.target.value;
             this.updatePreview();
@@ -189,19 +192,25 @@ class LineStyleModal {
     }
     
     loadCurrentSettings() {
-        let lineStyle, dashDensity, waveDensity, lineSpacing;
+        let lineStyle, dashDensity, waveDensity, lineSpacing, lineCount;
         
         if (this.currentMode === 'pen') {
             lineStyle = this.drawingEngine.penLineStyle || 'solid';
             dashDensity = this.drawingEngine.penDashDensity || 10;
-            // Pen mode doesn't have wave/multi-line settings yet
             waveDensity = 10;
-            lineSpacing = 4;
+            lineSpacing = 10;
+            lineCount = 2;
         } else {
             lineStyle = this.shapeDrawingManager.lineStyle || 'solid';
             dashDensity = this.shapeDrawingManager.dashDensity || 10;
             waveDensity = this.shapeDrawingManager.waveDensity || 10;
-            lineSpacing = this.shapeDrawingManager.multiLineSpacing || 4;
+            lineSpacing = this.shapeDrawingManager.multiLineSpacing || 10;
+            lineCount = this.shapeDrawingManager.multiLineCount || 2;
+            
+            // Convert double/triple to multi
+            if (lineStyle === 'double' || lineStyle === 'triple') {
+                lineStyle = 'multi';
+            }
         }
         
         // Update buttons
@@ -216,6 +225,9 @@ class LineStyleModal {
         document.getElementById('modal-wave-density-slider').value = waveDensity;
         document.getElementById('modal-wave-density-value').textContent = waveDensity;
         
+        document.getElementById('modal-line-count-slider').value = lineCount;
+        document.getElementById('modal-line-count-value').textContent = lineCount;
+        
         document.getElementById('modal-line-spacing-slider').value = lineSpacing;
         document.getElementById('modal-line-spacing-value').textContent = lineSpacing;
         
@@ -226,11 +238,13 @@ class LineStyleModal {
     updateSettingsVisibility(lineStyle) {
         const dashSetting = document.getElementById('modal-dash-density-setting');
         const waveSetting = document.getElementById('modal-wave-density-setting');
+        const countSetting = document.getElementById('modal-line-count-setting');
         const spacingSetting = document.getElementById('modal-line-spacing-setting');
         
         // Hide all first
         dashSetting.style.display = 'none';
         waveSetting.style.display = 'none';
+        countSetting.style.display = 'none';
         spacingSetting.style.display = 'none';
         
         // Show relevant settings
@@ -242,8 +256,8 @@ class LineStyleModal {
             case 'wavy':
                 waveSetting.style.display = 'block';
                 break;
-            case 'double':
-            case 'triple':
+            case 'multi':
+                countSetting.style.display = 'block';
                 spacingSetting.style.display = 'block';
                 break;
         }
@@ -266,11 +280,17 @@ class LineStyleModal {
         const lineStyle = this.getCurrentLineStyle();
         const dashDensity = parseInt(document.getElementById('modal-dash-density-slider').value);
         const waveDensity = parseInt(document.getElementById('modal-wave-density-slider').value);
+        const lineCount = parseInt(document.getElementById('modal-line-count-slider').value);
         const lineSpacing = parseInt(document.getElementById('modal-line-spacing-slider').value);
         
-        // Setup context
+        // Get pen size from drawing engine
+        const penSize = this.currentMode === 'pen' 
+            ? (this.drawingEngine.penSize || 5)
+            : (this.shapeDrawingManager.drawingEngine.penSize || 5);
+        
+        // Setup context with actual pen size
         ctx.strokeStyle = '#333333';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = Math.min(penSize, 8); // Limit preview line width
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         
@@ -311,12 +331,8 @@ class LineStyleModal {
                 this.drawWavyPreview(ctx, startX, centerY, endX, centerY, waveDensity);
                 break;
                 
-            case 'double':
-                this.drawMultiLinePreview(ctx, startX, centerY, endX, centerY, 2, lineSpacing);
-                break;
-                
-            case 'triple':
-                this.drawMultiLinePreview(ctx, startX, centerY, endX, centerY, 3, lineSpacing);
+            case 'multi':
+                this.drawMultiLinePreview(ctx, startX, centerY, endX, centerY, lineCount, lineSpacing);
                 break;
         }
     }
@@ -360,6 +376,7 @@ class LineStyleModal {
         const lineStyle = this.getCurrentLineStyle();
         const dashDensity = parseInt(document.getElementById('modal-dash-density-slider').value);
         const waveDensity = parseInt(document.getElementById('modal-wave-density-slider').value);
+        const lineCount = parseInt(document.getElementById('modal-line-count-slider').value);
         const lineSpacing = parseInt(document.getElementById('modal-line-spacing-slider').value);
         
         if (this.currentMode === 'pen') {
@@ -367,74 +384,68 @@ class LineStyleModal {
             this.drawingEngine.setPenLineStyle(lineStyle);
             this.drawingEngine.setPenDashDensity(dashDensity);
             
-            // Update pen config UI
-            this.updatePenConfigUI(lineStyle, dashDensity);
+            // Update pen button style
+            this.updatePenButtonStyle(lineStyle);
         } else {
-            // Apply to shape tool
+            // Apply to shape tool - convert 'multi' back to internal representation
             this.shapeDrawingManager.setLineStyle(lineStyle);
             this.shapeDrawingManager.setDashDensity(dashDensity);
             this.shapeDrawingManager.setWaveDensity(waveDensity);
+            this.shapeDrawingManager.setMultiLineCount(lineCount);
             this.shapeDrawingManager.setMultiLineSpacing(lineSpacing);
             
-            // Update shape config UI
-            this.updateShapeConfigUI(lineStyle, dashDensity, waveDensity, lineSpacing);
+            // Update shape button style
+            this.updateShapeButtonStyle(lineStyle);
         }
     }
     
-    updatePenConfigUI(lineStyle, dashDensity) {
-        // Update pen line style buttons in config panel
-        document.querySelectorAll('.pen-line-style-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.penLineStyle === lineStyle);
-        });
-        
-        // Update slider values
-        const penDashSlider = document.getElementById('pen-dash-density-slider');
-        const penDashValue = document.getElementById('pen-dash-density-value');
-        if (penDashSlider && penDashValue) {
-            penDashSlider.value = dashDensity;
-            penDashValue.textContent = dashDensity;
-        }
-        
-        // Show/hide settings based on line style
-        const penSettingsPanel = document.getElementById('pen-line-style-settings');
-        const penDashSetting = document.getElementById('pen-dash-density-setting');
-        if (penSettingsPanel && penDashSetting) {
-            if (lineStyle === 'dashed' || lineStyle === 'dotted') {
-                penSettingsPanel.style.display = 'block';
-                penDashSetting.style.display = 'block';
+    updatePenButtonStyle(lineStyle) {
+        const btn = document.getElementById('pen-line-style-settings-btn');
+        if (btn) {
+            if (lineStyle !== 'solid') {
+                btn.classList.add('active');
             } else {
-                penSettingsPanel.style.display = 'none';
-                penDashSetting.style.display = 'none';
+                btn.classList.remove('active');
+            }
+            
+            // Update icon based on style
+            const svg = btn.querySelector('svg');
+            if (svg) {
+                svg.innerHTML = this.getLineStyleSvgContent(lineStyle);
             }
         }
     }
     
-    updateShapeConfigUI(lineStyle, dashDensity, waveDensity, lineSpacing) {
-        // Update shape line style buttons in config panel
-        document.querySelectorAll('.line-style-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.lineStyle === lineStyle);
-        });
-        
-        // Update slider values
-        const dashSlider = document.getElementById('dash-density-slider');
-        const dashValue = document.getElementById('dash-density-value');
-        if (dashSlider && dashValue) {
-            dashSlider.value = dashDensity;
-            dashValue.textContent = dashDensity;
+    updateShapeButtonStyle(lineStyle) {
+        const btn = document.getElementById('shape-line-style-settings-btn');
+        if (btn) {
+            if (lineStyle !== 'solid') {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+            
+            // Update icon based on style
+            const svg = btn.querySelector('svg');
+            if (svg) {
+                svg.innerHTML = this.getLineStyleSvgContent(lineStyle);
+            }
         }
-        
-        const waveSlider = document.getElementById('wave-density-slider');
-        const waveValue = document.getElementById('wave-density-value');
-        if (waveSlider && waveValue) {
-            waveSlider.value = waveDensity;
-            waveValue.textContent = waveDensity;
-        }
-        
-        const spacingSlider = document.getElementById('multi-line-spacing-slider');
-        const spacingValue = document.getElementById('multi-line-spacing-value');
-        if (spacingSlider && spacingValue) {
-            spacingSlider.value = lineSpacing;
-            spacingValue.textContent = lineSpacing;
+    }
+    
+    getLineStyleSvgContent(lineStyle) {
+        switch (lineStyle) {
+            case 'dashed':
+                return '<line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2" stroke-dasharray="6,3"/>';
+            case 'dotted':
+                return '<line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2" stroke-dasharray="2,4"/>';
+            case 'wavy':
+                return '<path d="M2 8 Q6 4, 10 8 T18 8 T26 8 T34 8 Q38 12, 38 8" stroke="currentColor" stroke-width="2" fill="none"/>';
+            case 'multi':
+                return '<line x1="2" y1="5" x2="38" y2="5" stroke="currentColor" stroke-width="1.5"/><line x1="2" y1="11" x2="38" y2="11" stroke="currentColor" stroke-width="1.5"/>';
+            case 'solid':
+            default:
+                return '<line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2"/>';
         }
     }
 }

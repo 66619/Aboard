@@ -654,69 +654,15 @@ class DrawingBoard {
             });
         });
         
-        // Shape line style buttons
-        document.querySelectorAll('.line-style-btn').forEach(btn => {
+        // Shape type buttons
+        document.querySelectorAll('.shape-type-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const lineStyle = e.target.closest('.line-style-btn').dataset.lineStyle;
-                this.shapeDrawingManager.setLineStyle(lineStyle);
-                document.querySelectorAll('.line-style-btn').forEach(b => b.classList.remove('active'));
-                e.target.closest('.line-style-btn').classList.add('active');
-                
-                // Show/hide appropriate settings
-                this.updateLineStyleSettings(lineStyle);
+                const shapeType = e.target.closest('.shape-type-btn').dataset.shapeType;
+                this.shapeDrawingManager.setShape(shapeType);
+                document.querySelectorAll('.shape-type-btn').forEach(b => b.classList.remove('active'));
+                e.target.closest('.shape-type-btn').classList.add('active');
             });
         });
-        
-        // Pen line style buttons
-        document.querySelectorAll('.pen-line-style-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const lineStyle = e.target.closest('.pen-line-style-btn').dataset.penLineStyle;
-                this.drawingEngine.setPenLineStyle(lineStyle);
-                document.querySelectorAll('.pen-line-style-btn').forEach(b => b.classList.remove('active'));
-                e.target.closest('.pen-line-style-btn').classList.add('active');
-                
-                // Show/hide pen dash density setting
-                this.updatePenLineStyleSettings(lineStyle);
-            });
-        });
-        
-        // Shape line style sliders
-        const dashDensitySlider = document.getElementById('dash-density-slider');
-        const dashDensityValue = document.getElementById('dash-density-value');
-        if (dashDensitySlider) {
-            dashDensitySlider.addEventListener('input', (e) => {
-                this.shapeDrawingManager.setDashDensity(parseInt(e.target.value));
-                dashDensityValue.textContent = e.target.value;
-            });
-        }
-        
-        const waveDensitySlider = document.getElementById('wave-density-slider');
-        const waveDensityValue = document.getElementById('wave-density-value');
-        if (waveDensitySlider) {
-            waveDensitySlider.addEventListener('input', (e) => {
-                this.shapeDrawingManager.setWaveDensity(parseInt(e.target.value));
-                waveDensityValue.textContent = e.target.value;
-            });
-        }
-        
-        const multiLineSpacingSlider = document.getElementById('multi-line-spacing-slider');
-        const multiLineSpacingValue = document.getElementById('multi-line-spacing-value');
-        if (multiLineSpacingSlider) {
-            multiLineSpacingSlider.addEventListener('input', (e) => {
-                this.shapeDrawingManager.setMultiLineSpacing(parseInt(e.target.value));
-                multiLineSpacingValue.textContent = e.target.value;
-            });
-        }
-        
-        // Pen dash density slider
-        const penDashDensitySlider = document.getElementById('pen-dash-density-slider');
-        const penDashDensityValue = document.getElementById('pen-dash-density-value');
-        if (penDashDensitySlider) {
-            penDashDensitySlider.addEventListener('input', (e) => {
-                this.drawingEngine.setPenDashDensity(parseInt(e.target.value));
-                penDashDensityValue.textContent = e.target.value;
-            });
-        }
         
         // Line style settings buttons (open modal)
         const penLineStyleSettingsBtn = document.getElementById('pen-line-style-settings-btn');
@@ -730,6 +676,14 @@ class DrawingBoard {
         if (shapeLineStyleSettingsBtn) {
             shapeLineStyleSettingsBtn.addEventListener('click', () => {
                 this.lineStyleModal.show('shape');
+            });
+        }
+        
+        // Shape color & size button (open color size modal)
+        const shapeColorSizeBtn = document.getElementById('shape-color-size-btn');
+        if (shapeColorSizeBtn) {
+            shapeColorSizeBtn.addEventListener('click', () => {
+                this.showShapeColorSizeModal();
             });
         }
         
@@ -1552,17 +1506,175 @@ class DrawingBoard {
         const penDashDensitySetting = document.getElementById('pen-dash-density-setting');
         
         // Reset all settings
-        penLineStyleSettings.style.display = 'none';
-        penDashDensitySetting.style.display = 'none';
+        if (penLineStyleSettings) penLineStyleSettings.style.display = 'none';
+        if (penDashDensitySetting) penDashDensitySetting.style.display = 'none';
         
         // Show relevant settings
         switch(lineStyle) {
             case 'dashed':
             case 'dotted':
-                penLineStyleSettings.style.display = 'block';
-                penDashDensitySetting.style.display = 'flex';
+                if (penLineStyleSettings) penLineStyleSettings.style.display = 'block';
+                if (penDashDensitySetting) penDashDensitySetting.style.display = 'flex';
                 break;
         }
+    }
+    
+    showShapeColorSizeModal() {
+        // Create or show a simple modal for shape color and size settings
+        // This uses the same color and size controls as the pen tool
+        let modal = document.getElementById('shape-color-size-modal');
+        
+        if (!modal) {
+            // Create modal HTML dynamically
+            const modalHTML = `
+                <div id="shape-color-size-modal" class="modal">
+                    <div class="modal-content line-style-modal-content">
+                        <div class="line-style-modal-header">
+                            <h2 data-i18n="tools.pen.colorAndSize">Color & Size</h2>
+                            <button id="shape-color-size-modal-close" class="line-style-modal-close" title="Close">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="line-style-modal-body">
+                            <div class="line-style-modal-group">
+                                <label data-i18n="tools.pen.colorAndSize">Color & Size</label>
+                                <div class="color-picker-row">
+                                    <div class="color-picker-main">
+                                        <button class="shape-color-btn" data-shape-color="#000000" style="background-color: #000000;" title="Black"></button>
+                                        <button class="shape-color-btn" data-shape-color="#FF0000" style="background-color: #FF0000;" title="Red"></button>
+                                        <button class="shape-color-btn" data-shape-color="#0000FF" style="background-color: #0000FF;" title="Blue"></button>
+                                        <button class="shape-color-btn" data-shape-color="#00FF00" style="background-color: #00FF00;" title="Green"></button>
+                                    </div>
+                                    <div class="color-picker-main">
+                                        <button class="shape-color-btn" data-shape-color="#FFFF00" style="background-color: #FFFF00; border: 1px solid #ccc;" title="Yellow"></button>
+                                        <button class="shape-color-btn" data-shape-color="#FF8800" style="background-color: #FF8800;" title="Orange"></button>
+                                        <button class="shape-color-btn" data-shape-color="#8800FF" style="background-color: #8800FF;" title="Purple"></button>
+                                        <button class="shape-color-btn" data-shape-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;" title="White"></button>
+                                    </div>
+                                </div>
+                                <div class="color-and-size-row" style="margin-top: 12px;">
+                                    <label class="color-picker-icon-btn" for="shape-custom-color-picker" title="Color Picker">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
+                                            <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
+                                        </svg>
+                                        <input type="color" id="shape-custom-color-picker" class="custom-color-picker-input" value="#000000">
+                                    </label>
+                                    <div class="pen-size-inline">
+                                        <label><span data-i18n="tools.pen.size">Size</span>: <span id="shape-size-value">5</span>px</label>
+                                        <input type="range" id="shape-size-slider" min="1" max="50" value="5" class="slider slider-compact">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="line-style-modal-footer">
+                            <button id="shape-color-size-modal-apply" class="btn-primary" data-i18n="common.apply">Apply</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            modal = document.getElementById('shape-color-size-modal');
+            
+            // Setup event listeners for the new modal
+            this.setupShapeColorSizeModalListeners();
+        }
+        
+        // Load current values from drawingEngine
+        const currentColor = this.drawingEngine.currentColor || '#000000';
+        const currentSize = this.drawingEngine.penSize || 5;
+        
+        // Update UI to reflect current settings
+        document.querySelectorAll('.shape-color-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.shapeColor === currentColor);
+        });
+        const colorPicker = document.getElementById('shape-custom-color-picker');
+        if (colorPicker) colorPicker.value = currentColor;
+        const sizeSlider = document.getElementById('shape-size-slider');
+        const sizeValue = document.getElementById('shape-size-value');
+        if (sizeSlider) sizeSlider.value = currentSize;
+        if (sizeValue) sizeValue.textContent = currentSize;
+        
+        modal.classList.add('show');
+        
+        // Apply i18n translations if available
+        if (window.i18n && window.i18n.applyTranslations) {
+            window.i18n.applyTranslations();
+        }
+    }
+    
+    setupShapeColorSizeModalListeners() {
+        const modal = document.getElementById('shape-color-size-modal');
+        
+        // Close button
+        document.getElementById('shape-color-size-modal-close').addEventListener('click', () => {
+            modal.classList.remove('show');
+        });
+        
+        // Click outside to close
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+            }
+        });
+        
+        // Color buttons
+        document.querySelectorAll('.shape-color-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.shape-color-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const colorPicker = document.getElementById('shape-custom-color-picker');
+                if (colorPicker) colorPicker.value = btn.dataset.shapeColor;
+            });
+        });
+        
+        // Custom color picker
+        const colorPicker = document.getElementById('shape-custom-color-picker');
+        if (colorPicker) {
+            colorPicker.addEventListener('input', (e) => {
+                document.querySelectorAll('.shape-color-btn').forEach(b => b.classList.remove('active'));
+            });
+        }
+        
+        // Size slider
+        const sizeSlider = document.getElementById('shape-size-slider');
+        const sizeValue = document.getElementById('shape-size-value');
+        if (sizeSlider) {
+            sizeSlider.addEventListener('input', (e) => {
+                if (sizeValue) sizeValue.textContent = e.target.value;
+            });
+        }
+        
+        // Apply button
+        document.getElementById('shape-color-size-modal-apply').addEventListener('click', () => {
+            // Get selected color
+            const activeColorBtn = document.querySelector('.shape-color-btn.active');
+            const colorPicker = document.getElementById('shape-custom-color-picker');
+            const color = activeColorBtn ? activeColorBtn.dataset.shapeColor : colorPicker.value;
+            
+            // Get size
+            const size = parseInt(document.getElementById('shape-size-slider').value);
+            
+            // Apply to drawing engine (shapes use the same properties as pen)
+            this.drawingEngine.setColor(color);
+            this.drawingEngine.setPenSize(size);
+            
+            // Also update the main pen UI to stay in sync
+            document.querySelectorAll('.color-btn[data-color]').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.color === color);
+            });
+            const mainColorPicker = document.getElementById('custom-color-picker');
+            if (mainColorPicker) mainColorPicker.value = color;
+            const penSizeSlider = document.getElementById('pen-size-slider');
+            const penSizeValue = document.getElementById('pen-size-value');
+            if (penSizeSlider) penSizeSlider.value = size;
+            if (penSizeValue) penSizeValue.textContent = size;
+            
+            modal.classList.remove('show');
+        });
     }
     
     switchToPen() {

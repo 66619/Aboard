@@ -54,26 +54,27 @@
     flex: 0 0 auto;
 }
 
-/* Time display area settings button - positioned to the right of checkboxes */
-.time-display-settings-icon-btn {
-    position: relative; /* Changed from absolute */
-    width: 64px; /* Match the height of two checkbox rows */
-    height: 64px; /* Same as two rows with gap */
+/* Time display area settings button with text - positioned to the right of checkboxes */
+.time-display-settings-btn-with-text {
+    position: relative;
+    height: 64px;
     border: 2px solid #ddd;
     border-radius: 8px;
     background-color: #f8f8f8;
     cursor: pointer;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 4px;
     transition: all 0.2s ease;
     color: #666;
-    padding: 0;
-    flex-shrink: 0; /* Don't allow shrinking to maintain size */
-    margin-left: 0; /* Remove any extra margin */
+    padding: 8px 16px;
+    flex-shrink: 0;
+    font-size: 12px;
 }
 
-.time-display-settings-icon-btn:hover {
+.time-display-settings-btn-with-text:hover {
     background-color: #e8e8e8;
     border-color: var(--theme-color);
     color: #333;

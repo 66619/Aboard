@@ -100,9 +100,11 @@ window.translations = {
             wavy: '波浪線',
             double: '雙線',
             triple: '三線',
+            multiLine: '多線',
             dashDensity: '虛線密度',
             waveDensity: '波浪密度',
-            lineSpacing: '線條間距'
+            lineSpacing: '線條間距',
+            lineCount: '線條數量'
         }
     },
 
@@ -111,6 +113,14 @@ window.translations = {
         title: '線條樣式設定',
         openSettings: '更多設定',
         preview: '預覽'
+    },
+
+    // Time Display
+    timeDisplay: {
+        options: '時間顯示選項',
+        showDate: '顯示日期',
+        showTime: '顯示時間',
+        settings: '設定'
     },
 
     // Background

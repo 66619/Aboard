@@ -100,9 +100,11 @@ window.translations = {
             wavy: 'Wellig',
             double: 'Doppelt',
             triple: 'Dreifach',
+            multiLine: 'Mehrfachlinien',
             dashDensity: 'Strichdichte',
             waveDensity: 'Wellendichte',
-            lineSpacing: 'Linienabstand'
+            lineSpacing: 'Linienabstand',
+            lineCount: 'Linienanzahl'
         }
     },
 
@@ -111,6 +113,14 @@ window.translations = {
         title: 'Linienstil-Einstellungen',
         openSettings: 'Weitere Einstellungen',
         preview: 'Vorschau'
+    },
+
+    // Time Display
+    timeDisplay: {
+        options: 'Zeitanzeigeoptionen',
+        showDate: 'Datum anzeigen',
+        showTime: 'Uhrzeit anzeigen',
+        settings: 'Einstellungen'
     },
 
     // Background
