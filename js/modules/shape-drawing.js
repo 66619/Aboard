@@ -23,8 +23,6 @@ class ShapeDrawingManager {
         this.multiLineSpacing = 4; // Spacing between multiple lines
         
         // Arrow drawing constants
-        this.ARROW_SIZE_MIN = 15; // Minimum arrow head size
-        this.ARROW_SIZE_MULTIPLIER = 3; // Arrow head size = penSize * this (legacy, now uses independent size)
         this.ARROW_ANGLE = Math.PI / 6; // Arrow head angle (30 degrees)
         this.ARROW_LINE_OFFSET = 0.8; // Factor to shorten line at arrow ends
         this.ARROW_SIZE_DEFAULT = 15; // Default arrow size
@@ -184,9 +182,7 @@ class ShapeDrawingManager {
         this.isDrawing = true;
         // Use canvas coordinates for both preview and final drawing (WYSIWYG)
         this.startPoint = this.getCanvasPosition(e);
-        this.startCanvasPoint = this.startPoint;
         this.endPoint = this.startPoint;
-        this.endCanvasPoint = this.startPoint;
         
         // Sync and show preview canvas
         this.syncPreviewCanvas();
@@ -197,7 +193,6 @@ class ShapeDrawingManager {
         if (!this.isDrawing || !this.startPoint) return;
         
         this.endPoint = this.getCanvasPosition(e);
-        this.endCanvasPoint = this.endPoint;
         
         // Use requestAnimationFrame to throttle preview updates for better performance
         // This prevents excessive redraws on older devices during fast mouse movements
@@ -223,7 +218,7 @@ class ShapeDrawingManager {
         }
         
         // Draw final shape on main canvas using canvas coordinates
-        if (this.startCanvasPoint && this.endCanvasPoint) {
+        if (this.startPoint && this.endPoint) {
             this.drawFinalShape();
             
             // Save to history
@@ -236,8 +231,6 @@ class ShapeDrawingManager {
         this.isDrawing = false;
         this.startPoint = null;
         this.endPoint = null;
-        this.startCanvasPoint = null;
-        this.endCanvasPoint = null;
         
         // Hide preview canvas
         this.clearPreview();
@@ -348,22 +341,22 @@ class ShapeDrawingManager {
         
         switch(this.currentShape) {
             case 'line':
-                this.drawLineWithStyle(this.ctx, this.startCanvasPoint, this.endCanvasPoint);
+                this.drawLineWithStyle(this.ctx, this.startPoint, this.endPoint);
                 break;
             case 'arrow':
-                this.drawArrowLine(this.ctx, this.startCanvasPoint, this.endCanvasPoint, false);
+                this.drawArrowLine(this.ctx, this.startPoint, this.endPoint, false);
                 break;
             case 'doubleArrow':
-                this.drawArrowLine(this.ctx, this.startCanvasPoint, this.endCanvasPoint, true);
+                this.drawArrowLine(this.ctx, this.startPoint, this.endPoint, true);
                 break;
             case 'rectangle':
-                this.drawRectangleWithStyle(this.ctx, this.startCanvasPoint, this.endCanvasPoint);
+                this.drawRectangleWithStyle(this.ctx, this.startPoint, this.endPoint);
                 break;
             case 'circle':
-                this.drawCircleWithStyle(this.ctx, this.startCanvasPoint, this.endCanvasPoint);
+                this.drawCircleWithStyle(this.ctx, this.startPoint, this.endPoint);
                 break;
             case 'ellipse':
-                this.drawEllipseWithStyle(this.ctx, this.startCanvasPoint, this.endCanvasPoint);
+                this.drawEllipseWithStyle(this.ctx, this.startPoint, this.endPoint);
                 break;
         }
         
