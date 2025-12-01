@@ -28,6 +28,9 @@ class ShapeDrawingManager {
         this.ARROW_ANGLE = Math.PI / 6; // Arrow head angle (30 degrees)
         this.ARROW_LINE_OFFSET = 0.8; // Factor to shorten line at arrow ends
         
+        // Arrow size setting (independent from line thickness)
+        this.arrowSize = 15; // Default arrow size in pixels
+        
         // Preview layer (optional canvas overlay for live preview)
         this.previewCanvas = null;
         this.previewCtx = null;
@@ -52,6 +55,7 @@ class ShapeDrawingManager {
         this.waveDensity = parseInt(localStorage.getItem('shapeWaveDensity')) || 10;
         this.multiLineCount = parseInt(localStorage.getItem('shapeMultiLineCount')) || 2;
         this.multiLineSpacing = parseInt(localStorage.getItem('shapeMultiLineSpacing')) || 4;
+        this.arrowSize = parseInt(localStorage.getItem('shapeArrowSize')) || 15;
     }
     
     saveSettings() {
@@ -60,6 +64,12 @@ class ShapeDrawingManager {
         localStorage.setItem('shapeWaveDensity', this.waveDensity);
         localStorage.setItem('shapeMultiLineCount', this.multiLineCount);
         localStorage.setItem('shapeMultiLineSpacing', this.multiLineSpacing);
+        localStorage.setItem('shapeArrowSize', this.arrowSize);
+    }
+    
+    setArrowSize(size) {
+        this.arrowSize = Math.max(5, Math.min(50, size));
+        this.saveSettings();
     }
     
     setLineStyle(style) {
@@ -169,11 +179,11 @@ class ShapeDrawingManager {
     
     startDrawing(e) {
         this.isDrawing = true;
-        // Store both screen position (for preview) and canvas position (for final drawing)
-        this.startPoint = this.getPosition(e);
-        this.startCanvasPoint = this.getCanvasPosition(e);
+        // Use canvas coordinates for both preview and final drawing (WYSIWYG)
+        this.startPoint = this.getCanvasPosition(e);
+        this.startCanvasPoint = this.startPoint;
         this.endPoint = this.startPoint;
-        this.endCanvasPoint = this.startCanvasPoint;
+        this.endCanvasPoint = this.startPoint;
         
         // Sync and show preview canvas
         this.syncPreviewCanvas();
@@ -183,8 +193,8 @@ class ShapeDrawingManager {
     draw(e) {
         if (!this.isDrawing || !this.startPoint) return;
         
-        this.endPoint = this.getPosition(e);
-        this.endCanvasPoint = this.getCanvasPosition(e);
+        this.endPoint = this.getCanvasPosition(e);
+        this.endCanvasPoint = this.endPoint;
         
         // Use requestAnimationFrame to throttle preview updates for better performance
         // This prevents excessive redraws on older devices during fast mouse movements
@@ -253,9 +263,6 @@ class ShapeDrawingManager {
         ctx.fillStyle = 'transparent';
         
         // Calculate line width
-        // For preview canvas, we need to match the visual appearance of the final drawing
-        // The main canvas has a CSS scale applied, so lines appear scaled on screen
-        // The preview canvas draws at screen coordinates, so we need to apply the same scale
         let lineWidth = this.drawingEngine.penSize;
         
         // Apply pen type effects
@@ -277,13 +284,6 @@ class ShapeDrawingManager {
             default:
                 ctx.globalAlpha = 1.0;
                 break;
-        }
-        
-        // For preview, scale the line width to match the main canvas's visual appearance
-        // The main canvas is displayed with a CSS scale, which affects how thick lines appear
-        // Use explicit check for defined scale factor (canvasCssScale defaults to 1.0)
-        if (isPreview && this.canvasCssScale !== undefined && this.canvasCssScale > 0) {
-            lineWidth = lineWidth * this.canvasCssScale;
         }
         
         ctx.lineWidth = lineWidth;
@@ -549,8 +549,8 @@ class ShapeDrawingManager {
         const nx = dx / length;
         const ny = dy / length;
         
-        // Arrow head size based on line width
-        const arrowSize = Math.max(this.ARROW_SIZE_MIN, this.drawingEngine.penSize * this.ARROW_SIZE_MULTIPLIER);
+        // Use independent arrow size setting
+        const arrowSize = this.arrowSize;
         const arrowAngle = this.ARROW_ANGLE;
         const lineOffset = this.ARROW_LINE_OFFSET;
         

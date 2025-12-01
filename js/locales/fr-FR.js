@@ -70,6 +70,8 @@ window.translations = {
             ellipse: 'Ellipse',
             arrow: 'Flèche',
             doubleArrow: 'Double flèche',
+            arrowSize: 'Taille de flèche',
+            arrowSizeLabel: 'Flèche',
             hint: 'Appuyez et glissez pour dessiner, relâchez pour terminer',
             lineProperties: 'Propriétés de ligne'
         },

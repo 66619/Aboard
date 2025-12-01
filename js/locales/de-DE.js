@@ -73,6 +73,8 @@ window.translations = {
             ellipse: 'Ellipse',
             arrow: 'Pfeil',
             doubleArrow: 'Doppelpfeil',
+            arrowSize: 'Pfeilgröße',
+            arrowSizeLabel: 'Pfeil',
             hint: 'Drücken und ziehen zum Zeichnen, loslassen zum Beenden',
             lineProperties: 'Linieneigenschaften'
         },

@@ -653,6 +653,19 @@ class DrawingBoard {
             });
         }
         
+        // Arrow size slider (independent control)
+        const arrowSizeSlider = document.getElementById('arrow-size-slider');
+        const arrowSizeValue = document.getElementById('arrow-size-value');
+        if (arrowSizeSlider) {
+            arrowSizeSlider.addEventListener('input', (e) => {
+                this.shapeDrawingManager.setArrowSize(parseInt(e.target.value));
+                arrowSizeValue.textContent = e.target.value;
+            });
+            // Initialize from saved value
+            arrowSizeSlider.value = this.shapeDrawingManager.arrowSize;
+            arrowSizeValue.textContent = this.shapeDrawingManager.arrowSize;
+        }
+        
         // Shape custom color picker - syncs with pen color picker
         const shapeCustomColorPicker = document.getElementById('shape-custom-color-picker');
         if (shapeCustomColorPicker) {
@@ -696,6 +709,16 @@ class DrawingBoard {
                 this.shapeDrawingManager.setShape(shapeType);
                 document.querySelectorAll('.shape-type-btn').forEach(b => b.classList.remove('active'));
                 e.target.closest('.shape-type-btn').classList.add('active');
+                
+                // Show/hide arrow size control based on shape type
+                const arrowSizeGroup = document.getElementById('arrow-size-group');
+                if (arrowSizeGroup) {
+                    if (shapeType === 'arrow' || shapeType === 'doubleArrow') {
+                        arrowSizeGroup.style.display = '';
+                    } else {
+                        arrowSizeGroup.style.display = 'none';
+                    }
+                }
             });
         });
         
