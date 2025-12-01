@@ -26,6 +26,10 @@ class ShapeDrawingManager {
         this.previewCanvas = null;
         this.previewCtx = null;
         
+        // Performance optimization: requestAnimationFrame throttling
+        this.pendingDraw = false;
+        this.rafId = null;
+        
         // Create preview canvas for live shape preview
         this.createPreviewCanvas();
         
@@ -86,29 +90,46 @@ class ShapeDrawingManager {
         this.previewCanvas.style.display = 'none';
         
         document.body.appendChild(this.previewCanvas);
-        this.previewCtx = this.previewCanvas.getContext('2d');
+        // Use performance-optimized canvas context options
+        this.previewCtx = this.previewCanvas.getContext('2d', {
+            alpha: true,
+            desynchronized: true  // Reduces latency on supported browsers
+        });
+        
+        // Cache DPR to avoid repeated lookups
+        this.cachedDpr = window.devicePixelRatio || 1;
+        this.lastCanvasRect = null;
     }
     
     syncPreviewCanvas() {
         // Sync preview canvas size with main canvas position and size on screen
         const rect = this.canvas.getBoundingClientRect();
-        const dpr = window.devicePixelRatio || 1;
+        const dpr = this.cachedDpr;
         
-        // Set canvas buffer size
-        this.previewCanvas.width = rect.width * dpr;
-        this.previewCanvas.height = rect.height * dpr;
+        // Only resize if dimensions actually changed (avoid expensive operations)
+        const needsResize = !this.lastCanvasRect ||
+            this.lastCanvasRect.width !== rect.width ||
+            this.lastCanvasRect.height !== rect.height;
         
-        // Set CSS size to match the main canvas display size
-        this.previewCanvas.style.width = rect.width + 'px';
-        this.previewCanvas.style.height = rect.height + 'px';
+        if (needsResize) {
+            // Set canvas buffer size
+            this.previewCanvas.width = rect.width * dpr;
+            this.previewCanvas.height = rect.height * dpr;
+            
+            // Set CSS size to match the main canvas display size
+            this.previewCanvas.style.width = rect.width + 'px';
+            this.previewCanvas.style.height = rect.height + 'px';
+            
+            // Apply DPR scaling once after resize
+            this.previewCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
         
-        // Position exactly over the main canvas
+        // Always update position (cheap operation)
         this.previewCanvas.style.left = rect.left + 'px';
         this.previewCanvas.style.top = rect.top + 'px';
         
-        // Reset transform and scale for DPR
-        this.previewCtx.setTransform(1, 0, 0, 1, 0, 0);
-        this.previewCtx.scale(dpr, dpr);
+        // Cache the rect for next comparison
+        this.lastCanvasRect = { width: rect.width, height: rect.height };
     }
     
     setShape(shape) {
@@ -148,13 +169,28 @@ class ShapeDrawingManager {
         this.endPoint = this.getPosition(e);
         this.endCanvasPoint = this.getCanvasPosition(e);
         
-        // Clear preview and draw current shape preview
-        this.clearPreview();
-        this.drawShapePreview();
+        // Use requestAnimationFrame to throttle preview updates for better performance
+        // This prevents excessive redraws on older devices during fast mouse movements
+        if (!this.pendingDraw) {
+            this.pendingDraw = true;
+            this.rafId = requestAnimationFrame(() => {
+                this.pendingDraw = false;
+                // Clear preview and draw current shape preview
+                this.clearPreview();
+                this.drawShapePreview();
+            });
+        }
     }
     
     stopDrawing() {
         if (!this.isDrawing) return;
+        
+        // Cancel any pending animation frame
+        if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+            this.pendingDraw = false;
+        }
         
         // Draw final shape on main canvas using canvas coordinates
         if (this.startCanvasPoint && this.endCanvasPoint) {
@@ -179,10 +215,10 @@ class ShapeDrawingManager {
     }
     
     clearPreview() {
-        const dpr = window.devicePixelRatio || 1;
-        this.previewCtx.setTransform(1, 0, 0, 1, 0, 0);
-        this.previewCtx.clearRect(0, 0, this.previewCanvas.width, this.previewCanvas.height);
-        this.previewCtx.scale(dpr, dpr);
+        // Optimized clear: just clear the rect without resetting transform
+        // The DPR scale is already applied in syncPreviewCanvas
+        const dpr = this.cachedDpr;
+        this.previewCtx.clearRect(0, 0, this.previewCanvas.width / dpr, this.previewCanvas.height / dpr);
     }
     
     setupDrawingContext(ctx, isPreview = false) {
@@ -519,6 +555,11 @@ class ShapeDrawingManager {
     
     // Cleanup
     destroy() {
+        // Cancel any pending animation frame
+        if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+        }
         if (this.previewCanvas && this.previewCanvas.parentNode) {
             this.previewCanvas.parentNode.removeChild(this.previewCanvas);
         }

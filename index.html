@@ -143,23 +143,43 @@
                         <span data-i18n="tools.shape.circle">Circle</span>
                     </button>
                 </div>
-            </div>
-            <div class="config-group shape-buttons-row">
-                <!-- Line Properties button (first) -->
-                <button id="shape-color-size-btn" class="open-line-style-btn" title="Line Properties">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10" stroke-width="2"/>
-                        <circle cx="12" cy="12" r="4" fill="currentColor"/>
-                    </svg>
-                    <span data-i18n="tools.shape.lineProperties">Line Properties</span>
-                </button>
-                <!-- Line Style button (second) -->
+                <!-- Line Style button -->
                 <button id="shape-line-style-settings-btn" class="open-line-style-btn" title="Line Style">
                     <svg width="40" height="16" viewBox="0 0 40 16">
                         <line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2"/>
                     </svg>
                     <span data-i18n="tools.lineStyle.title">Line Style</span>
                 </button>
+            </div>
+            <div class="config-group">
+                <label data-i18n="tools.pen.colorAndSize">Color & Size</label>
+                <div class="color-picker-row">
+                    <div class="color-picker-main">
+                        <button class="color-btn" data-color="#000000" style="background-color: #000000;" title="Black"></button>
+                        <button class="color-btn" data-color="#FF0000" style="background-color: #FF0000;" title="Red"></button>
+                        <button class="color-btn" data-color="#0000FF" style="background-color: #0000FF;" title="Blue"></button>
+                        <button class="color-btn" data-color="#00FF00" style="background-color: #00FF00;" title="Green"></button>
+                    </div>
+                    <div class="color-picker-main">
+                        <button class="color-btn" data-color="#FFFF00" style="background-color: #FFFF00; border: 1px solid #ccc;" title="Yellow"></button>
+                        <button class="color-btn" data-color="#FF8800" style="background-color: #FF8800;" title="Orange"></button>
+                        <button class="color-btn" data-color="#8800FF" style="background-color: #8800FF;" title="Purple"></button>
+                        <button class="color-btn" data-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;" title="White"></button>
+                    </div>
+                </div>
+                <div class="color-and-size-row">
+                    <label class="color-picker-icon-btn" for="shape-custom-color-picker" title="Color Picker">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
+                            <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
+                        </svg>
+                        <input type="color" id="shape-custom-color-picker" class="custom-color-picker-input" value="#000000">
+                    </label>
+                    <div class="pen-size-inline">
+                        <label><span data-i18n="tools.pen.size">Size</span>: <span id="shape-size-value">5</span>px</label>
+                        <input type="range" id="shape-size-slider" min="1" max="50" value="5" class="slider slider-compact">
+                    </div>
+                </div>
             </div>
             <div class="config-group">
                 <p class="shape-hint" data-i18n="tools.shape.hint">Press and drag to draw shape, release to finish</p>
