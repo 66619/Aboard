@@ -1614,6 +1614,7 @@ class DrawingBoard {
             const isFeatureAreaVisible = featureArea.classList.contains('show');
             if (isFeatureAreaVisible) {
                 featureArea.classList.remove('show');
+                configArea.classList.remove('show'); // Also hide config-area when closing feature-area
             } else {
                 featureArea.classList.add('show');
                 configArea.classList.remove('show');
