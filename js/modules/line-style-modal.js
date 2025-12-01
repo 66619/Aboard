@@ -113,34 +113,6 @@ class LineStyleModal {
                                 <label><span data-i18n="tools.lineStyle.lineSpacing">Line Spacing</span>: <span id="modal-line-spacing-value">10</span>px</label>
                                 <input type="range" id="modal-line-spacing-slider" min="5" max="50" value="10" class="slider">
                             </div>
-                            
-                            <!-- Arrow Type Setting (only for shape mode with solid/dashed/dotted) -->
-                            <div class="line-style-modal-setting" id="modal-arrow-type-setting" style="display: none;">
-                                <label><span data-i18n="tools.lineStyle.arrowType">Arrow Type</span></label>
-                                <div class="arrow-type-options">
-                                    <button class="arrow-type-btn active" data-arrow-type="none">
-                                        <svg viewBox="0 0 40 16">
-                                            <line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2"/>
-                                        </svg>
-                                        <span data-i18n="tools.lineStyle.noArrow">None</span>
-                                    </button>
-                                    <button class="arrow-type-btn" data-arrow-type="arrow">
-                                        <svg viewBox="0 0 40 16">
-                                            <line x1="2" y1="8" x2="32" y2="8" stroke="currentColor" stroke-width="2"/>
-                                            <polyline points="28,4 36,8 28,12" stroke="currentColor" stroke-width="2" fill="none"/>
-                                        </svg>
-                                        <span data-i18n="tools.lineStyle.arrow">Arrow</span>
-                                    </button>
-                                    <button class="arrow-type-btn" data-arrow-type="doubleArrow">
-                                        <svg viewBox="0 0 40 16">
-                                            <line x1="10" y1="8" x2="30" y2="8" stroke="currentColor" stroke-width="2"/>
-                                            <polyline points="4,8 10,4 10,12" stroke="currentColor" stroke-width="2" fill="none"/>
-                                            <polyline points="30,4 36,8 30,12" stroke="currentColor" stroke-width="2" fill="none"/>
-                                        </svg>
-                                        <span data-i18n="tools.lineStyle.doubleArrow">Double</span>
-                                    </button>
-                                </div>
-                            </div>
                         </div>
                         
                         <!-- Preview Area -->
@@ -226,16 +198,6 @@ class LineStyleModal {
             this.updatePreview();
         });
         
-        // Arrow type buttons
-        document.querySelectorAll('.arrow-type-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.arrow-type-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                this.arrowType = btn.dataset.arrowType;
-                this.updatePreview();
-            });
-        });
-        
         // Preview expand button
         document.getElementById('preview-expand-btn').addEventListener('click', () => {
             this.showExpandedPreview();
@@ -314,14 +276,12 @@ class LineStyleModal {
         const waveSetting = document.getElementById('modal-wave-density-setting');
         const countSetting = document.getElementById('modal-line-count-setting');
         const spacingSetting = document.getElementById('modal-line-spacing-setting');
-        const arrowSetting = document.getElementById('modal-arrow-type-setting');
         
         // Hide all first
         dashSetting.style.display = 'none';
         waveSetting.style.display = 'none';
         countSetting.style.display = 'none';
         spacingSetting.style.display = 'none';
-        if (arrowSetting) arrowSetting.style.display = 'none'; // Arrow types are now shape types
         
         // Show relevant settings
         switch (lineStyle) {
