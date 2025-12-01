@@ -24,12 +24,15 @@ class ShapeDrawingManager {
         
         // Arrow drawing constants
         this.ARROW_SIZE_MIN = 15; // Minimum arrow head size
-        this.ARROW_SIZE_MULTIPLIER = 3; // Arrow head size = penSize * this
+        this.ARROW_SIZE_MULTIPLIER = 3; // Arrow head size = penSize * this (legacy, now uses independent size)
         this.ARROW_ANGLE = Math.PI / 6; // Arrow head angle (30 degrees)
         this.ARROW_LINE_OFFSET = 0.8; // Factor to shorten line at arrow ends
+        this.ARROW_SIZE_DEFAULT = 15; // Default arrow size
+        this.ARROW_SIZE_MIN_SETTING = 5; // Minimum configurable arrow size
+        this.ARROW_SIZE_MAX_SETTING = 50; // Maximum configurable arrow size
         
         // Arrow size setting (independent from line thickness)
-        this.arrowSize = 15; // Default arrow size in pixels
+        this.arrowSize = this.ARROW_SIZE_DEFAULT;
         
         // Preview layer (optional canvas overlay for live preview)
         this.previewCanvas = null;
@@ -55,7 +58,7 @@ class ShapeDrawingManager {
         this.waveDensity = parseInt(localStorage.getItem('shapeWaveDensity')) || 10;
         this.multiLineCount = parseInt(localStorage.getItem('shapeMultiLineCount')) || 2;
         this.multiLineSpacing = parseInt(localStorage.getItem('shapeMultiLineSpacing')) || 4;
-        this.arrowSize = parseInt(localStorage.getItem('shapeArrowSize')) || 15;
+        this.arrowSize = parseInt(localStorage.getItem('shapeArrowSize')) || this.ARROW_SIZE_DEFAULT;
     }
     
     saveSettings() {
@@ -68,7 +71,7 @@ class ShapeDrawingManager {
     }
     
     setArrowSize(size) {
-        this.arrowSize = Math.max(5, Math.min(50, size));
+        this.arrowSize = Math.max(this.ARROW_SIZE_MIN_SETTING, Math.min(this.ARROW_SIZE_MAX_SETTING, size));
         this.saveSettings();
     }
     
