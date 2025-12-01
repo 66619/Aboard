@@ -1602,6 +1602,17 @@ class DrawingBoard {
             } else {
                 featureArea.classList.add('show');
                 configArea.classList.remove('show');
+                
+                // Position feature-area above the "更多" button
+                const moreBtn = document.getElementById('more-btn');
+                const moreBtnRect = moreBtn.getBoundingClientRect();
+                const toolbar = document.getElementById('toolbar');
+                const toolbarRect = toolbar.getBoundingClientRect();
+                
+                featureArea.style.bottom = 'auto';
+                featureArea.style.left = `${moreBtnRect.left}px`;
+                featureArea.style.top = `${toolbarRect.top - 10}px`;
+                featureArea.style.transform = 'translateY(-100%)';
             }
         } else {
             // For other tools (like pan), just hide panels
@@ -1762,21 +1773,22 @@ class DrawingBoard {
             this.canvas.style.cursor = 'default';
         } else if (tool === 'more') {
             document.getElementById('more-btn').classList.add('active');
-            // Show feature-area instead of more-config and position it above the "更多" button
+            // Don't manipulate feature-area visibility here - let setTool handle toggle
+            // Only position it if it's already visible
             const featureArea = document.getElementById('feature-area');
-            const moreBtn = document.getElementById('more-btn');
-            featureArea.classList.add('show');
-            
-            // Position feature-area above the "更多" button
-            const moreBtnRect = moreBtn.getBoundingClientRect();
-            const toolbar = document.getElementById('toolbar');
-            const toolbarRect = toolbar.getBoundingClientRect();
-            
-            // Calculate position above the toolbar
-            featureArea.style.bottom = 'auto';
-            featureArea.style.left = `${moreBtnRect.left}px`;
-            featureArea.style.top = `${toolbarRect.top - 10}px`;
-            featureArea.style.transform = 'translateY(-100%)';
+            if (featureArea.classList.contains('show')) {
+                const moreBtn = document.getElementById('more-btn');
+                // Position feature-area above the "更多" button
+                const moreBtnRect = moreBtn.getBoundingClientRect();
+                const toolbar = document.getElementById('toolbar');
+                const toolbarRect = toolbar.getBoundingClientRect();
+                
+                // Calculate position above the toolbar
+                featureArea.style.bottom = 'auto';
+                featureArea.style.left = `${moreBtnRect.left}px`;
+                featureArea.style.top = `${toolbarRect.top - 10}px`;
+                featureArea.style.transform = 'translateY(-100%)';
+            }
             
             this.canvas.style.cursor = 'default';
         }

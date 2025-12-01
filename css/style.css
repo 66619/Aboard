@@ -1235,6 +1235,11 @@ body {
     .tool-btn span {
         font-size: 11px;
     }
+    
+    /* Hide the Move (pan) button on mobile devices - pan is done via pinch gestures */
+    #pan-btn {
+        display: none;
+    }
 
     #history-controls {
         top: 10px;
