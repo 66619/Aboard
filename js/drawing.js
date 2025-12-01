@@ -29,6 +29,13 @@ class DrawingEngine {
         this.multiLineLastPerpX = 0;
         this.multiLineLastPerpY = 0;
         this.multiLineLastPoints = null; // Store last offset points for each line
+        this.multiLinePendingPoint = null; // Accumulate short segments
+        
+        // Multi-line drawing constants
+        this.MULTI_LINE_MIN_DISTANCE = 1.5; // Minimum distance threshold for multi-line drawing
+        this.MULTI_LINE_BLEND_MIN = 0.7; // Minimum blend factor for perpendicular smoothing
+        this.MULTI_LINE_BLEND_MAX = 0.95; // Maximum blend factor
+        this.MULTI_LINE_BLEND_SCALE = 50; // Scale factor for blend calculation
         
         // Drawing buffer
         this.points = [];
@@ -341,8 +348,7 @@ class DrawingEngine {
         
         // Skip drawing if points are too close (causes unstable perpendiculars)
         // Minimum distance threshold to prevent dots and artifacts when drawing slowly
-        const minDistance = 1.5;
-        if (length < minDistance) {
+        if (length < this.MULTI_LINE_MIN_DISTANCE) {
             // For very short segments, accumulate in pending point
             if (!this.multiLinePendingPoint) {
                 this.multiLinePendingPoint = currPoint;
@@ -359,7 +365,7 @@ class DrawingEngine {
         const actualDy = currPoint.y - actualPrevPoint.y;
         const actualLength = Math.sqrt(actualDx * actualDx + actualDy * actualDy);
         
-        if (actualLength === 0) return;
+        if (actualLength < 0.001) return; // Use small epsilon instead of strict zero check
         
         // Perpendicular unit vector for current segment
         let currentPerpX = -actualDy / actualLength;
@@ -384,7 +390,10 @@ class DrawingEngine {
         
         if (this.multiLineLastPerpX !== 0 || this.multiLineLastPerpY !== 0) {
             // Adaptive blend factor: more blending for longer segments
-            const blendFactor = Math.min(0.95, 0.7 + actualLength / 50);
+            const blendFactor = Math.min(
+                this.MULTI_LINE_BLEND_MAX,
+                this.MULTI_LINE_BLEND_MIN + actualLength / this.MULTI_LINE_BLEND_SCALE
+            );
             endPerpX = currentPerpX * blendFactor + this.multiLineLastPerpX * (1 - blendFactor);
             endPerpY = currentPerpY * blendFactor + this.multiLineLastPerpY * (1 - blendFactor);
             
@@ -399,6 +408,8 @@ class DrawingEngine {
         // Total width of multi-line
         const totalWidth = (count - 1) * spacing;
         const startOffset = -totalWidth / 2;
+        
+        // Calculate current offset points using the end perpendicular
         
         // Calculate current offset points using the end perpendicular
         const currentPoints = [];

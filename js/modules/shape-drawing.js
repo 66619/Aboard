@@ -16,11 +16,17 @@ class ShapeDrawingManager {
         this.endPoint = null;
         
         // Line style settings
-        this.lineStyle = 'solid'; // solid, dashed, dotted, wavy, double, triple
+        this.lineStyle = 'solid'; // solid, dashed, dotted, wavy, double, triple, arrow, doubleArrow
         this.dashDensity = 10; // Dash segment length
         this.waveDensity = 10; // Wave frequency
         this.multiLineCount = 2; // Number of lines for multi-line styles
         this.multiLineSpacing = 4; // Spacing between multiple lines
+        
+        // Arrow drawing constants
+        this.ARROW_SIZE_MIN = 15; // Minimum arrow head size
+        this.ARROW_SIZE_MULTIPLIER = 3; // Arrow head size = penSize * this
+        this.ARROW_ANGLE = Math.PI / 6; // Arrow head angle (30 degrees)
+        this.ARROW_LINE_OFFSET = 0.8; // Factor to shorten line at arrow ends
         
         // Preview layer (optional canvas overlay for live preview)
         this.previewCanvas = null;
@@ -519,22 +525,21 @@ class ShapeDrawingManager {
         const dy = end.y - start.y;
         const length = Math.sqrt(dx * dx + dy * dy);
         
-        if (length === 0) return;
+        if (length < 0.001) return; // Use epsilon for floating point comparison
         
         // Normalize direction
         const nx = dx / length;
         const ny = dy / length;
         
         // Arrow head size based on line width
-        const arrowSize = Math.max(15, this.drawingEngine.penSize * 3);
-        
-        // Calculate arrow head points
-        const arrowAngle = Math.PI / 6; // 30 degrees
+        const arrowSize = Math.max(this.ARROW_SIZE_MIN, this.drawingEngine.penSize * this.ARROW_SIZE_MULTIPLIER);
+        const arrowAngle = this.ARROW_ANGLE;
+        const lineOffset = this.ARROW_LINE_OFFSET;
         
         // End arrow
         const endArrowBase = {
-            x: end.x - nx * arrowSize * 0.8,
-            y: end.y - ny * arrowSize * 0.8
+            x: end.x - nx * arrowSize * lineOffset,
+            y: end.y - ny * arrowSize * lineOffset
         };
         
         const endArrowLeft = {
@@ -550,7 +555,7 @@ class ShapeDrawingManager {
         // Draw main line (shortened to accommodate arrow heads)
         ctx.beginPath();
         if (isDouble) {
-            ctx.moveTo(start.x + nx * arrowSize * 0.8, start.y + ny * arrowSize * 0.8);
+            ctx.moveTo(start.x + nx * arrowSize * lineOffset, start.y + ny * arrowSize * lineOffset);
         } else {
             ctx.moveTo(start.x, start.y);
         }
@@ -568,11 +573,6 @@ class ShapeDrawingManager {
         
         // Draw start arrow head if double arrow
         if (isDouble) {
-            const startArrowBase = {
-                x: start.x + nx * arrowSize * 0.8,
-                y: start.y + ny * arrowSize * 0.8
-            };
-            
             const startArrowLeft = {
                 x: start.x + nx * arrowSize * Math.cos(arrowAngle) - ny * arrowSize * Math.sin(arrowAngle),
                 y: start.y + ny * arrowSize * Math.cos(arrowAngle) + nx * arrowSize * Math.sin(arrowAngle)
