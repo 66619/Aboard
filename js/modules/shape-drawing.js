@@ -111,7 +111,9 @@ class ShapeDrawingManager {
         
         // Calculate the CSS scale factor of the main canvas
         // This is the ratio of displayed size to actual size
-        this.canvasCssScale = rect.width / this.canvas.offsetWidth;
+        // Guard against division by zero when canvas is hidden
+        const offsetWidth = this.canvas.offsetWidth;
+        this.canvasCssScale = offsetWidth > 0 ? rect.width / offsetWidth : 1.0;
         
         // Only resize if dimensions actually changed (avoid expensive operations)
         // Note: Position is always updated after this block regardless of resize
@@ -273,7 +275,8 @@ class ShapeDrawingManager {
         
         // For preview, scale the line width to match the main canvas's visual appearance
         // The main canvas is displayed with a CSS scale, which affects how thick lines appear
-        if (isPreview && this.canvasCssScale) {
+        // Use explicit check for defined scale factor (canvasCssScale defaults to 1.0)
+        if (isPreview && this.canvasCssScale !== undefined && this.canvasCssScale > 0) {
             lineWidth = lineWidth * this.canvasCssScale;
         }
         
