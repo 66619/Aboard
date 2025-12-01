@@ -1614,7 +1614,9 @@ class DrawingBoard {
             const isFeatureAreaVisible = featureArea.classList.contains('show');
             if (isFeatureAreaVisible) {
                 featureArea.classList.remove('show');
-                configArea.classList.remove('show'); // Also hide config-area when closing feature-area
+                // Also hide config-area when closing feature-area to prevent empty panel from showing
+                // The 'more' tool has no associated config panel, so config-area should always be hidden
+                configArea.classList.remove('show');
             } else {
                 featureArea.classList.add('show');
                 configArea.classList.remove('show');
