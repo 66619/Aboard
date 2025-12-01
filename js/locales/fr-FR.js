@@ -98,6 +98,8 @@ window.translations = {
             double: 'Double',
             triple: 'Triple',
             multiLine: 'Multi-lignes',
+            arrow: 'Flèche',
+            doubleArrow: 'Double flèche',
             dashDensity: 'Densité des tirets',
             waveDensity: 'Densité des ondes',
             lineSpacing: 'Espacement des lignes',
@@ -117,7 +119,8 @@ window.translations = {
         options: 'Options d\'affichage de l\'heure',
         showDate: 'Afficher la date',
         showTime: 'Afficher l\'heure',
-        settings: 'Paramètres'
+        settings: 'Paramètres',
+        fullscreenDisplay: 'Plein écran'
     },
 
     // Background

@@ -103,6 +103,8 @@ window.translations = {
             double: '雙線',
             triple: '三線',
             multiLine: '多線',
+            arrow: '箭頭',
+            doubleArrow: '雙箭頭',
             dashDensity: '虛線密度',
             waveDensity: '波浪密度',
             lineSpacing: '線條間距',
@@ -122,7 +124,8 @@ window.translations = {
         options: '時間顯示選項',
         showDate: '顯示日期',
         showTime: '顯示時間',
-        settings: '設定'
+        settings: '設定',
+        fullscreenDisplay: '全螢幕顯示'
     },
 
     // Background

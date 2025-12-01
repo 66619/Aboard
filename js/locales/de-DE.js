@@ -103,6 +103,8 @@ window.translations = {
             double: 'Doppelt',
             triple: 'Dreifach',
             multiLine: 'Mehrfachlinien',
+            arrow: 'Pfeil',
+            doubleArrow: 'Doppelpfeil',
             dashDensity: 'Strichdichte',
             waveDensity: 'Wellendichte',
             lineSpacing: 'Linienabstand',
@@ -122,7 +124,8 @@ window.translations = {
         options: 'Zeitanzeigeoptionen',
         showDate: 'Datum anzeigen',
         showTime: 'Uhrzeit anzeigen',
-        settings: 'Einstellungen'
+        settings: 'Einstellungen',
+        fullscreenDisplay: 'Vollbildanzeige'
     },
 
     // Background

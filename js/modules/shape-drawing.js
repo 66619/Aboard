@@ -361,6 +361,12 @@ class ShapeDrawingManager {
             case 'multi':
                 this.drawMultiLine(ctx, start, end, this.multiLineCount);
                 break;
+            case 'arrow':
+                this.drawArrowLine(ctx, start, end, false);
+                break;
+            case 'doubleArrow':
+                this.drawArrowLine(ctx, start, end, true);
+                break;
             default:
                 this.drawLine(ctx, start, end);
                 break;
@@ -497,6 +503,93 @@ class ShapeDrawingManager {
         ctx.moveTo(start.x, start.y);
         ctx.lineTo(end.x, end.y);
         ctx.stroke();
+    }
+    
+    /**
+     * Draw an arrow line (with arrowhead at end, optionally at start too)
+     * @param {CanvasRenderingContext2D} ctx - Canvas context
+     * @param {Object} start - Start point {x, y}
+     * @param {Object} end - End point {x, y}
+     * @param {boolean} isDouble - Whether to draw arrowheads at both ends
+     */
+    drawArrowLine(ctx, start, end, isDouble) {
+        if (!start || !end) return;
+        
+        const dx = end.x - start.x;
+        const dy = end.y - start.y;
+        const length = Math.sqrt(dx * dx + dy * dy);
+        
+        if (length === 0) return;
+        
+        // Normalize direction
+        const nx = dx / length;
+        const ny = dy / length;
+        
+        // Arrow head size based on line width
+        const arrowSize = Math.max(15, this.drawingEngine.penSize * 3);
+        
+        // Calculate arrow head points
+        const arrowAngle = Math.PI / 6; // 30 degrees
+        
+        // End arrow
+        const endArrowBase = {
+            x: end.x - nx * arrowSize * 0.8,
+            y: end.y - ny * arrowSize * 0.8
+        };
+        
+        const endArrowLeft = {
+            x: end.x - nx * arrowSize * Math.cos(arrowAngle) - ny * arrowSize * Math.sin(arrowAngle),
+            y: end.y - ny * arrowSize * Math.cos(arrowAngle) + nx * arrowSize * Math.sin(arrowAngle)
+        };
+        
+        const endArrowRight = {
+            x: end.x - nx * arrowSize * Math.cos(arrowAngle) + ny * arrowSize * Math.sin(arrowAngle),
+            y: end.y - ny * arrowSize * Math.cos(arrowAngle) - nx * arrowSize * Math.sin(arrowAngle)
+        };
+        
+        // Draw main line (shortened to accommodate arrow heads)
+        ctx.beginPath();
+        if (isDouble) {
+            ctx.moveTo(start.x + nx * arrowSize * 0.8, start.y + ny * arrowSize * 0.8);
+        } else {
+            ctx.moveTo(start.x, start.y);
+        }
+        ctx.lineTo(endArrowBase.x, endArrowBase.y);
+        ctx.stroke();
+        
+        // Draw end arrow head (filled triangle)
+        ctx.beginPath();
+        ctx.moveTo(end.x, end.y);
+        ctx.lineTo(endArrowLeft.x, endArrowLeft.y);
+        ctx.lineTo(endArrowRight.x, endArrowRight.y);
+        ctx.closePath();
+        ctx.fillStyle = ctx.strokeStyle;
+        ctx.fill();
+        
+        // Draw start arrow head if double arrow
+        if (isDouble) {
+            const startArrowBase = {
+                x: start.x + nx * arrowSize * 0.8,
+                y: start.y + ny * arrowSize * 0.8
+            };
+            
+            const startArrowLeft = {
+                x: start.x + nx * arrowSize * Math.cos(arrowAngle) - ny * arrowSize * Math.sin(arrowAngle),
+                y: start.y + ny * arrowSize * Math.cos(arrowAngle) + nx * arrowSize * Math.sin(arrowAngle)
+            };
+            
+            const startArrowRight = {
+                x: start.x + nx * arrowSize * Math.cos(arrowAngle) + ny * arrowSize * Math.sin(arrowAngle),
+                y: start.y + ny * arrowSize * Math.cos(arrowAngle) - nx * arrowSize * Math.sin(arrowAngle)
+            };
+            
+            ctx.beginPath();
+            ctx.moveTo(start.x, start.y);
+            ctx.lineTo(startArrowLeft.x, startArrowLeft.y);
+            ctx.lineTo(startArrowRight.x, startArrowRight.y);
+            ctx.closePath();
+            ctx.fill();
+        }
     }
     
     drawWavyLine(ctx, start, end) {

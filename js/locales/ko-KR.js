@@ -103,6 +103,8 @@ window.translations = {
             double: '이중선',
             triple: '삼중선',
             multiLine: '다중선',
+            arrow: '화살표',
+            doubleArrow: '양방향 화살표',
             dashDensity: '파선 밀도',
             waveDensity: '물결 밀도',
             lineSpacing: '선 간격',
@@ -122,7 +124,8 @@ window.translations = {
         options: '시간 표시 옵션',
         showDate: '날짜 표시',
         showTime: '시간 표시',
-        settings: '설정'
+        settings: '설정',
+        fullscreenDisplay: '전체 화면 표시'
     },
 
     // Background

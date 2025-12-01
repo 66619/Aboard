@@ -296,14 +296,22 @@
                         <span data-i18n="timeDisplay.showTime">Show Time</span>
                     </label>
                 </div>
-                <!-- Settings button for time display area - positioned to the right of checkboxes -->
-                <button id="time-display-area-settings-btn" class="time-display-settings-btn-with-text" title="Settings">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M12 1v6m0 6v6M5.6 5.6l4.2 4.2m4.2 4.2l4.2 4.2M1 12h6m6 0h6M5.6 18.4l4.2-4.2m4.2-4.2l4.2-4.2"></path>
-                    </svg>
-                    <span data-i18n="timeDisplay.settings">Settings</span>
-                </button>
+                <!-- Settings and Fullscreen buttons for time display area -->
+                <div class="time-display-action-buttons">
+                    <button id="time-display-area-settings-btn" class="time-display-settings-btn-with-text" title="Settings">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M12 1v6m0 6v6M5.6 5.6l4.2 4.2m4.2 4.2l4.2 4.2M1 12h6m6 0h6M5.6 18.4l4.2-4.2m4.2-4.2l4.2-4.2"></path>
+                        </svg>
+                        <span data-i18n="timeDisplay.settings">Settings</span>
+                    </button>
+                    <button id="time-display-fullscreen-btn" class="time-display-settings-btn-with-text" title="Fullscreen" data-i18n-title="timeDisplay.fullscreenDisplay">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                        </svg>
+                        <span data-i18n="timeDisplay.fullscreenDisplay">Fullscreen</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>

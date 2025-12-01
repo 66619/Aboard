@@ -103,6 +103,8 @@ window.translations = {
             double: '二重線',
             triple: '三重線',
             multiLine: '多重線',
+            arrow: '矢印',
+            doubleArrow: '双方向矢印',
             dashDensity: '破線の密度',
             waveDensity: '波の密度',
             lineSpacing: '線の間隔',
@@ -122,7 +124,8 @@ window.translations = {
         options: '時刻表示オプション',
         showDate: '日付を表示',
         showTime: '時刻を表示',
-        settings: '設定'
+        settings: '設定',
+        fullscreenDisplay: 'フルスクリーン表示'
     },
 
     // Background

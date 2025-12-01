@@ -200,6 +200,7 @@ class DrawingEngine {
         this.multiLineLastPerpX = 0;
         this.multiLineLastPerpY = 0;
         this.multiLineLastPoints = null;
+        this.multiLinePendingPoint = null;
         
         // Check for edge snapping when pen tool is active
         if (this.currentTool === 'pen' && this.edgeDrawingManager) {
@@ -338,12 +339,31 @@ class DrawingEngine {
         const dy = currPoint.y - prevPoint.y;
         const length = Math.sqrt(dx * dx + dy * dy);
         
-        // Skip drawing if points are identical (length is 0) to avoid division by zero
-        if (length === 0) return;
+        // Skip drawing if points are too close (causes unstable perpendiculars)
+        // Minimum distance threshold to prevent dots and artifacts when drawing slowly
+        const minDistance = 1.5;
+        if (length < minDistance) {
+            // For very short segments, accumulate in pending point
+            if (!this.multiLinePendingPoint) {
+                this.multiLinePendingPoint = currPoint;
+            }
+            return;
+        }
+        
+        // If we had a pending point, use it as the actual previous point
+        const actualPrevPoint = this.multiLinePendingPoint || prevPoint;
+        this.multiLinePendingPoint = null;
+        
+        // Recalculate with actual previous point
+        const actualDx = currPoint.x - actualPrevPoint.x;
+        const actualDy = currPoint.y - actualPrevPoint.y;
+        const actualLength = Math.sqrt(actualDx * actualDx + actualDy * actualDy);
+        
+        if (actualLength === 0) return;
         
         // Perpendicular unit vector for current segment
-        let currentPerpX = -dy / length;
-        let currentPerpY = dx / length;
+        let currentPerpX = -actualDy / actualLength;
+        let currentPerpY = actualDx / actualLength;
         
         // For the starting perpendicular, use the previous one if available
         // This ensures smooth connections at corners
@@ -357,14 +377,14 @@ class DrawingEngine {
         }
         
         // For the ending perpendicular, blend with current for smooth transition
-        // But use a higher blend factor to respond more quickly to direction changes
+        // Use adaptive blend factor based on segment length
+        // Longer segments = more weight on current perpendicular
         let endPerpX = currentPerpX;
         let endPerpY = currentPerpY;
         
         if (this.multiLineLastPerpX !== 0 || this.multiLineLastPerpY !== 0) {
-            // Blend current and previous perpendicular (90% current, 10% previous)
-            // Higher current weight reduces corner artifacts
-            const blendFactor = 0.9;
+            // Adaptive blend factor: more blending for longer segments
+            const blendFactor = Math.min(0.95, 0.7 + actualLength / 50);
             endPerpX = currentPerpX * blendFactor + this.multiLineLastPerpX * (1 - blendFactor);
             endPerpY = currentPerpY * blendFactor + this.multiLineLastPerpY * (1 - blendFactor);
             
@@ -401,7 +421,7 @@ class DrawingEngine {
                 this.ctx.moveTo(this.multiLineLastPoints[i].x, this.multiLineLastPoints[i].y);
             } else {
                 // First segment - use start perpendicular for consistency
-                this.ctx.moveTo(prevPoint.x + startPerpX * offset, prevPoint.y + startPerpY * offset);
+                this.ctx.moveTo(actualPrevPoint.x + startPerpX * offset, actualPrevPoint.y + startPerpY * offset);
             }
             
             this.ctx.lineTo(currentPoints[i].x, currentPoints[i].y);

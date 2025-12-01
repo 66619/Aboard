@@ -1521,6 +1521,15 @@ class DrawingBoard {
     }
     
     setTool(tool, showConfig = true) {
+        const configArea = document.getElementById('config-area');
+        const featureArea = document.getElementById('feature-area');
+        const previousTool = this.drawingEngine.currentTool;
+        
+        // Check if we're clicking the same tool button again (toggle behavior)
+        const isSameTool = (previousTool === tool);
+        const isConfigVisible = configArea.classList.contains('show');
+        
+        // Update drawing engine tool
         this.drawingEngine.setTool(tool);
         if (tool === 'eraser') {
             this.showEraserCursor();
@@ -1530,20 +1539,33 @@ class DrawingBoard {
         
         this.updateUI();
         
-        // Hide config-area by default (but don't always hide feature-area)
-        document.getElementById('config-area').classList.remove('show');
+        // Handle toggle behavior for tools with config panels
+        const toolsWithConfig = ['pen', 'eraser', 'background', 'shape'];
         
-        // Show appropriate panel based on tool
-        if (showConfig && (tool === 'pen' || tool === 'eraser' || tool === 'background' || tool === 'shape')) {
-            document.getElementById('config-area').classList.add('show');
-            // Don't close feature-area when selecting shape - allow multiple panels to be open
-            if (tool !== 'shape') {
-                document.getElementById('feature-area').classList.remove('show');
+        if (showConfig && toolsWithConfig.includes(tool)) {
+            // If clicking the same tool and config is visible, toggle it off
+            if (isSameTool && isConfigVisible) {
+                configArea.classList.remove('show');
+            } else {
+                // Show config panel
+                configArea.classList.add('show');
+                // Don't close feature-area when selecting shape - allow multiple panels to be open
+                if (tool !== 'shape') {
+                    featureArea.classList.remove('show');
+                }
             }
         } else if (tool === 'more') {
-            document.getElementById('feature-area').classList.add('show');
+            // Toggle feature-area for more button
+            if (isSameTool && featureArea.classList.contains('show')) {
+                featureArea.classList.remove('show');
+            } else {
+                featureArea.classList.add('show');
+                configArea.classList.remove('show');
+            }
         } else {
-            document.getElementById('feature-area').classList.remove('show');
+            // For other tools (like pan), just hide panels
+            configArea.classList.remove('show');
+            featureArea.classList.remove('show');
         }
     }
     

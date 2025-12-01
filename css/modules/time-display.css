@@ -59,22 +59,30 @@
     flex: 0 0 auto;
 }
 
+/* Container for settings and fullscreen buttons */
+.time-display-action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
 /* Time display area settings button with text - positioned to the right of checkboxes */
 .time-display-settings-btn-with-text {
     position: relative;
-    height: 64px;
+    height: auto;
+    min-height: 32px;
     border: 2px solid #ddd;
     border-radius: 8px;
     background-color: #f8f8f8;
     cursor: pointer;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 6px;
     transition: all 0.2s ease;
     color: #666;
-    padding: 8px 16px;
+    padding: 6px 12px;
     flex-shrink: 0;
     font-size: 12px;
     width: auto;

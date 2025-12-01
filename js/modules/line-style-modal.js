@@ -69,6 +69,21 @@ class LineStyleModal {
                                     </svg>
                                     <span data-i18n="tools.lineStyle.multiLine">Multi-line</span>
                                 </button>
+                                <button class="line-style-type-btn" data-modal-line-style="arrow">
+                                    <svg viewBox="0 0 50 20">
+                                        <line x1="2" y1="10" x2="42" y2="10" stroke="currentColor" stroke-width="2"/>
+                                        <polyline points="36,5 45,10 36,15" stroke="currentColor" stroke-width="2" fill="none"/>
+                                    </svg>
+                                    <span data-i18n="tools.lineStyle.arrow">Arrow</span>
+                                </button>
+                                <button class="line-style-type-btn" data-modal-line-style="doubleArrow">
+                                    <svg viewBox="0 0 50 20">
+                                        <line x1="10" y1="10" x2="40" y2="10" stroke="currentColor" stroke-width="2"/>
+                                        <polyline points="5,10 12,5 12,15" stroke="currentColor" stroke-width="2" fill="none"/>
+                                        <polyline points="38,5 45,10 38,15" stroke="currentColor" stroke-width="2" fill="none"/>
+                                    </svg>
+                                    <span data-i18n="tools.lineStyle.doubleArrow">Double Arrow</span>
+                                </button>
                             </div>
                         </div>
                         
@@ -307,6 +322,7 @@ class LineStyleModal {
         
         // Setup context with exact pen size (1:1 with actual drawing)
         ctx.strokeStyle = '#333333';
+        ctx.fillStyle = '#333333';
         ctx.lineWidth = penSize;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
@@ -351,6 +367,42 @@ class LineStyleModal {
             case 'multi':
                 this.drawMultiLinePreview(ctx, startX, centerY, endX, centerY, lineCount, lineSpacing);
                 break;
+                
+            case 'arrow':
+                this.drawArrowPreview(ctx, startX, centerY, endX, centerY, penSize, false);
+                break;
+                
+            case 'doubleArrow':
+                this.drawArrowPreview(ctx, startX, centerY, endX, centerY, penSize, true);
+                break;
+        }
+    }
+    
+    drawArrowPreview(ctx, startX, startY, endX, endY, penSize, isDouble) {
+        const arrowSize = Math.max(10, penSize * 2);
+        
+        // Draw the main line
+        ctx.beginPath();
+        ctx.moveTo(isDouble ? startX + arrowSize * 0.8 : startX, startY);
+        ctx.lineTo(endX - arrowSize * 0.8, endY);
+        ctx.stroke();
+        
+        // Draw end arrow head
+        ctx.beginPath();
+        ctx.moveTo(endX, endY);
+        ctx.lineTo(endX - arrowSize, endY - arrowSize * 0.5);
+        ctx.lineTo(endX - arrowSize, endY + arrowSize * 0.5);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Draw start arrow head if double arrow
+        if (isDouble) {
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(startX + arrowSize, startY - arrowSize * 0.5);
+            ctx.lineTo(startX + arrowSize, startY + arrowSize * 0.5);
+            ctx.closePath();
+            ctx.fill();
         }
     }
     
@@ -462,6 +514,10 @@ class LineStyleModal {
                 return '<path d="M2 8 Q6 4, 10 8 T18 8 T26 8 T34 8 Q38 12, 38 8" stroke="currentColor" stroke-width="2" fill="none"/>';
             case 'multi':
                 return '<line x1="2" y1="5" x2="38" y2="5" stroke="currentColor" stroke-width="1.5"/><line x1="2" y1="11" x2="38" y2="11" stroke="currentColor" stroke-width="1.5"/>';
+            case 'arrow':
+                return '<line x1="2" y1="8" x2="32" y2="8" stroke="currentColor" stroke-width="2"/><polyline points="28,4 36,8 28,12" stroke="currentColor" stroke-width="2" fill="none"/>';
+            case 'doubleArrow':
+                return '<line x1="10" y1="8" x2="30" y2="8" stroke="currentColor" stroke-width="2"/><polyline points="4,8 10,4 10,12" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="30,4 36,8 30,12" stroke="currentColor" stroke-width="2" fill="none"/>';
             case 'solid':
             default:
                 return '<line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2"/>';
