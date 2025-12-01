@@ -15,9 +15,26 @@ class LineStyleModal {
         this.previewCanvas = null;
         this.previewCtx = null;
         
+        // Constants for preview overflow detection
+        this.PREVIEW_OVERFLOW_HEIGHT_THRESHOLD = 60;
+        
         // Create modal elements
         this.createModal();
         this.setupEventListeners();
+    }
+    
+    // Helper method to check if arrow drawing should be used
+    shouldDrawArrow() {
+        return this.currentMode === 'shape' && this.arrowType && this.arrowType !== 'none';
+    }
+    
+    // Helper method to get the final line style (handles arrow type conversion)
+    getFinalLineStyle(lineStyle) {
+        if (this.shouldDrawArrow() && 
+            (lineStyle === 'solid' || lineStyle === 'dashed' || lineStyle === 'dotted')) {
+            return this.arrowType;
+        }
+        return lineStyle;
     }
     
     createModal() {
@@ -404,7 +421,7 @@ class LineStyleModal {
         switch (lineStyle) {
             case 'solid':
                 // Check if arrow type is set for shape mode
-                if (this.currentMode === 'shape' && this.arrowType && this.arrowType !== 'none') {
+                if (this.shouldDrawArrow()) {
                     this.drawArrowPreview(ctx, startX, centerY, endX, centerY, penSize, this.arrowType === 'doubleArrow');
                 } else {
                     ctx.beginPath();
@@ -416,7 +433,7 @@ class LineStyleModal {
                 
             case 'dashed':
                 ctx.setLineDash([dashDensity, dashDensity / 2]);
-                if (this.currentMode === 'shape' && this.arrowType && this.arrowType !== 'none') {
+                if (this.shouldDrawArrow()) {
                     this.drawArrowPreview(ctx, startX, centerY, endX, centerY, penSize, this.arrowType === 'doubleArrow');
                 } else {
                     ctx.beginPath();
@@ -429,7 +446,7 @@ class LineStyleModal {
                 
             case 'dotted':
                 ctx.setLineDash([3, dashDensity / 2]);
-                if (this.currentMode === 'shape' && this.arrowType && this.arrowType !== 'none') {
+                if (this.shouldDrawArrow()) {
                     this.drawArrowPreview(ctx, startX, centerY, endX, centerY, penSize, this.arrowType === 'doubleArrow');
                 } else {
                     ctx.beginPath();
@@ -541,22 +558,18 @@ class LineStyleModal {
             // Update pen button style
             this.updatePenButtonStyle(lineStyle);
         } else {
-            // For shape tool, handle arrow type
-            // If arrow type is selected, use it as the line style
-            if (this.arrowType && this.arrowType !== 'none' && 
-                (lineStyle === 'solid' || lineStyle === 'dashed' || lineStyle === 'dotted')) {
-                lineStyle = this.arrowType;
-            }
+            // For shape tool, use helper to get final line style with arrow type
+            const finalLineStyle = this.getFinalLineStyle(lineStyle);
             
             // Apply to shape tool - convert 'multi' back to internal representation
-            this.shapeDrawingManager.setLineStyle(lineStyle);
+            this.shapeDrawingManager.setLineStyle(finalLineStyle);
             this.shapeDrawingManager.setDashDensity(dashDensity);
             this.shapeDrawingManager.setWaveDensity(waveDensity);
             this.shapeDrawingManager.setMultiLineCount(lineCount);
             this.shapeDrawingManager.setMultiLineSpacing(lineSpacing);
             
             // Update shape button style
-            this.updateShapeButtonStyle(lineStyle);
+            this.updateShapeButtonStyle(finalLineStyle);
         }
     }
     
@@ -635,7 +648,7 @@ class LineStyleModal {
         
         const expandBtn = document.getElementById('preview-expand-btn');
         if (expandBtn) {
-            expandBtn.style.display = requiredHeight > 60 ? 'flex' : 'none';
+            expandBtn.style.display = requiredHeight > this.PREVIEW_OVERFLOW_HEIGHT_THRESHOLD ? 'flex' : 'none';
         }
     }
     
