@@ -105,6 +105,8 @@ window.translations = {
             multiLine: 'Mehrfachlinien',
             arrow: 'Pfeil',
             doubleArrow: 'Doppelpfeil',
+            noArrow: 'Kein Pfeil',
+            arrowType: 'Pfeiltyp',
             dashDensity: 'Strichdichte',
             waveDensity: 'Wellendichte',
             lineSpacing: 'Linienabstand',

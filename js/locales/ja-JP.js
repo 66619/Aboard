@@ -105,6 +105,8 @@ window.translations = {
             multiLine: '多重線',
             arrow: '矢印',
             doubleArrow: '双方向矢印',
+            noArrow: '矢印なし',
+            arrowType: '矢印の種類',
             dashDensity: '破線の密度',
             waveDensity: '波の密度',
             lineSpacing: '線の間隔',

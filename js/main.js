@@ -1243,6 +1243,29 @@ class DrawingBoard {
     }
     
     repositionToolbarsOnResize() {
+        // Dynamic toolbar positioning based on window orientation
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+        const isPortrait = windowHeight > windowWidth;
+        const toolbar = document.getElementById('toolbar');
+        
+        // On portrait orientation (typically phones), position toolbar on left side
+        if (isPortrait && toolbar && !toolbar.classList.contains('user-positioned')) {
+            // Apply left side positioning for portrait mode
+            toolbar.classList.add('vertical');
+            toolbar.style.left = '20px';
+            toolbar.style.right = 'auto';
+            toolbar.style.bottom = '50%';
+            toolbar.style.transform = 'translateY(50%)';
+        } else if (!isPortrait && toolbar && !toolbar.classList.contains('user-positioned')) {
+            // For landscape mode, use bottom center positioning
+            toolbar.classList.remove('vertical');
+            toolbar.style.left = '50%';
+            toolbar.style.right = 'auto';
+            toolbar.style.bottom = '20px';
+            toolbar.style.transform = 'translateX(-50%)';
+        }
+        
         // Ensure all toolbars and panels stay within viewport after window resize
         const EDGE_SPACING = 10; // Minimum spacing from viewport edges
         const panels = [
@@ -1250,13 +1273,9 @@ class DrawingBoard {
             document.getElementById('config-area'),
             document.getElementById('time-display-area'),
             document.getElementById('feature-area'),
-            document.getElementById('toolbar'),
             document.getElementById('pagination-controls'),
             document.getElementById('timer-display')
         ];
-        
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
         
         panels.forEach(panel => {
             if (!panel) return;
@@ -1484,6 +1503,12 @@ class DrawingBoard {
             if (this.isDraggingPanel && this.draggedElement) {
                 this.draggedElement.classList.remove('dragging');
                 this.draggedElement.style.transition = '';
+                
+                // Mark toolbar as user-positioned to prevent auto-repositioning
+                if (this.draggedElement.id === 'toolbar') {
+                    this.draggedElement.classList.add('user-positioned');
+                }
+                
                 this.isDraggingPanel = false;
                 this.draggedElement = null;
             }

@@ -402,6 +402,14 @@ class TimeDisplayManager {
         });
     }
     
+    // Method to directly show fullscreen (called from button)
+    showFullscreen() {
+        if (!this.enabled) {
+            this.show();
+        }
+        this.enterFullscreen();
+    }
+    
     enterFullscreen() {
         this.isFullscreen = true;
         this.timeFullscreenModal.classList.add('show');

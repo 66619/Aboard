@@ -105,6 +105,8 @@ window.translations = {
             multiLine: '다중선',
             arrow: '화살표',
             doubleArrow: '양방향 화살표',
+            noArrow: '화살표 없음',
+            arrowType: '화살표 유형',
             dashDensity: '파선 밀도',
             waveDensity: '물결 밀도',
             lineSpacing: '선 간격',

@@ -105,6 +105,8 @@ window.translations = {
             multiLine: '多線',
             arrow: '箭頭',
             doubleArrow: '雙箭頭',
+            noArrow: '無箭頭',
+            arrowType: '箭頭類型',
             dashDensity: '虛線密度',
             waveDensity: '波浪密度',
             lineSpacing: '線條間距',

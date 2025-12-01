@@ -100,6 +100,8 @@ window.translations = {
             multiLine: 'Multilínea',
             arrow: 'Flecha',
             doubleArrow: 'Doble flecha',
+            noArrow: 'Sin flecha',
+            arrowType: 'Tipo de flecha',
             dashDensity: 'Densidad de guiones',
             waveDensity: 'Densidad de ondas',
             lineSpacing: 'Espaciado de líneas',

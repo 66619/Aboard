@@ -105,6 +105,8 @@ window.translations = {
             multiLine: 'Multi-line',
             arrow: 'Arrow',
             doubleArrow: 'Double Arrow',
+            noArrow: 'None',
+            arrowType: 'Arrow Type',
             dashDensity: 'Dash Density',
             waveDensity: 'Wave Density',
             lineSpacing: 'Line Spacing',
