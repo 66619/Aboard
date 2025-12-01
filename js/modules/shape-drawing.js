@@ -30,6 +30,9 @@ class ShapeDrawingManager {
         this.pendingDraw = false;
         this.rafId = null;
         
+        // Canvas CSS scale factor (updated in syncPreviewCanvas)
+        this.canvasCssScale = 1.0;
+        
         // Create preview canvas for live shape preview
         this.createPreviewCanvas();
         
@@ -105,6 +108,10 @@ class ShapeDrawingManager {
         // Sync preview canvas size with main canvas position and size on screen
         const rect = this.canvas.getBoundingClientRect();
         const dpr = this.cachedDpr;
+        
+        // Calculate the CSS scale factor of the main canvas
+        // This is the ratio of displayed size to actual size
+        this.canvasCssScale = rect.width / this.canvas.offsetWidth;
         
         // Only resize if dimensions actually changed (avoid expensive operations)
         // Note: Position is always updated after this block regardless of resize
@@ -235,8 +242,13 @@ class ShapeDrawingManager {
         ctx.lineJoin = 'round';
         ctx.globalCompositeOperation = 'source-over';
         ctx.strokeStyle = this.drawingEngine.currentColor;
-        ctx.lineWidth = this.drawingEngine.penSize;
         ctx.fillStyle = 'transparent';
+        
+        // Calculate line width
+        // For preview canvas, we need to match the visual appearance of the final drawing
+        // The main canvas has a CSS scale applied, so lines appear scaled on screen
+        // The preview canvas draws at screen coordinates, so we need to apply the same scale
+        let lineWidth = this.drawingEngine.penSize;
         
         // Apply pen type effects
         switch(this.drawingEngine.penType) {
@@ -251,13 +263,21 @@ class ShapeDrawingManager {
                 break;
             case 'brush':
                 ctx.globalAlpha = 0.85;
-                ctx.lineWidth = this.drawingEngine.penSize * 1.5;
+                lineWidth = this.drawingEngine.penSize * 1.5;
                 break;
             case 'normal':
             default:
                 ctx.globalAlpha = 1.0;
                 break;
         }
+        
+        // For preview, scale the line width to match the main canvas's visual appearance
+        // The main canvas is displayed with a CSS scale, which affects how thick lines appear
+        if (isPreview && this.canvasCssScale) {
+            lineWidth = lineWidth * this.canvasCssScale;
+        }
+        
+        ctx.lineWidth = lineWidth;
         
         // Apply line style
         this.applyLineStyle(ctx);

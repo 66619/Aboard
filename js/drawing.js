@@ -342,21 +342,37 @@ class DrawingEngine {
         if (length === 0) return;
         
         // Perpendicular unit vector for current segment
-        let perpX = -dy / length;
-        let perpY = dx / length;
+        let currentPerpX = -dy / length;
+        let currentPerpY = dx / length;
         
-        // Smooth the perpendicular with the previous one to avoid sudden direction changes
+        // For the starting perpendicular, use the previous one if available
+        // This ensures smooth connections at corners
+        let startPerpX = currentPerpX;
+        let startPerpY = currentPerpY;
+        
         if (this.multiLineLastPerpX !== 0 || this.multiLineLastPerpY !== 0) {
-            // Blend current and previous perpendicular (80% current, 20% previous)
-            const blendFactor = 0.8;
-            perpX = perpX * blendFactor + this.multiLineLastPerpX * (1 - blendFactor);
-            perpY = perpY * blendFactor + this.multiLineLastPerpY * (1 - blendFactor);
+            // Use the previous perpendicular for starting points
+            startPerpX = this.multiLineLastPerpX;
+            startPerpY = this.multiLineLastPerpY;
+        }
+        
+        // For the ending perpendicular, blend with current for smooth transition
+        // But use a higher blend factor to respond more quickly to direction changes
+        let endPerpX = currentPerpX;
+        let endPerpY = currentPerpY;
+        
+        if (this.multiLineLastPerpX !== 0 || this.multiLineLastPerpY !== 0) {
+            // Blend current and previous perpendicular (90% current, 10% previous)
+            // Higher current weight reduces corner artifacts
+            const blendFactor = 0.9;
+            endPerpX = currentPerpX * blendFactor + this.multiLineLastPerpX * (1 - blendFactor);
+            endPerpY = currentPerpY * blendFactor + this.multiLineLastPerpY * (1 - blendFactor);
             
             // Normalize after blending
-            const perpLen = Math.sqrt(perpX * perpX + perpY * perpY);
+            const perpLen = Math.sqrt(endPerpX * endPerpX + endPerpY * endPerpY);
             if (perpLen > 0) {
-                perpX /= perpLen;
-                perpY /= perpLen;
+                endPerpX /= perpLen;
+                endPerpY /= perpLen;
             }
         }
         
@@ -364,13 +380,13 @@ class DrawingEngine {
         const totalWidth = (count - 1) * spacing;
         const startOffset = -totalWidth / 2;
         
-        // Calculate current offset points
+        // Calculate current offset points using the end perpendicular
         const currentPoints = [];
         for (let i = 0; i < count; i++) {
             const offset = startOffset + i * spacing;
             currentPoints.push({
-                x: currPoint.x + perpX * offset,
-                y: currPoint.y + perpY * offset
+                x: currPoint.x + endPerpX * offset,
+                y: currPoint.y + endPerpY * offset
             });
         }
         
@@ -384,8 +400,8 @@ class DrawingEngine {
                 // Connect from previous point for smooth lines
                 this.ctx.moveTo(this.multiLineLastPoints[i].x, this.multiLineLastPoints[i].y);
             } else {
-                // First segment - start from prevPoint with offset
-                this.ctx.moveTo(prevPoint.x + perpX * offset, prevPoint.y + perpY * offset);
+                // First segment - use start perpendicular for consistency
+                this.ctx.moveTo(prevPoint.x + startPerpX * offset, prevPoint.y + startPerpY * offset);
             }
             
             this.ctx.lineTo(currentPoints[i].x, currentPoints[i].y);
@@ -393,8 +409,9 @@ class DrawingEngine {
         }
         
         // Store current perpendicular and points for next segment
-        this.multiLineLastPerpX = perpX;
-        this.multiLineLastPerpY = perpY;
+        // Use the blended end perpendicular for smoother transitions
+        this.multiLineLastPerpX = endPerpX;
+        this.multiLineLastPerpY = endPerpY;
         this.multiLineLastPoints = currentPoints;
     }
     
