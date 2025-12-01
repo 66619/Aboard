@@ -107,12 +107,13 @@ class ShapeDrawingManager {
         const dpr = this.cachedDpr;
         
         // Only resize if dimensions actually changed (avoid expensive operations)
+        // Note: Position is always updated after this block regardless of resize
         const needsResize = !this.lastCanvasRect ||
             this.lastCanvasRect.width !== rect.width ||
             this.lastCanvasRect.height !== rect.height;
         
         if (needsResize) {
-            // Set canvas buffer size
+            // Set canvas buffer size (physical pixels = CSS pixels * DPR)
             this.previewCanvas.width = rect.width * dpr;
             this.previewCanvas.height = rect.height * dpr;
             
@@ -121,10 +122,11 @@ class ShapeDrawingManager {
             this.previewCanvas.style.height = rect.height + 'px';
             
             // Apply DPR scaling once after resize
+            // This allows drawing in CSS pixel coordinates while the buffer is sized for retina
             this.previewCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
         
-        // Always update position (cheap operation)
+        // Always update position (cheap operation) - handles canvas movement without resize
         this.previewCanvas.style.left = rect.left + 'px';
         this.previewCanvas.style.top = rect.top + 'px';
         
@@ -215,8 +217,14 @@ class ShapeDrawingManager {
     }
     
     clearPreview() {
-        // Optimized clear: just clear the rect without resetting transform
-        // The DPR scale is already applied in syncPreviewCanvas
+        // Optimized clear: just clear the rect without resetting transform.
+        // 
+        // Coordinate system note:
+        // - The canvas buffer is sized at (width * dpr) x (height * dpr) pixels
+        // - syncPreviewCanvas() applies a DPR scale transform via setTransform(dpr, 0, 0, dpr, 0, 0)
+        // - This means drawing coordinates are in CSS pixels, not physical pixels
+        // - clearRect needs CSS pixel dimensions (canvas.width/dpr, canvas.height/dpr)
+        //   because the transform scales our coordinates up by DPR
         const dpr = this.cachedDpr;
         this.previewCtx.clearRect(0, 0, this.previewCanvas.width / dpr, this.previewCanvas.height / dpr);
     }
