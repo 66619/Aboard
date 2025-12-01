@@ -6,11 +6,11 @@
     /* Position will be set dynamically above feature-area */
     right: 20px;
     z-index: 998;
-    padding: 16px 24px;
+    padding: 10px 14px;
     background-color: #ffffff;
     border-radius: 16px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    min-width: 280px;
+    min-width: 220px;
     display: none;
     cursor: move;
     /* Improved touch device support */
@@ -44,7 +44,12 @@
 
 /* Fix config-group in time display area to prevent whitespace */
 #time-display-area .config-group {
-    width: fit-content;
+    width: auto;
+    max-width: 100%;
+}
+
+#time-display-area .config-group > label {
+    margin-right: 0;
 }
 
 /* Time display options row - flex layout for checkboxes and settings button */

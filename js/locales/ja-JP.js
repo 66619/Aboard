@@ -72,6 +72,7 @@ window.translations = {
             circle: '円',
             ellipse: '楕円',
             arrow: '矢印',
+            doubleArrow: '双方向矢印',
             hint: 'ドラッグして図形を描画、離して完成',
             lineProperties: '線の属性'
         },

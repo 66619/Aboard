@@ -72,6 +72,7 @@ window.translations = {
             circle: 'Circle',
             ellipse: 'Ellipse',
             arrow: 'Arrow',
+            doubleArrow: 'Double Arrow',
             hint: 'Press and drag to draw shape, release to finish',
             lineProperties: 'Line Properties'
         },

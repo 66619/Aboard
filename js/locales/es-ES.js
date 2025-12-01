@@ -69,6 +69,7 @@ window.translations = {
             circle: 'Círculo',
             ellipse: 'Elipse',
             arrow: 'Flecha',
+            doubleArrow: 'Doble flecha',
             hint: 'Presione y arrastre para dibujar, suelte para terminar',
             lineProperties: 'Propiedades de línea'
         },

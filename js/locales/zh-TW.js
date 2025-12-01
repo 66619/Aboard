@@ -72,6 +72,7 @@ window.translations = {
             circle: '圓形',
             ellipse: '橢圓',
             arrow: '箭頭',
+            doubleArrow: '雙箭頭',
             hint: '按住拖動繪製形狀，鬆開完成',
             lineProperties: '線條屬性'
         },

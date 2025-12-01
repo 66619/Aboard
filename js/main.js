@@ -1249,19 +1249,21 @@ class DrawingBoard {
         const isPortrait = windowHeight > windowWidth;
         const toolbar = document.getElementById('toolbar');
         
-        // On portrait orientation (typically phones), position toolbar on left side
+        // On portrait orientation (typically phones), position toolbar on right side
         if (isPortrait && toolbar && !toolbar.classList.contains('user-positioned')) {
-            // Apply left side positioning for portrait mode
+            // Apply right side positioning for portrait mode
             toolbar.classList.add('vertical');
-            toolbar.style.left = '20px';
-            toolbar.style.right = 'auto';
-            toolbar.style.bottom = '50%';
-            toolbar.style.transform = 'translateY(50%)';
+            toolbar.style.right = '20px';
+            toolbar.style.left = 'auto';
+            toolbar.style.top = '50%';
+            toolbar.style.bottom = 'auto';
+            toolbar.style.transform = 'translateY(-50%)';
         } else if (!isPortrait && toolbar && !toolbar.classList.contains('user-positioned')) {
             // For landscape mode, use bottom center positioning
             toolbar.classList.remove('vertical');
             toolbar.style.left = '50%';
             toolbar.style.right = 'auto';
+            toolbar.style.top = 'auto';
             toolbar.style.bottom = '20px';
             toolbar.style.transform = 'translateX(-50%)';
         }
@@ -1439,6 +1441,11 @@ class DrawingBoard {
             let snappedLeft = false;
             let snappedRight = false;
             
+            // Get current element dimensions (updated during drag)
+            const currentRect = this.draggedElement.getBoundingClientRect();
+            const currentWidth = currentRect.width;
+            const currentHeight = currentRect.height;
+            
             if (this.settingsManager.edgeSnapEnabled) {
                 // Check for left edge snap first
                 if (x < edgeSnapDistance) {
@@ -1448,7 +1455,7 @@ class DrawingBoard {
                     snappedLeft = true;
                 }
                 // Check for right edge snap
-                else if (x + this.draggedElementWidth > windowWidth - edgeSnapDistance) {
+                else if (x + currentWidth > windowWidth - edgeSnapDistance) {
                     // When vertical, need to recalculate width
                     if (isToolbar || isConfigArea || isTimeDisplayArea || isFeatureArea) {
                         // Temporarily add vertical class to get correct dimensions
@@ -1457,7 +1464,7 @@ class DrawingBoard {
                         this.draggedElement.classList.remove('vertical');
                         x = windowWidth - tempWidth - 10;
                     } else {
-                        x = windowWidth - this.draggedElementWidth - 10;
+                        x = windowWidth - currentWidth - 10;
                     }
                     snappedToEdge = true;
                     isVertical = true;
@@ -1469,8 +1476,8 @@ class DrawingBoard {
                     snappedToEdge = true;
                 }
                 // Snap to bottom
-                if (y + this.draggedElementHeight > windowHeight - edgeSnapDistance) {
-                    y = windowHeight - this.draggedElementHeight - 10;
+                if (y + currentHeight > windowHeight - edgeSnapDistance) {
+                    y = windowHeight - currentHeight - 10;
                     snappedToEdge = true;
                 }
             }
@@ -1483,13 +1490,21 @@ class DrawingBoard {
                     const newWidth = this.draggedElement.getBoundingClientRect().width;
                     x = windowWidth - newWidth - 10;
                 }
+                // Update height after dimension change for vertical layout
+                const newRect = this.draggedElement.getBoundingClientRect();
+                this.draggedElementHeight = newRect.height;
             } else {
                 this.draggedElement.classList.remove('vertical');
+                // Update dimensions when switching back to horizontal
+                const newRect = this.draggedElement.getBoundingClientRect();
+                this.draggedElementWidth = newRect.width;
+                this.draggedElementHeight = newRect.height;
             }
             
             // Constrain to viewport boundaries (prevent overflow)
-            x = Math.max(0, Math.min(x, windowWidth - this.draggedElement.getBoundingClientRect().width));
-            y = Math.max(0, Math.min(y, windowHeight - this.draggedElement.getBoundingClientRect().height));
+            const finalRect = this.draggedElement.getBoundingClientRect();
+            x = Math.max(0, Math.min(x, windowWidth - finalRect.width));
+            y = Math.max(0, Math.min(y, windowHeight - finalRect.height));
             
             this.draggedElement.style.left = `${x}px`;
             this.draggedElement.style.top = `${y}px`;
@@ -1581,7 +1596,8 @@ class DrawingBoard {
             }
         } else if (tool === 'more') {
             // Toggle feature-area for more button
-            if (isSameTool && featureArea.classList.contains('show')) {
+            const isFeatureAreaVisible = featureArea.classList.contains('show');
+            if (isFeatureAreaVisible) {
                 featureArea.classList.remove('show');
             } else {
                 featureArea.classList.add('show');

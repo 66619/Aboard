@@ -319,11 +319,20 @@ class ShapeDrawingManager {
             case 'line':
                 this.drawLineWithStyle(this.previewCtx, this.startPoint, this.endPoint);
                 break;
+            case 'arrow':
+                this.drawArrowLine(this.previewCtx, this.startPoint, this.endPoint, false);
+                break;
+            case 'doubleArrow':
+                this.drawArrowLine(this.previewCtx, this.startPoint, this.endPoint, true);
+                break;
             case 'rectangle':
                 this.drawRectangleWithStyle(this.previewCtx, this.startPoint, this.endPoint);
                 break;
             case 'circle':
                 this.drawCircleWithStyle(this.previewCtx, this.startPoint, this.endPoint);
+                break;
+            case 'ellipse':
+                this.drawEllipseWithStyle(this.previewCtx, this.startPoint, this.endPoint);
                 break;
         }
         
@@ -338,11 +347,20 @@ class ShapeDrawingManager {
             case 'line':
                 this.drawLineWithStyle(this.ctx, this.startCanvasPoint, this.endCanvasPoint);
                 break;
+            case 'arrow':
+                this.drawArrowLine(this.ctx, this.startCanvasPoint, this.endCanvasPoint, false);
+                break;
+            case 'doubleArrow':
+                this.drawArrowLine(this.ctx, this.startCanvasPoint, this.endCanvasPoint, true);
+                break;
             case 'rectangle':
                 this.drawRectangleWithStyle(this.ctx, this.startCanvasPoint, this.endCanvasPoint);
                 break;
             case 'circle':
                 this.drawCircleWithStyle(this.ctx, this.startCanvasPoint, this.endCanvasPoint);
+                break;
+            case 'ellipse':
+                this.drawEllipseWithStyle(this.ctx, this.startCanvasPoint, this.endCanvasPoint);
                 break;
         }
         
@@ -673,6 +691,99 @@ class ShapeDrawingManager {
                 width + offset * 2,
                 height + offset * 2
             );
+            ctx.stroke();
+        }
+    }
+    
+    /**
+     * Draw ellipse with various line styles
+     * Ellipse is drawn from center point outward to edge (defines radii)
+     */
+    drawEllipseWithStyle(ctx, center, edge) {
+        if (!center || !edge) return;
+        
+        // Calculate radii from center to edge point
+        const radiusX = Math.abs(edge.x - center.x);
+        const radiusY = Math.abs(edge.y - center.y);
+        
+        if (radiusX < 2 && radiusY < 2) return;
+        
+        switch(this.lineStyle) {
+            case 'wavy':
+                this.drawWavyEllipse(ctx, center, radiusX, radiusY);
+                break;
+            case 'double':
+                this.drawMultiEllipse(ctx, center, radiusX, radiusY, 2);
+                break;
+            case 'triple':
+                this.drawMultiEllipse(ctx, center, radiusX, radiusY, 3);
+                break;
+            case 'multi':
+                this.drawMultiEllipse(ctx, center, radiusX, radiusY, this.multiLineCount);
+                break;
+            default:
+                // Solid, dashed, dotted - use standard ellipse
+                ctx.beginPath();
+                ctx.ellipse(center.x, center.y, radiusX, radiusY, 0, 0, Math.PI * 2);
+                ctx.stroke();
+                break;
+        }
+    }
+    
+    /**
+     * Draw wavy ellipse using bezier curves
+     */
+    drawWavyEllipse(ctx, center, radiusX, radiusY) {
+        const waveAmplitude = this.drawingEngine.penSize * 1.2;
+        const avgRadius = (radiusX + radiusY) / 2;
+        const numWaves = Math.max(12, Math.floor(avgRadius * Math.PI * 2 / this.waveDensity));
+        
+        ctx.beginPath();
+        
+        for (let i = 0; i <= numWaves; i++) {
+            const angle = (i / numWaves) * Math.PI * 2;
+            
+            // Alternate wave amplitude
+            const waveOffset = (i % 2 === 0) ? waveAmplitude : -waveAmplitude;
+            const currentRadiusX = radiusX + waveOffset;
+            const currentRadiusY = radiusY + waveOffset;
+            
+            const x = center.x + Math.cos(angle) * currentRadiusX;
+            const y = center.y + Math.sin(angle) * currentRadiusY;
+            
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                // Calculate control point
+                const midAngle = (angle + ((i - 1) / numWaves) * Math.PI * 2) / 2;
+                const prevWaveOffset = ((i - 1) % 2 === 0) ? waveAmplitude : -waveAmplitude;
+                const midRadiusX = radiusX + (waveOffset + prevWaveOffset) / 2;
+                const midRadiusY = radiusY + (waveOffset + prevWaveOffset) / 2;
+                const cpX = center.x + Math.cos(midAngle) * midRadiusX;
+                const cpY = center.y + Math.sin(midAngle) * midRadiusY;
+                
+                ctx.quadraticCurveTo(cpX, cpY, x, y);
+            }
+        }
+        
+        ctx.closePath();
+        ctx.stroke();
+    }
+    
+    /**
+     * Draw multiple concentric ellipses (for double/triple line style)
+     */
+    drawMultiEllipse(ctx, center, radiusX, radiusY, count) {
+        const totalSpacing = (count - 1) * this.multiLineSpacing;
+        const startOffset = -totalSpacing / 2;
+        
+        for (let i = 0; i < count; i++) {
+            const offset = startOffset + i * this.multiLineSpacing;
+            const ellipseRadiusX = Math.max(1, radiusX + offset);
+            const ellipseRadiusY = Math.max(1, radiusY + offset);
+            
+            ctx.beginPath();
+            ctx.ellipse(center.x, center.y, ellipseRadiusX, ellipseRadiusY, 0, 0, Math.PI * 2);
             ctx.stroke();
         }
     }

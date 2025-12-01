@@ -72,6 +72,7 @@ window.translations = {
             circle: '원',
             ellipse: '타원',
             arrow: '화살표',
+            doubleArrow: '양방향 화살표',
             hint: '눌러서 드래그하여 도형 그리기, 놓으면 완성',
             lineProperties: '선 속성'
         },

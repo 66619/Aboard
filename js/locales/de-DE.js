@@ -72,6 +72,7 @@ window.translations = {
             circle: 'Kreis',
             ellipse: 'Ellipse',
             arrow: 'Pfeil',
+            doubleArrow: 'Doppelpfeil',
             hint: 'Drücken und ziehen zum Zeichnen, loslassen zum Beenden',
             lineProperties: 'Linieneigenschaften'
         },

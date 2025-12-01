@@ -24,16 +24,15 @@ class LineStyleModal {
     }
     
     // Helper method to check if arrow drawing should be used
+    // Note: Arrow types are now handled as separate shape types (arrow, doubleArrow)
+    // This method is kept for backwards compatibility but always returns false
     shouldDrawArrow() {
-        return this.currentMode === 'shape' && this.arrowType && this.arrowType !== 'none';
+        return false;
     }
     
     // Helper method to get the final line style (handles arrow type conversion)
+    // Note: Arrow types are now handled as separate shape types
     getFinalLineStyle(lineStyle) {
-        if (this.shouldDrawArrow() && 
-            (lineStyle === 'solid' || lineStyle === 'dashed' || lineStyle === 'dotted')) {
-            return this.arrowType;
-        }
         return lineStyle;
     }
     
@@ -306,25 +305,6 @@ class LineStyleModal {
         document.getElementById('modal-line-spacing-slider').value = lineSpacing;
         document.getElementById('modal-line-spacing-value').textContent = lineSpacing;
         
-        // Load arrow type for shape mode
-        if (this.currentMode === 'shape') {
-            // Check if line style is arrow or doubleArrow
-            if (lineStyle === 'arrow' || lineStyle === 'doubleArrow') {
-                this.arrowType = lineStyle;
-                // Reset line style to solid for display
-                lineStyle = 'solid';
-                document.querySelectorAll('#modal-line-style-grid .line-style-type-btn').forEach(btn => {
-                    btn.classList.toggle('active', btn.dataset.modalLineStyle === 'solid');
-                });
-            } else {
-                this.arrowType = 'none';
-            }
-            // Update arrow buttons
-            document.querySelectorAll('.arrow-type-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.arrowType === this.arrowType);
-            });
-        }
-        
         // Update visibility
         this.updateSettingsVisibility(lineStyle);
     }
@@ -341,23 +321,13 @@ class LineStyleModal {
         waveSetting.style.display = 'none';
         countSetting.style.display = 'none';
         spacingSetting.style.display = 'none';
-        arrowSetting.style.display = 'none';
+        if (arrowSetting) arrowSetting.style.display = 'none'; // Arrow types are now shape types
         
         // Show relevant settings
         switch (lineStyle) {
             case 'dashed':
             case 'dotted':
                 dashSetting.style.display = 'block';
-                // Show arrow type for shape mode with solid/dashed/dotted
-                if (this.currentMode === 'shape') {
-                    arrowSetting.style.display = 'block';
-                }
-                break;
-            case 'solid':
-                // Show arrow type for shape mode with solid/dashed/dotted
-                if (this.currentMode === 'shape') {
-                    arrowSetting.style.display = 'block';
-                }
                 break;
             case 'wavy':
                 waveSetting.style.display = 'block';
@@ -420,40 +390,27 @@ class LineStyleModal {
         
         switch (lineStyle) {
             case 'solid':
-                // Check if arrow type is set for shape mode
-                if (this.shouldDrawArrow()) {
-                    this.drawArrowPreview(ctx, startX, centerY, endX, centerY, penSize, this.arrowType === 'doubleArrow');
-                } else {
-                    ctx.beginPath();
-                    ctx.moveTo(startX, centerY);
-                    ctx.lineTo(endX, centerY);
-                    ctx.stroke();
-                }
+                ctx.beginPath();
+                ctx.moveTo(startX, centerY);
+                ctx.lineTo(endX, centerY);
+                ctx.stroke();
                 break;
                 
             case 'dashed':
                 ctx.setLineDash([dashDensity, dashDensity / 2]);
-                if (this.shouldDrawArrow()) {
-                    this.drawArrowPreview(ctx, startX, centerY, endX, centerY, penSize, this.arrowType === 'doubleArrow');
-                } else {
-                    ctx.beginPath();
-                    ctx.moveTo(startX, centerY);
-                    ctx.lineTo(endX, centerY);
-                    ctx.stroke();
-                }
+                ctx.beginPath();
+                ctx.moveTo(startX, centerY);
+                ctx.lineTo(endX, centerY);
+                ctx.stroke();
                 ctx.setLineDash([]);
                 break;
                 
             case 'dotted':
                 ctx.setLineDash([3, dashDensity / 2]);
-                if (this.shouldDrawArrow()) {
-                    this.drawArrowPreview(ctx, startX, centerY, endX, centerY, penSize, this.arrowType === 'doubleArrow');
-                } else {
-                    ctx.beginPath();
-                    ctx.moveTo(startX, centerY);
-                    ctx.lineTo(endX, centerY);
-                    ctx.stroke();
-                }
+                ctx.beginPath();
+                ctx.moveTo(startX, centerY);
+                ctx.lineTo(endX, centerY);
+                ctx.stroke();
                 ctx.setLineDash([]);
                 break;
                 
@@ -463,14 +420,6 @@ class LineStyleModal {
                 
             case 'multi':
                 this.drawMultiLinePreview(ctx, startX, centerY, endX, centerY, lineCount, lineSpacing);
-                break;
-                
-            case 'arrow':
-                this.drawArrowPreview(ctx, startX, centerY, endX, centerY, penSize, false);
-                break;
-                
-            case 'doubleArrow':
-                this.drawArrowPreview(ctx, startX, centerY, endX, centerY, penSize, true);
                 break;
         }
         
