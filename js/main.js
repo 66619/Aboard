@@ -1530,6 +1530,7 @@ class DrawingBoard {
             let y = clientY - this.dragOffset.y;
             
             const edgeSnapDistance = 30;
+            const edgeSnapHysteresis = 60; // Wider zone to prevent flicker when already snapped
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
             const isToolbar = this.draggedElement.id === 'toolbar';
@@ -1542,21 +1543,27 @@ class DrawingBoard {
             let snappedLeft = false;
             let snappedRight = false;
             
+            // Check if currently in vertical mode
+            const currentlyVertical = this.draggedElement.classList.contains('vertical');
+            
             // Get current element dimensions (updated during drag)
             const currentRect = this.draggedElement.getBoundingClientRect();
             const currentWidth = currentRect.width;
             const currentHeight = currentRect.height;
             
             if (this.settingsManager.edgeSnapEnabled) {
+                // Use hysteresis: easier to snap than to unsnap (prevents flicker)
+                const effectiveSnapDistance = currentlyVertical ? edgeSnapHysteresis : edgeSnapDistance;
+                
                 // Check for left edge snap first
-                if (x < edgeSnapDistance) {
+                if (x < effectiveSnapDistance) {
                     x = 10;
                     snappedToEdge = true;
                     isVertical = true;
                     snappedLeft = true;
                 }
                 // Check for right edge snap
-                else if (x + currentWidth > windowWidth - edgeSnapDistance) {
+                else if (x + currentWidth > windowWidth - effectiveSnapDistance) {
                     // When vertical, need to recalculate width
                     if (isToolbar || isConfigArea || isTimeDisplayArea || isFeatureArea) {
                         // Temporarily add vertical class to get correct dimensions

@@ -550,6 +550,14 @@ window.translations = {
         noShowAgain: '不再弹出'
     },
 
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: '確認清空',
+        message: '確定要清空當前畫布嗎？此操作無法撤銷，其他畫布不受影響。',
+        confirm: '確定',
+        cancel: '取消'
+    },
+
     // Color names
     colors: {
         black: '黑色',

@@ -357,7 +357,8 @@ body {
 .color-btn.active {
     border-color: var(--theme-color);
     transform: scale(1.15);
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    /* Use box-shadow to create visible border for light colors (yellow, white) */
+    box-shadow: 0 0 0 2px var(--theme-color), 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Sliders */

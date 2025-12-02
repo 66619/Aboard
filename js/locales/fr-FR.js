@@ -496,6 +496,14 @@ Profitez de votre travail créatif !`,
         noShowAgain: 'Ne plus afficher'
     },
 
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: 'Confirmer l\'effacement',
+        message: 'Êtes-vous sûr de vouloir effacer la toile actuelle ? Cette action ne peut pas être annulée. Les autres toiles ne seront pas affectées.',
+        confirm: 'Confirmer',
+        cancel: 'Annuler'
+    },
+
     // Color names
     colors: {
         black: 'Noir',

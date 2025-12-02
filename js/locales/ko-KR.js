@@ -533,6 +533,14 @@ window.translations = {
         noShowAgain: '다시 표시하지 않음'
     },
 
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: '지우기 확인',
+        message: '현재 캔버스를 지우시겠습니까? 이 작업은 취소할 수 없습니다. 다른 캔버스는 영향을 받지 않습니다.',
+        confirm: '확인',
+        cancel: '취소'
+    },
+
     // Color names
     colors: {
         black: '검정',

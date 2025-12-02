@@ -533,6 +533,14 @@ window.translations = {
         noShowAgain: '再度表示しない'
     },
 
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: 'クリアの確認',
+        message: '現在のキャンバスをクリアしてもよろしいですか？この操作は元に戻せません。他のキャンバスには影響しません。',
+        confirm: '確認',
+        cancel: 'キャンセル'
+    },
+
     // Color names
     colors: {
         black: '黒',

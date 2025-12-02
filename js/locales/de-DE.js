@@ -560,6 +560,14 @@ Viel Spaß bei Ihrer kreativen Arbeit!`,
         noShowAgain: 'Nicht mehr anzeigen'
     },
 
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: 'Löschen bestätigen',
+        message: 'Sind Sie sicher, dass Sie die aktuelle Leinwand löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden. Andere Leinwände sind nicht betroffen.',
+        confirm: 'Bestätigen',
+        cancel: 'Abbrechen'
+    },
+
     // Color names
     colors: {
         black: 'Schwarz',

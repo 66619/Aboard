@@ -496,6 +496,14 @@ Consejos de uso:
         noShowAgain: 'No mostrar de nuevo'
     },
 
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: 'Confirmar borrado',
+        message: '¿Está seguro de que desea borrar el lienzo actual? Esta acción no se puede deshacer. Otros lienzos no se verán afectados.',
+        confirm: 'Confirmar',
+        cancel: 'Cancelar'
+    },
+
     // Color names
     colors: {
         black: 'Negro',

@@ -550,6 +550,14 @@ Enjoy your creative work!`,
         noShowAgain: 'Don\'t show again'
     },
 
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: 'Confirm Clear',
+        message: 'Are you sure you want to clear the current canvas? This action cannot be undone. Other canvases will not be affected.',
+        confirm: 'Confirm',
+        cancel: 'Cancel'
+    },
+
     // Color names
     colors: {
         black: 'Black',
