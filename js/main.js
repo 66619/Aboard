@@ -501,18 +501,41 @@ class DrawingBoard {
                 this.drawingEngine.setColor(e.target.dataset.color);
                 document.querySelectorAll('.color-btn[data-color]').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
+                // Sync shape color picker value
+                const shapeColorPicker = document.getElementById('shape-custom-color-picker');
+                if (shapeColorPicker) {
+                    shapeColorPicker.value = e.target.dataset.color;
+                }
             });
         });
         
         const customColorPicker = document.getElementById('custom-color-picker');
+        const customColorPickerBtn = document.querySelector('label[for="custom-color-picker"]');
         customColorPicker.addEventListener('input', (e) => {
             this.drawingEngine.setColor(e.target.value);
             document.querySelectorAll('.color-btn[data-color]').forEach(b => b.classList.remove('active'));
+            // Mark color picker button as active
+            if (customColorPickerBtn) {
+                customColorPickerBtn.classList.add('active');
+            }
             // Sync shape color picker
             const shapeColorPicker = document.getElementById('shape-custom-color-picker');
             if (shapeColorPicker) {
                 shapeColorPicker.value = e.target.value;
             }
+        });
+        // Deactivate color picker when a preset is selected
+        document.querySelectorAll('.color-btn[data-color]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (customColorPickerBtn) {
+                    customColorPickerBtn.classList.remove('active');
+                }
+                // Also deactivate shape color picker button
+                const shapeCustomColorPickerBtn = document.querySelector('label[for="shape-custom-color-picker"]');
+                if (shapeCustomColorPickerBtn) {
+                    shapeCustomColorPickerBtn.classList.remove('active');
+                }
+            });
         });
         
         // Background color picker
@@ -529,13 +552,26 @@ class DrawingBoard {
         });
         
         const customBgColorPicker = document.getElementById('custom-bg-color-picker');
+        const customBgColorPickerBtn = document.querySelector('label[for="custom-bg-color-picker"]');
         customBgColorPicker.addEventListener('input', (e) => {
             this.backgroundManager.setBackgroundColor(e.target.value);
             document.querySelectorAll('.color-btn[data-bg-color]').forEach(b => b.classList.remove('active'));
+            // Mark color picker button as active
+            if (customBgColorPickerBtn) {
+                customBgColorPickerBtn.classList.add('active');
+            }
             // Save page background in paginated mode
             if (!this.settingsManager.infiniteCanvas) {
                 this.savePageBackground(this.currentPage);
             }
+        });
+        // Deactivate color picker when a preset is selected
+        document.querySelectorAll('.color-btn[data-bg-color]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (customBgColorPickerBtn) {
+                    customBgColorPickerBtn.classList.remove('active');
+                }
+            });
         });
         
         // Background pattern buttons
@@ -668,14 +704,23 @@ class DrawingBoard {
         
         // Shape custom color picker - syncs with pen color picker
         const shapeCustomColorPicker = document.getElementById('shape-custom-color-picker');
+        const shapeCustomColorPickerBtn = document.querySelector('label[for="shape-custom-color-picker"]');
         if (shapeCustomColorPicker) {
             shapeCustomColorPicker.addEventListener('input', (e) => {
                 this.drawingEngine.setColor(e.target.value);
                 document.querySelectorAll('.color-btn[data-color]').forEach(b => b.classList.remove('active'));
-                // Sync pen color picker
+                // Mark color picker button as active
+                if (shapeCustomColorPickerBtn) {
+                    shapeCustomColorPickerBtn.classList.add('active');
+                }
+                // Sync pen color picker value and active state
                 const penColorPicker = document.getElementById('custom-color-picker');
+                const penColorPickerBtn = document.querySelector('label[for="custom-color-picker"]');
                 if (penColorPicker) {
                     penColorPicker.value = e.target.value;
+                }
+                if (penColorPickerBtn) {
+                    penColorPickerBtn.classList.add('active');
                 }
             });
         }
@@ -1010,9 +1055,22 @@ class DrawingBoard {
         });
         
         const customThemeColorPicker = document.getElementById('custom-theme-color-picker');
+        const customThemeColorPickerBtn = document.querySelector('label[for="custom-theme-color-picker"]');
         customThemeColorPicker.addEventListener('input', (e) => {
             this.settingsManager.setThemeColor(e.target.value);
             document.querySelectorAll('.color-btn[data-theme-color]').forEach(b => b.classList.remove('active'));
+            // Mark color picker button as active
+            if (customThemeColorPickerBtn) {
+                customThemeColorPickerBtn.classList.add('active');
+            }
+        });
+        // Deactivate color picker when a preset is selected
+        document.querySelectorAll('.color-btn[data-theme-color]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (customThemeColorPickerBtn) {
+                    customThemeColorPickerBtn.classList.remove('active');
+                }
+            });
         });
         
         // Pattern preferences
@@ -1109,13 +1167,23 @@ class DrawingBoard {
                 this.timeDisplayManager.setColor(e.target.dataset.timeColor);
                 document.querySelectorAll('.color-btn[data-time-color]').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
+                // Deactivate color picker button
+                const customTimeColorPickerBtn = document.querySelector('label[for="custom-time-color-picker"]');
+                if (customTimeColorPickerBtn) {
+                    customTimeColorPickerBtn.classList.remove('active');
+                }
             });
         });
         
         const customTimeColorPicker = document.getElementById('custom-time-color-picker');
+        const customTimeColorPickerBtn = document.querySelector('label[for="custom-time-color-picker"]');
         customTimeColorPicker.addEventListener('input', (e) => {
             this.timeDisplayManager.setColor(e.target.value);
             document.querySelectorAll('.color-btn[data-time-color]').forEach(b => b.classList.remove('active'));
+            // Mark color picker button as active
+            if (customTimeColorPickerBtn) {
+                customTimeColorPickerBtn.classList.add('active');
+            }
         });
         
         // Time background color buttons
@@ -1124,13 +1192,23 @@ class DrawingBoard {
                 this.timeDisplayManager.setBgColor(e.target.dataset.timeBgColor);
                 document.querySelectorAll('.color-btn[data-time-bg-color]').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
+                // Deactivate color picker button
+                const customTimeBgColorPickerBtn = document.querySelector('label[for="custom-time-bg-color-picker"]');
+                if (customTimeBgColorPickerBtn) {
+                    customTimeBgColorPickerBtn.classList.remove('active');
+                }
             });
         });
         
         const customTimeBgColorPicker = document.getElementById('custom-time-bg-color-picker');
+        const customTimeBgColorPickerBtn = document.querySelector('label[for="custom-time-bg-color-picker"]');
         customTimeBgColorPicker.addEventListener('input', (e) => {
             this.timeDisplayManager.setBgColor(e.target.value);
             document.querySelectorAll('.color-btn[data-time-bg-color]').forEach(b => b.classList.remove('active'));
+            // Mark color picker button as active
+            if (customTimeBgColorPickerBtn) {
+                customTimeBgColorPickerBtn.classList.add('active');
+            }
         });
         
         // Time fullscreen mode buttons

@@ -315,6 +315,12 @@ body {
     transform: scale(1.05);
 }
 
+.color-picker-icon-btn.active {
+    border-color: var(--theme-color);
+    transform: scale(1.15);
+    background-color: #e8f4ff;
+}
+
 .color-picker-icon-btn svg {
     width: 24px;  /* Larger size for better visibility */
     height: 24px;
