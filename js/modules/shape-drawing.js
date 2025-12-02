@@ -180,9 +180,11 @@ class ShapeDrawingManager {
     
     startDrawing(e) {
         this.isDrawing = true;
-        // Use canvas coordinates for both preview and final drawing (WYSIWYG)
-        this.startPoint = this.getCanvasPosition(e);
+        // Store both screen coordinates (for preview) and canvas coordinates (for final drawing)
+        this.startPoint = this.getCanvasPosition(e);  // Canvas coords for final draw
+        this.startScreenPoint = this.getPosition(e);   // Screen coords for preview
         this.endPoint = this.startPoint;
+        this.endScreenPoint = this.startScreenPoint;
         
         // Sync and show preview canvas
         this.syncPreviewCanvas();
@@ -192,7 +194,8 @@ class ShapeDrawingManager {
     draw(e) {
         if (!this.isDrawing || !this.startPoint) return;
         
-        this.endPoint = this.getCanvasPosition(e);
+        this.endPoint = this.getCanvasPosition(e);     // Canvas coords for final draw
+        this.endScreenPoint = this.getPosition(e);      // Screen coords for preview
         
         // Use requestAnimationFrame to throttle preview updates for better performance
         // This prevents excessive redraws on older devices during fast mouse movements
@@ -231,6 +234,8 @@ class ShapeDrawingManager {
         this.isDrawing = false;
         this.startPoint = null;
         this.endPoint = null;
+        this.startScreenPoint = null;
+        this.endScreenPoint = null;
         
         // Hide preview canvas
         this.clearPreview();
@@ -311,24 +316,25 @@ class ShapeDrawingManager {
     drawShapePreview() {
         this.setupDrawingContext(this.previewCtx, true);
         
+        // Use screen coordinates for preview (matches what user sees on screen)
         switch(this.currentShape) {
             case 'line':
-                this.drawLineWithStyle(this.previewCtx, this.startPoint, this.endPoint);
+                this.drawLineWithStyle(this.previewCtx, this.startScreenPoint, this.endScreenPoint);
                 break;
             case 'arrow':
-                this.drawArrowLine(this.previewCtx, this.startPoint, this.endPoint, false);
+                this.drawArrowLine(this.previewCtx, this.startScreenPoint, this.endScreenPoint, false);
                 break;
             case 'doubleArrow':
-                this.drawArrowLine(this.previewCtx, this.startPoint, this.endPoint, true);
+                this.drawArrowLine(this.previewCtx, this.startScreenPoint, this.endScreenPoint, true);
                 break;
             case 'rectangle':
-                this.drawRectangleWithStyle(this.previewCtx, this.startPoint, this.endPoint);
+                this.drawRectangleWithStyle(this.previewCtx, this.startScreenPoint, this.endScreenPoint);
                 break;
             case 'circle':
-                this.drawCircleWithStyle(this.previewCtx, this.startPoint, this.endPoint);
+                this.drawCircleWithStyle(this.previewCtx, this.startScreenPoint, this.endScreenPoint);
                 break;
             case 'ellipse':
-                this.drawEllipseWithStyle(this.previewCtx, this.startPoint, this.endPoint);
+                this.drawEllipseWithStyle(this.previewCtx, this.startScreenPoint, this.endScreenPoint);
                 break;
         }
         

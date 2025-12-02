@@ -74,7 +74,6 @@ window.translations = {
             arrow: '箭头',
             doubleArrow: '双箭头',
             arrowSize: '箭头大小',
-            arrowSizeLabel: '箭头',
             hint: '按住拖动绘制形状，松开完成',
             lineProperties: '线条属性'
         },

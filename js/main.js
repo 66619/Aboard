@@ -656,7 +656,7 @@ class DrawingBoard {
         // Arrow size slider (independent control)
         const arrowSizeSlider = document.getElementById('arrow-size-slider');
         const arrowSizeValue = document.getElementById('arrow-size-value');
-        if (arrowSizeSlider) {
+        if (arrowSizeSlider && arrowSizeValue) {
             arrowSizeSlider.addEventListener('input', (e) => {
                 this.shapeDrawingManager.setArrowSize(parseInt(e.target.value));
                 arrowSizeValue.textContent = e.target.value;
