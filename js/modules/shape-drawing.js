@@ -289,6 +289,14 @@ class ShapeDrawingManager {
                 break;
         }
         
+        // For preview canvas: the context has setTransform(dpr, 0, 0, dpr, 0, 0) applied,
+        // which scales all drawing operations including lineWidth. To match the final
+        // drawing (which doesn't have this transform), we need to compensate by dividing
+        // lineWidth by DPR when drawing on the preview canvas.
+        if (isPreview) {
+            lineWidth = lineWidth / this.cachedDpr;
+        }
+        
         ctx.lineWidth = lineWidth;
         
         // Apply line style

@@ -32,7 +32,7 @@ class DrawingEngine {
         this.multiLinePendingPoint = null; // Accumulate short segments
         
         // Multi-line drawing constants
-        this.MULTI_LINE_MIN_DISTANCE = 2.0; // Minimum distance threshold for multi-line drawing (increased to prevent short zigzags at slow speeds)
+        this.MULTI_LINE_MIN_DISTANCE = 1.2; // Minimum distance threshold for multi-line drawing (balanced for smooth curves at slow speeds)
         this.MULTI_LINE_BLEND_MIN = 0.7; // Minimum blend factor for perpendicular smoothing
         this.MULTI_LINE_BLEND_MAX = 0.95; // Maximum blend factor
         this.MULTI_LINE_BLEND_SCALE = 50; // Scale factor for blend calculation
