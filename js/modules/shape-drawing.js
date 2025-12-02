@@ -183,8 +183,8 @@ class ShapeDrawingManager {
         // Store both screen coordinates (for preview) and canvas coordinates (for final drawing)
         this.startPoint = this.getCanvasPosition(e);  // Canvas coords for final draw
         this.startScreenPoint = this.getPosition(e);   // Screen coords for preview
-        this.endPoint = this.startPoint;
-        this.endScreenPoint = this.startScreenPoint;
+        this.endPoint = null;
+        this.endScreenPoint = null;
         
         // Sync and show preview canvas
         this.syncPreviewCanvas();
@@ -203,9 +203,11 @@ class ShapeDrawingManager {
             this.pendingDraw = true;
             this.rafId = requestAnimationFrame(() => {
                 this.pendingDraw = false;
-                // Clear preview and draw current shape preview
-                this.clearPreview();
-                this.drawShapePreview();
+                // Only draw preview if we have both start and end points
+                if (this.startScreenPoint && this.endScreenPoint) {
+                    this.clearPreview();
+                    this.drawShapePreview();
+                }
             });
         }
     }
