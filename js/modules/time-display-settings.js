@@ -295,11 +295,12 @@ class TimeDisplaySettingsModal {
             this.timeDisplayManager.timeColor = customTimeColorPicker.dataset.selectedColor;
         }
         
-        // For background color, always use the color picker value
+        // For background color, always use the color picker value with fallback
         const customBgColorPicker = document.getElementById('td-custom-bg-color-picker');
         
         if (customBgColorPicker) {
-            this.timeDisplayManager.bgColor = customBgColorPicker.value;
+            // Use dataset.selectedColor if available, otherwise use the picker's value
+            this.timeDisplayManager.bgColor = customBgColorPicker.dataset.selectedColor || customBgColorPicker.value || '#ffffff';
         }
         
         // Get font size
