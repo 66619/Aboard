@@ -72,6 +72,8 @@ window.translations = {
             circle: '원',
             ellipse: '타원',
             arrow: '화살표',
+            doubleArrow: '양방향 화살표',
+            arrowSize: '화살표 크기',
             hint: '눌러서 드래그하여 도형 그리기, 놓으면 완성',
             lineProperties: '선 속성'
         },
@@ -103,6 +105,10 @@ window.translations = {
             double: '이중선',
             triple: '삼중선',
             multiLine: '다중선',
+            arrow: '화살표',
+            doubleArrow: '양방향 화살표',
+            noArrow: '화살표 없음',
+            arrowType: '화살표 유형',
             dashDensity: '파선 밀도',
             waveDensity: '물결 밀도',
             lineSpacing: '선 간격',
@@ -122,7 +128,8 @@ window.translations = {
         options: '시간 표시 옵션',
         showDate: '날짜 표시',
         showTime: '시간 표시',
-        settings: '설정'
+        settings: '설정',
+        fullscreenDisplay: '전체 화면 표시'
     },
 
     // Background
@@ -524,6 +531,14 @@ window.translations = {
 창의적인 작업을 즐기세요!`,
         confirm: '확인',
         noShowAgain: '다시 표시하지 않음'
+    },
+
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: '지우기 확인',
+        message: '현재 캔버스를 지우시겠습니까? 이 작업은 취소할 수 없습니다. 다른 캔버스는 영향을 받지 않습니다.',
+        confirm: '확인',
+        cancel: '취소'
     },
 
     // Color names

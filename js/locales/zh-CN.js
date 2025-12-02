@@ -72,6 +72,8 @@ window.translations = {
             circle: '圆形',
             ellipse: '椭圆',
             arrow: '箭头',
+            doubleArrow: '双箭头',
+            arrowSize: '箭头大小',
             hint: '按住拖动绘制形状，松开完成',
             lineProperties: '线条属性'
         },
@@ -103,6 +105,10 @@ window.translations = {
             double: '双线',
             triple: '三线',
             multiLine: '多线',
+            arrow: '箭头',
+            doubleArrow: '双箭头',
+            noArrow: '无箭头',
+            arrowType: '箭头类型',
             dashDensity: '虚线密度',
             waveDensity: '波浪密度',
             lineSpacing: '线条间距',
@@ -419,6 +425,7 @@ window.translations = {
         showDate: '显示日期',
         showTime: '显示时间',
         settings: '设置',
+        fullscreenDisplay: '全屏显示',
         displayOptions: '显示选项',
         dateAndTime: '日期和时间',
         dateOnly: '仅日期',
@@ -541,6 +548,14 @@ window.translations = {
 祝您使用愉快！`,
         confirm: '确定',
         noShowAgain: '不再弹出'
+    },
+
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: '确认清空',
+        message: '确定要清空当前画布吗？此操作无法撤销，其他画布不受影响。',
+        confirm: '确定',
+        cancel: '取消'
     },
 
     // Color names

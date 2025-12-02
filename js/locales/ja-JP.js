@@ -72,6 +72,8 @@ window.translations = {
             circle: '円',
             ellipse: '楕円',
             arrow: '矢印',
+            doubleArrow: '双方向矢印',
+            arrowSize: '矢印のサイズ',
             hint: 'ドラッグして図形を描画、離して完成',
             lineProperties: '線の属性'
         },
@@ -103,6 +105,10 @@ window.translations = {
             double: '二重線',
             triple: '三重線',
             multiLine: '多重線',
+            arrow: '矢印',
+            doubleArrow: '双方向矢印',
+            noArrow: '矢印なし',
+            arrowType: '矢印の種類',
             dashDensity: '破線の密度',
             waveDensity: '波の密度',
             lineSpacing: '線の間隔',
@@ -122,7 +128,8 @@ window.translations = {
         options: '時刻表示オプション',
         showDate: '日付を表示',
         showTime: '時刻を表示',
-        settings: '設定'
+        settings: '設定',
+        fullscreenDisplay: 'フルスクリーン表示'
     },
 
     // Background
@@ -524,6 +531,14 @@ window.translations = {
 クリエイティブな作業をお楽しみください！`,
         confirm: 'OK',
         noShowAgain: '再度表示しない'
+    },
+
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: 'クリアの確認',
+        message: '現在のキャンバスをクリアしてもよろしいですか？この操作は元に戻せません。他のキャンバスには影響しません。',
+        confirm: '確認',
+        cancel: 'キャンセル'
     },
 
     // Color names

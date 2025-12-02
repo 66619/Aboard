@@ -72,6 +72,8 @@ window.translations = {
             circle: '圓形',
             ellipse: '橢圓',
             arrow: '箭頭',
+            doubleArrow: '雙箭頭',
+            arrowSize: '箭頭大小',
             hint: '按住拖動繪製形狀，鬆開完成',
             lineProperties: '線條屬性'
         },
@@ -103,6 +105,10 @@ window.translations = {
             double: '雙線',
             triple: '三線',
             multiLine: '多線',
+            arrow: '箭頭',
+            doubleArrow: '雙箭頭',
+            noArrow: '無箭頭',
+            arrowType: '箭頭類型',
             dashDensity: '虛線密度',
             waveDensity: '波浪密度',
             lineSpacing: '線條間距',
@@ -122,7 +128,8 @@ window.translations = {
         options: '時間顯示選項',
         showDate: '顯示日期',
         showTime: '顯示時間',
-        settings: '設定'
+        settings: '設定',
+        fullscreenDisplay: '全螢幕顯示'
     },
 
     // Background
@@ -541,6 +548,14 @@ window.translations = {
 祝您使用愉快！`,
         confirm: '确定',
         noShowAgain: '不再弹出'
+    },
+
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: '確認清空',
+        message: '確定要清空當前畫布嗎？此操作無法撤銷，其他畫布不受影響。',
+        confirm: '確定',
+        cancel: '取消'
     },
 
     // Color names

@@ -72,6 +72,8 @@ window.translations = {
             circle: 'Circle',
             ellipse: 'Ellipse',
             arrow: 'Arrow',
+            doubleArrow: 'Double Arrow',
+            arrowSize: 'Arrow Size',
             hint: 'Press and drag to draw shape, release to finish',
             lineProperties: 'Line Properties'
         },
@@ -103,6 +105,10 @@ window.translations = {
             double: 'Double',
             triple: 'Triple',
             multiLine: 'Multi-line',
+            arrow: 'Arrow',
+            doubleArrow: 'Double Arrow',
+            noArrow: 'None',
+            arrowType: 'Arrow Type',
             dashDensity: 'Dash Density',
             waveDensity: 'Wave Density',
             lineSpacing: 'Line Spacing',
@@ -419,6 +425,7 @@ window.translations = {
         showDate: 'Show Date',
         showTime: 'Show Time',
         settings: 'Settings',
+        fullscreenDisplay: 'Fullscreen',
         displayOptions: 'Display Options',
         dateAndTime: 'Date and Time',
         dateOnly: 'Date Only',
@@ -541,6 +548,14 @@ Usage Tips:
 Enjoy your creative work!`,
         confirm: 'OK',
         noShowAgain: 'Don\'t show again'
+    },
+
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: 'Confirm Clear',
+        message: 'Are you sure you want to clear the current canvas? This action cannot be undone. Other canvases will not be affected.',
+        confirm: 'Confirm',
+        cancel: 'Cancel'
     },
 
     // Color names

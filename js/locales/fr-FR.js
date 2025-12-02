@@ -69,6 +69,8 @@ window.translations = {
             circle: 'Cercle',
             ellipse: 'Ellipse',
             arrow: 'Flèche',
+            doubleArrow: 'Double flèche',
+            arrowSize: 'Taille de flèche',
             hint: 'Appuyez et glissez pour dessiner, relâchez pour terminer',
             lineProperties: 'Propriétés de ligne'
         },
@@ -98,6 +100,10 @@ window.translations = {
             double: 'Double',
             triple: 'Triple',
             multiLine: 'Multi-lignes',
+            arrow: 'Flèche',
+            doubleArrow: 'Double flèche',
+            noArrow: 'Sans flèche',
+            arrowType: 'Type de flèche',
             dashDensity: 'Densité des tirets',
             waveDensity: 'Densité des ondes',
             lineSpacing: 'Espacement des lignes',
@@ -117,7 +123,8 @@ window.translations = {
         options: 'Options d\'affichage de l\'heure',
         showDate: 'Afficher la date',
         showTime: 'Afficher l\'heure',
-        settings: 'Paramètres'
+        settings: 'Paramètres',
+        fullscreenDisplay: 'Plein écran'
     },
 
     // Background
@@ -487,6 +494,14 @@ Conseils d'utilisation :
 Profitez de votre travail créatif !`,
         confirm: 'OK',
         noShowAgain: 'Ne plus afficher'
+    },
+
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: 'Confirmer l\'effacement',
+        message: 'Êtes-vous sûr de vouloir effacer la toile actuelle ? Cette action ne peut pas être annulée. Les autres toiles ne seront pas affectées.',
+        confirm: 'Confirmer',
+        cancel: 'Annuler'
     },
 
     // Color names

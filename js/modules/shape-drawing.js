@@ -16,15 +16,32 @@ class ShapeDrawingManager {
         this.endPoint = null;
         
         // Line style settings
-        this.lineStyle = 'solid'; // solid, dashed, dotted, wavy, double, triple
+        this.lineStyle = 'solid'; // solid, dashed, dotted, wavy, double, triple, arrow, doubleArrow
         this.dashDensity = 10; // Dash segment length
         this.waveDensity = 10; // Wave frequency
         this.multiLineCount = 2; // Number of lines for multi-line styles
         this.multiLineSpacing = 4; // Spacing between multiple lines
         
+        // Arrow drawing constants
+        this.ARROW_ANGLE = Math.PI / 6; // Arrow head angle (30 degrees)
+        this.ARROW_LINE_OFFSET = 0.8; // Factor to shorten line at arrow ends
+        this.ARROW_SIZE_DEFAULT = 15; // Default arrow size
+        this.ARROW_SIZE_MIN_SETTING = 5; // Minimum configurable arrow size
+        this.ARROW_SIZE_MAX_SETTING = 50; // Maximum configurable arrow size
+        
+        // Arrow size setting (independent from line thickness)
+        this.arrowSize = this.ARROW_SIZE_DEFAULT;
+        
         // Preview layer (optional canvas overlay for live preview)
         this.previewCanvas = null;
         this.previewCtx = null;
+        
+        // Performance optimization: requestAnimationFrame throttling
+        this.pendingDraw = false;
+        this.rafId = null;
+        
+        // Canvas CSS scale factor (updated in syncPreviewCanvas)
+        this.canvasCssScale = 1.0;
         
         // Create preview canvas for live shape preview
         this.createPreviewCanvas();
@@ -39,6 +56,7 @@ class ShapeDrawingManager {
         this.waveDensity = parseInt(localStorage.getItem('shapeWaveDensity')) || 10;
         this.multiLineCount = parseInt(localStorage.getItem('shapeMultiLineCount')) || 2;
         this.multiLineSpacing = parseInt(localStorage.getItem('shapeMultiLineSpacing')) || 4;
+        this.arrowSize = parseInt(localStorage.getItem('shapeArrowSize')) || this.ARROW_SIZE_DEFAULT;
     }
     
     saveSettings() {
@@ -47,6 +65,12 @@ class ShapeDrawingManager {
         localStorage.setItem('shapeWaveDensity', this.waveDensity);
         localStorage.setItem('shapeMultiLineCount', this.multiLineCount);
         localStorage.setItem('shapeMultiLineSpacing', this.multiLineSpacing);
+        localStorage.setItem('shapeArrowSize', this.arrowSize);
+    }
+    
+    setArrowSize(size) {
+        this.arrowSize = Math.max(this.ARROW_SIZE_MIN_SETTING, Math.min(this.ARROW_SIZE_MAX_SETTING, size));
+        this.saveSettings();
     }
     
     setLineStyle(style) {
@@ -86,29 +110,54 @@ class ShapeDrawingManager {
         this.previewCanvas.style.display = 'none';
         
         document.body.appendChild(this.previewCanvas);
-        this.previewCtx = this.previewCanvas.getContext('2d');
+        // Use performance-optimized canvas context options
+        this.previewCtx = this.previewCanvas.getContext('2d', {
+            alpha: true,
+            desynchronized: true  // Reduces latency on supported browsers
+        });
+        
+        // Cache DPR to avoid repeated lookups
+        this.cachedDpr = window.devicePixelRatio || 1;
+        this.lastCanvasRect = null;
     }
     
     syncPreviewCanvas() {
         // Sync preview canvas size with main canvas position and size on screen
         const rect = this.canvas.getBoundingClientRect();
-        const dpr = window.devicePixelRatio || 1;
+        const dpr = this.cachedDpr;
         
-        // Set canvas buffer size
-        this.previewCanvas.width = rect.width * dpr;
-        this.previewCanvas.height = rect.height * dpr;
+        // Calculate the CSS scale factor of the main canvas
+        // This is the ratio of displayed size to actual size
+        // Guard against division by zero when canvas is hidden
+        const offsetWidth = this.canvas.offsetWidth;
+        this.canvasCssScale = offsetWidth > 0 ? rect.width / offsetWidth : 1.0;
         
-        // Set CSS size to match the main canvas display size
-        this.previewCanvas.style.width = rect.width + 'px';
-        this.previewCanvas.style.height = rect.height + 'px';
+        // Only resize if dimensions actually changed (avoid expensive operations)
+        // Note: Position is always updated after this block regardless of resize
+        const needsResize = !this.lastCanvasRect ||
+            this.lastCanvasRect.width !== rect.width ||
+            this.lastCanvasRect.height !== rect.height;
         
-        // Position exactly over the main canvas
+        if (needsResize) {
+            // Set canvas buffer size (physical pixels = CSS pixels * DPR)
+            this.previewCanvas.width = rect.width * dpr;
+            this.previewCanvas.height = rect.height * dpr;
+            
+            // Set CSS size to match the main canvas display size
+            this.previewCanvas.style.width = rect.width + 'px';
+            this.previewCanvas.style.height = rect.height + 'px';
+            
+            // Apply DPR scaling once after resize
+            // This allows drawing in CSS pixel coordinates while the buffer is sized for retina
+            this.previewCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+        
+        // Always update position (cheap operation) - handles canvas movement without resize
         this.previewCanvas.style.left = rect.left + 'px';
         this.previewCanvas.style.top = rect.top + 'px';
         
-        // Reset transform and scale for DPR
-        this.previewCtx.setTransform(1, 0, 0, 1, 0, 0);
-        this.previewCtx.scale(dpr, dpr);
+        // Cache the rect for next comparison
+        this.lastCanvasRect = { width: rect.width, height: rect.height };
     }
     
     setShape(shape) {
@@ -131,11 +180,11 @@ class ShapeDrawingManager {
     
     startDrawing(e) {
         this.isDrawing = true;
-        // Store both screen position (for preview) and canvas position (for final drawing)
-        this.startPoint = this.getPosition(e);
-        this.startCanvasPoint = this.getCanvasPosition(e);
-        this.endPoint = this.startPoint;
-        this.endCanvasPoint = this.startCanvasPoint;
+        // Store both screen coordinates (for preview) and canvas coordinates (for final drawing)
+        this.startPoint = this.getCanvasPosition(e);  // Canvas coords for final draw
+        this.startScreenPoint = this.getPosition(e);   // Screen coords for preview
+        this.endPoint = null;
+        this.endScreenPoint = null;
         
         // Sync and show preview canvas
         this.syncPreviewCanvas();
@@ -145,19 +194,36 @@ class ShapeDrawingManager {
     draw(e) {
         if (!this.isDrawing || !this.startPoint) return;
         
-        this.endPoint = this.getPosition(e);
-        this.endCanvasPoint = this.getCanvasPosition(e);
+        this.endPoint = this.getCanvasPosition(e);     // Canvas coords for final draw
+        this.endScreenPoint = this.getPosition(e);      // Screen coords for preview
         
-        // Clear preview and draw current shape preview
-        this.clearPreview();
-        this.drawShapePreview();
+        // Use requestAnimationFrame to throttle preview updates for better performance
+        // This prevents excessive redraws on older devices during fast mouse movements
+        if (!this.pendingDraw) {
+            this.pendingDraw = true;
+            this.rafId = requestAnimationFrame(() => {
+                this.pendingDraw = false;
+                // Only draw preview if we have both start and end points
+                if (this.startScreenPoint && this.endScreenPoint) {
+                    this.clearPreview();
+                    this.drawShapePreview();
+                }
+            });
+        }
     }
     
     stopDrawing() {
         if (!this.isDrawing) return;
         
+        // Cancel any pending animation frame
+        if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+            this.pendingDraw = false;
+        }
+        
         // Draw final shape on main canvas using canvas coordinates
-        if (this.startCanvasPoint && this.endCanvasPoint) {
+        if (this.startPoint && this.endPoint) {
             this.drawFinalShape();
             
             // Save to history
@@ -170,8 +236,8 @@ class ShapeDrawingManager {
         this.isDrawing = false;
         this.startPoint = null;
         this.endPoint = null;
-        this.startCanvasPoint = null;
-        this.endCanvasPoint = null;
+        this.startScreenPoint = null;
+        this.endScreenPoint = null;
         
         // Hide preview canvas
         this.clearPreview();
@@ -179,10 +245,16 @@ class ShapeDrawingManager {
     }
     
     clearPreview() {
-        const dpr = window.devicePixelRatio || 1;
-        this.previewCtx.setTransform(1, 0, 0, 1, 0, 0);
-        this.previewCtx.clearRect(0, 0, this.previewCanvas.width, this.previewCanvas.height);
-        this.previewCtx.scale(dpr, dpr);
+        // Optimized clear: just clear the rect without resetting transform.
+        // 
+        // Coordinate system note:
+        // - The canvas buffer is sized at (width * dpr) x (height * dpr) pixels
+        // - syncPreviewCanvas() applies a DPR scale transform via setTransform(dpr, 0, 0, dpr, 0, 0)
+        // - This means drawing coordinates are in CSS pixels, not physical pixels
+        // - clearRect needs CSS pixel dimensions (canvas.width/dpr, canvas.height/dpr)
+        //   because the transform scales our coordinates up by DPR
+        const dpr = this.cachedDpr;
+        this.previewCtx.clearRect(0, 0, this.previewCanvas.width / dpr, this.previewCanvas.height / dpr);
     }
     
     setupDrawingContext(ctx, isPreview = false) {
@@ -191,8 +263,10 @@ class ShapeDrawingManager {
         ctx.lineJoin = 'round';
         ctx.globalCompositeOperation = 'source-over';
         ctx.strokeStyle = this.drawingEngine.currentColor;
-        ctx.lineWidth = this.drawingEngine.penSize;
         ctx.fillStyle = 'transparent';
+        
+        // Calculate line width
+        let lineWidth = this.drawingEngine.penSize;
         
         // Apply pen type effects
         switch(this.drawingEngine.penType) {
@@ -207,13 +281,23 @@ class ShapeDrawingManager {
                 break;
             case 'brush':
                 ctx.globalAlpha = 0.85;
-                ctx.lineWidth = this.drawingEngine.penSize * 1.5;
+                lineWidth = this.drawingEngine.penSize * 1.5;
                 break;
             case 'normal':
             default:
                 ctx.globalAlpha = 1.0;
                 break;
         }
+        
+        // For preview canvas: the context has setTransform(dpr, 0, 0, dpr, 0, 0) applied,
+        // which scales all drawing operations including lineWidth. To match the final
+        // drawing (which doesn't have this transform), we need to compensate by dividing
+        // lineWidth by DPR when drawing on the preview canvas.
+        if (isPreview) {
+            lineWidth = lineWidth / this.cachedDpr;
+        }
+        
+        ctx.lineWidth = lineWidth;
         
         // Apply line style
         this.applyLineStyle(ctx);
@@ -242,15 +326,25 @@ class ShapeDrawingManager {
     drawShapePreview() {
         this.setupDrawingContext(this.previewCtx, true);
         
+        // Use screen coordinates for preview (matches what user sees on screen)
         switch(this.currentShape) {
             case 'line':
-                this.drawLineWithStyle(this.previewCtx, this.startPoint, this.endPoint);
+                this.drawLineWithStyle(this.previewCtx, this.startScreenPoint, this.endScreenPoint);
+                break;
+            case 'arrow':
+                this.drawArrowLine(this.previewCtx, this.startScreenPoint, this.endScreenPoint, false);
+                break;
+            case 'doubleArrow':
+                this.drawArrowLine(this.previewCtx, this.startScreenPoint, this.endScreenPoint, true);
                 break;
             case 'rectangle':
-                this.drawRectangleWithStyle(this.previewCtx, this.startPoint, this.endPoint);
+                this.drawRectangleWithStyle(this.previewCtx, this.startScreenPoint, this.endScreenPoint);
                 break;
             case 'circle':
-                this.drawCircleWithStyle(this.previewCtx, this.startPoint, this.endPoint);
+                this.drawCircleWithStyle(this.previewCtx, this.startScreenPoint, this.endScreenPoint);
+                break;
+            case 'ellipse':
+                this.drawEllipseWithStyle(this.previewCtx, this.startScreenPoint, this.endScreenPoint);
                 break;
         }
         
@@ -263,13 +357,22 @@ class ShapeDrawingManager {
         
         switch(this.currentShape) {
             case 'line':
-                this.drawLineWithStyle(this.ctx, this.startCanvasPoint, this.endCanvasPoint);
+                this.drawLineWithStyle(this.ctx, this.startPoint, this.endPoint);
+                break;
+            case 'arrow':
+                this.drawArrowLine(this.ctx, this.startPoint, this.endPoint, false);
+                break;
+            case 'doubleArrow':
+                this.drawArrowLine(this.ctx, this.startPoint, this.endPoint, true);
                 break;
             case 'rectangle':
-                this.drawRectangleWithStyle(this.ctx, this.startCanvasPoint, this.endCanvasPoint);
+                this.drawRectangleWithStyle(this.ctx, this.startPoint, this.endPoint);
                 break;
             case 'circle':
-                this.drawCircleWithStyle(this.ctx, this.startCanvasPoint, this.endCanvasPoint);
+                this.drawCircleWithStyle(this.ctx, this.startPoint, this.endPoint);
+                break;
+            case 'ellipse':
+                this.drawEllipseWithStyle(this.ctx, this.startPoint, this.endPoint);
                 break;
         }
         
@@ -293,6 +396,12 @@ class ShapeDrawingManager {
                 break;
             case 'multi':
                 this.drawMultiLine(ctx, start, end, this.multiLineCount);
+                break;
+            case 'arrow':
+                this.drawArrowLine(ctx, start, end, false);
+                break;
+            case 'doubleArrow':
+                this.drawArrowLine(ctx, start, end, true);
                 break;
             default:
                 this.drawLine(ctx, start, end);
@@ -432,6 +541,87 @@ class ShapeDrawingManager {
         ctx.stroke();
     }
     
+    /**
+     * Draw an arrow line (with arrowhead at end, optionally at start too)
+     * @param {CanvasRenderingContext2D} ctx - Canvas context
+     * @param {Object} start - Start point {x, y}
+     * @param {Object} end - End point {x, y}
+     * @param {boolean} isDouble - Whether to draw arrowheads at both ends
+     */
+    drawArrowLine(ctx, start, end, isDouble) {
+        if (!start || !end) return;
+        
+        const dx = end.x - start.x;
+        const dy = end.y - start.y;
+        const length = Math.sqrt(dx * dx + dy * dy);
+        
+        if (length < 0.001) return; // Use epsilon for floating point comparison
+        
+        // Normalize direction
+        const nx = dx / length;
+        const ny = dy / length;
+        
+        // Use independent arrow size setting
+        const arrowSize = this.arrowSize;
+        const arrowAngle = this.ARROW_ANGLE;
+        const lineOffset = this.ARROW_LINE_OFFSET;
+        
+        // End arrow
+        const endArrowBase = {
+            x: end.x - nx * arrowSize * lineOffset,
+            y: end.y - ny * arrowSize * lineOffset
+        };
+        
+        const endArrowLeft = {
+            x: end.x - nx * arrowSize * Math.cos(arrowAngle) - ny * arrowSize * Math.sin(arrowAngle),
+            y: end.y - ny * arrowSize * Math.cos(arrowAngle) + nx * arrowSize * Math.sin(arrowAngle)
+        };
+        
+        const endArrowRight = {
+            x: end.x - nx * arrowSize * Math.cos(arrowAngle) + ny * arrowSize * Math.sin(arrowAngle),
+            y: end.y - ny * arrowSize * Math.cos(arrowAngle) - nx * arrowSize * Math.sin(arrowAngle)
+        };
+        
+        // Draw main line (shortened to accommodate arrow heads)
+        ctx.beginPath();
+        if (isDouble) {
+            ctx.moveTo(start.x + nx * arrowSize * lineOffset, start.y + ny * arrowSize * lineOffset);
+        } else {
+            ctx.moveTo(start.x, start.y);
+        }
+        ctx.lineTo(endArrowBase.x, endArrowBase.y);
+        ctx.stroke();
+        
+        // Draw end arrow head (filled triangle)
+        ctx.beginPath();
+        ctx.moveTo(end.x, end.y);
+        ctx.lineTo(endArrowLeft.x, endArrowLeft.y);
+        ctx.lineTo(endArrowRight.x, endArrowRight.y);
+        ctx.closePath();
+        ctx.fillStyle = ctx.strokeStyle;
+        ctx.fill();
+        
+        // Draw start arrow head if double arrow
+        if (isDouble) {
+            const startArrowLeft = {
+                x: start.x + nx * arrowSize * Math.cos(arrowAngle) - ny * arrowSize * Math.sin(arrowAngle),
+                y: start.y + ny * arrowSize * Math.cos(arrowAngle) + nx * arrowSize * Math.sin(arrowAngle)
+            };
+            
+            const startArrowRight = {
+                x: start.x + nx * arrowSize * Math.cos(arrowAngle) + ny * arrowSize * Math.sin(arrowAngle),
+                y: start.y + ny * arrowSize * Math.cos(arrowAngle) - nx * arrowSize * Math.sin(arrowAngle)
+            };
+            
+            ctx.beginPath();
+            ctx.moveTo(start.x, start.y);
+            ctx.lineTo(startArrowLeft.x, startArrowLeft.y);
+            ctx.lineTo(startArrowRight.x, startArrowRight.y);
+            ctx.closePath();
+            ctx.fill();
+        }
+    }
+    
     drawWavyLine(ctx, start, end) {
         if (!start || !end) return;
         
@@ -517,8 +707,106 @@ class ShapeDrawingManager {
         }
     }
     
+    /**
+     * Draw ellipse with various line styles
+     * Ellipse is drawn from center point outward to edge (defines radii)
+     */
+    drawEllipseWithStyle(ctx, center, edge) {
+        if (!center || !edge) return;
+        
+        // Calculate radii from center to edge point
+        const radiusX = Math.abs(edge.x - center.x);
+        const radiusY = Math.abs(edge.y - center.y);
+        
+        if (radiusX < 2 && radiusY < 2) return;
+        
+        switch(this.lineStyle) {
+            case 'wavy':
+                this.drawWavyEllipse(ctx, center, radiusX, radiusY);
+                break;
+            case 'double':
+                this.drawMultiEllipse(ctx, center, radiusX, radiusY, 2);
+                break;
+            case 'triple':
+                this.drawMultiEllipse(ctx, center, radiusX, radiusY, 3);
+                break;
+            case 'multi':
+                this.drawMultiEllipse(ctx, center, radiusX, radiusY, this.multiLineCount);
+                break;
+            default:
+                // Solid, dashed, dotted - use standard ellipse
+                ctx.beginPath();
+                ctx.ellipse(center.x, center.y, radiusX, radiusY, 0, 0, Math.PI * 2);
+                ctx.stroke();
+                break;
+        }
+    }
+    
+    /**
+     * Draw wavy ellipse using bezier curves
+     */
+    drawWavyEllipse(ctx, center, radiusX, radiusY) {
+        const waveAmplitude = this.drawingEngine.penSize * 1.2;
+        const avgRadius = (radiusX + radiusY) / 2;
+        const numWaves = Math.max(12, Math.floor(avgRadius * Math.PI * 2 / this.waveDensity));
+        
+        ctx.beginPath();
+        
+        for (let i = 0; i <= numWaves; i++) {
+            const angle = (i / numWaves) * Math.PI * 2;
+            
+            // Alternate wave amplitude
+            const waveOffset = (i % 2 === 0) ? waveAmplitude : -waveAmplitude;
+            const currentRadiusX = radiusX + waveOffset;
+            const currentRadiusY = radiusY + waveOffset;
+            
+            const x = center.x + Math.cos(angle) * currentRadiusX;
+            const y = center.y + Math.sin(angle) * currentRadiusY;
+            
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                // Calculate control point
+                const midAngle = (angle + ((i - 1) / numWaves) * Math.PI * 2) / 2;
+                const prevWaveOffset = ((i - 1) % 2 === 0) ? waveAmplitude : -waveAmplitude;
+                const midRadiusX = radiusX + (waveOffset + prevWaveOffset) / 2;
+                const midRadiusY = radiusY + (waveOffset + prevWaveOffset) / 2;
+                const cpX = center.x + Math.cos(midAngle) * midRadiusX;
+                const cpY = center.y + Math.sin(midAngle) * midRadiusY;
+                
+                ctx.quadraticCurveTo(cpX, cpY, x, y);
+            }
+        }
+        
+        ctx.closePath();
+        ctx.stroke();
+    }
+    
+    /**
+     * Draw multiple concentric ellipses (for double/triple line style)
+     */
+    drawMultiEllipse(ctx, center, radiusX, radiusY, count) {
+        const totalSpacing = (count - 1) * this.multiLineSpacing;
+        const startOffset = -totalSpacing / 2;
+        
+        for (let i = 0; i < count; i++) {
+            const offset = startOffset + i * this.multiLineSpacing;
+            const ellipseRadiusX = Math.max(1, radiusX + offset);
+            const ellipseRadiusY = Math.max(1, radiusY + offset);
+            
+            ctx.beginPath();
+            ctx.ellipse(center.x, center.y, ellipseRadiusX, ellipseRadiusY, 0, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+    }
+    
     // Cleanup
     destroy() {
+        // Cancel any pending animation frame
+        if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+        }
         if (this.previewCanvas && this.previewCanvas.parentNode) {
             this.previewCanvas.parentNode.removeChild(this.previewCanvas);
         }

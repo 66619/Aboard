@@ -501,13 +501,41 @@ class DrawingBoard {
                 this.drawingEngine.setColor(e.target.dataset.color);
                 document.querySelectorAll('.color-btn[data-color]').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
+                // Sync shape color picker value
+                const shapeColorPicker = document.getElementById('shape-custom-color-picker');
+                if (shapeColorPicker) {
+                    shapeColorPicker.value = e.target.dataset.color;
+                }
             });
         });
         
         const customColorPicker = document.getElementById('custom-color-picker');
+        const customColorPickerBtn = document.querySelector('label[for="custom-color-picker"]');
         customColorPicker.addEventListener('input', (e) => {
             this.drawingEngine.setColor(e.target.value);
             document.querySelectorAll('.color-btn[data-color]').forEach(b => b.classList.remove('active'));
+            // Mark color picker button as active
+            if (customColorPickerBtn) {
+                customColorPickerBtn.classList.add('active');
+            }
+            // Sync shape color picker
+            const shapeColorPicker = document.getElementById('shape-custom-color-picker');
+            if (shapeColorPicker) {
+                shapeColorPicker.value = e.target.value;
+            }
+        });
+        // Deactivate color picker when a preset is selected
+        document.querySelectorAll('.color-btn[data-color]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (customColorPickerBtn) {
+                    customColorPickerBtn.classList.remove('active');
+                }
+                // Also deactivate shape color picker button
+                const shapeCustomColorPickerBtn = document.querySelector('label[for="shape-custom-color-picker"]');
+                if (shapeCustomColorPickerBtn) {
+                    shapeCustomColorPickerBtn.classList.remove('active');
+                }
+            });
         });
         
         // Background color picker
@@ -524,13 +552,26 @@ class DrawingBoard {
         });
         
         const customBgColorPicker = document.getElementById('custom-bg-color-picker');
+        const customBgColorPickerBtn = document.querySelector('label[for="custom-bg-color-picker"]');
         customBgColorPicker.addEventListener('input', (e) => {
             this.backgroundManager.setBackgroundColor(e.target.value);
             document.querySelectorAll('.color-btn[data-bg-color]').forEach(b => b.classList.remove('active'));
+            // Mark color picker button as active
+            if (customBgColorPickerBtn) {
+                customBgColorPickerBtn.classList.add('active');
+            }
             // Save page background in paginated mode
             if (!this.settingsManager.infiniteCanvas) {
                 this.savePageBackground(this.currentPage);
             }
+        });
+        // Deactivate color picker when a preset is selected
+        document.querySelectorAll('.color-btn[data-bg-color]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (customBgColorPickerBtn) {
+                    customBgColorPickerBtn.classList.remove('active');
+                }
+            });
         });
         
         // Background pattern buttons
@@ -623,10 +664,66 @@ class DrawingBoard {
         // Sliders
         const penSizeSlider = document.getElementById('pen-size-slider');
         const penSizeValue = document.getElementById('pen-size-value');
+        const shapeSizeSlider = document.getElementById('shape-size-slider');
+        const shapeSizeValue = document.getElementById('shape-size-value');
+        
+        // Pen size slider - syncs with shape slider
         penSizeSlider.addEventListener('input', (e) => {
             this.drawingEngine.setPenSize(parseInt(e.target.value));
             penSizeValue.textContent = e.target.value;
+            // Sync shape slider
+            if (shapeSizeSlider) {
+                shapeSizeSlider.value = e.target.value;
+                shapeSizeValue.textContent = e.target.value;
+            }
         });
+        
+        // Shape size slider - syncs with pen slider
+        if (shapeSizeSlider) {
+            shapeSizeSlider.addEventListener('input', (e) => {
+                this.drawingEngine.setPenSize(parseInt(e.target.value));
+                shapeSizeValue.textContent = e.target.value;
+                // Sync pen slider
+                penSizeSlider.value = e.target.value;
+                penSizeValue.textContent = e.target.value;
+            });
+        }
+        
+        // Arrow size slider (independent control)
+        const arrowSizeSlider = document.getElementById('arrow-size-slider');
+        const arrowSizeValue = document.getElementById('arrow-size-value');
+        if (arrowSizeSlider && arrowSizeValue) {
+            arrowSizeSlider.addEventListener('input', (e) => {
+                this.shapeDrawingManager.setArrowSize(parseInt(e.target.value));
+                arrowSizeValue.textContent = e.target.value;
+            });
+            // Initialize from saved value
+            arrowSizeSlider.value = this.shapeDrawingManager.arrowSize;
+            arrowSizeValue.textContent = this.shapeDrawingManager.arrowSize;
+        }
+        
+        // Shape custom color picker - syncs with pen color picker
+        const shapeCustomColorPicker = document.getElementById('shape-custom-color-picker');
+        const shapeCustomColorPickerBtn = document.querySelector('label[for="shape-custom-color-picker"]');
+        if (shapeCustomColorPicker) {
+            shapeCustomColorPicker.addEventListener('input', (e) => {
+                this.drawingEngine.setColor(e.target.value);
+                document.querySelectorAll('.color-btn[data-color]').forEach(b => b.classList.remove('active'));
+                // Mark color picker button as active
+                if (shapeCustomColorPickerBtn) {
+                    shapeCustomColorPickerBtn.classList.add('active');
+                }
+                // Sync pen color picker value and active state
+                const penColorPicker = document.getElementById('custom-color-picker');
+                const penColorPickerBtn = document.querySelector('label[for="custom-color-picker"]');
+                if (penColorPicker) {
+                    penColorPicker.value = e.target.value;
+                }
+                if (penColorPickerBtn) {
+                    penColorPickerBtn.classList.add('active');
+                }
+            });
+        }
         
         // Eraser shape buttons
         document.querySelectorAll('.eraser-shape-btn').forEach(btn => {
@@ -657,16 +754,16 @@ class DrawingBoard {
                 this.shapeDrawingManager.setShape(shapeType);
                 document.querySelectorAll('.shape-type-btn').forEach(b => b.classList.remove('active'));
                 e.target.closest('.shape-type-btn').classList.add('active');
-            });
-        });
-        
-        // Shape type buttons
-        document.querySelectorAll('.shape-type-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const shapeType = e.target.closest('.shape-type-btn').dataset.shapeType;
-                this.shapeDrawingManager.setShape(shapeType);
-                document.querySelectorAll('.shape-type-btn').forEach(b => b.classList.remove('active'));
-                e.target.closest('.shape-type-btn').classList.add('active');
+                
+                // Show/hide arrow size control based on shape type
+                const arrowSizeGroup = document.getElementById('arrow-size-group');
+                if (arrowSizeGroup) {
+                    if (shapeType === 'arrow' || shapeType === 'doubleArrow') {
+                        arrowSizeGroup.style.display = '';
+                    } else {
+                        arrowSizeGroup.style.display = 'none';
+                    }
+                }
             });
         });
         
@@ -682,14 +779,6 @@ class DrawingBoard {
         if (shapeLineStyleSettingsBtn) {
             shapeLineStyleSettingsBtn.addEventListener('click', () => {
                 this.lineStyleModal.show('shape');
-            });
-        }
-        
-        // Shape color & size button (open color size modal)
-        const shapeColorSizeBtn = document.getElementById('shape-color-size-btn');
-        if (shapeColorSizeBtn) {
-            shapeColorSizeBtn.addEventListener('click', () => {
-                this.showShapeColorSizeModal();
             });
         }
         
@@ -966,9 +1055,22 @@ class DrawingBoard {
         });
         
         const customThemeColorPicker = document.getElementById('custom-theme-color-picker');
+        const customThemeColorPickerBtn = document.querySelector('label[for="custom-theme-color-picker"]');
         customThemeColorPicker.addEventListener('input', (e) => {
             this.settingsManager.setThemeColor(e.target.value);
             document.querySelectorAll('.color-btn[data-theme-color]').forEach(b => b.classList.remove('active'));
+            // Mark color picker button as active
+            if (customThemeColorPickerBtn) {
+                customThemeColorPickerBtn.classList.add('active');
+            }
+        });
+        // Deactivate color picker when a preset is selected
+        document.querySelectorAll('.color-btn[data-theme-color]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (customThemeColorPickerBtn) {
+                    customThemeColorPickerBtn.classList.remove('active');
+                }
+            });
         });
         
         // Pattern preferences
@@ -1065,13 +1167,23 @@ class DrawingBoard {
                 this.timeDisplayManager.setColor(e.target.dataset.timeColor);
                 document.querySelectorAll('.color-btn[data-time-color]').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
+                // Deactivate color picker button
+                const customTimeColorPickerBtn = document.querySelector('label[for="custom-time-color-picker"]');
+                if (customTimeColorPickerBtn) {
+                    customTimeColorPickerBtn.classList.remove('active');
+                }
             });
         });
         
         const customTimeColorPicker = document.getElementById('custom-time-color-picker');
+        const customTimeColorPickerBtn = document.querySelector('label[for="custom-time-color-picker"]');
         customTimeColorPicker.addEventListener('input', (e) => {
             this.timeDisplayManager.setColor(e.target.value);
             document.querySelectorAll('.color-btn[data-time-color]').forEach(b => b.classList.remove('active'));
+            // Mark color picker button as active
+            if (customTimeColorPickerBtn) {
+                customTimeColorPickerBtn.classList.add('active');
+            }
         });
         
         // Time background color buttons
@@ -1080,13 +1192,23 @@ class DrawingBoard {
                 this.timeDisplayManager.setBgColor(e.target.dataset.timeBgColor);
                 document.querySelectorAll('.color-btn[data-time-bg-color]').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
+                // Deactivate color picker button
+                const customTimeBgColorPickerBtn = document.querySelector('label[for="custom-time-bg-color-picker"]');
+                if (customTimeBgColorPickerBtn) {
+                    customTimeBgColorPickerBtn.classList.remove('active');
+                }
             });
         });
         
         const customTimeBgColorPicker = document.getElementById('custom-time-bg-color-picker');
+        const customTimeBgColorPickerBtn = document.querySelector('label[for="custom-time-bg-color-picker"]');
         customTimeBgColorPicker.addEventListener('input', (e) => {
             this.timeDisplayManager.setBgColor(e.target.value);
             document.querySelectorAll('.color-btn[data-time-bg-color]').forEach(b => b.classList.remove('active'));
+            // Mark color picker button as active
+            if (customTimeBgColorPickerBtn) {
+                customTimeBgColorPickerBtn.classList.add('active');
+            }
         });
         
         // Time fullscreen mode buttons
@@ -1222,6 +1344,31 @@ class DrawingBoard {
     }
     
     repositionToolbarsOnResize() {
+        // Dynamic toolbar positioning based on window orientation
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+        const isPortrait = windowHeight > windowWidth;
+        const toolbar = document.getElementById('toolbar');
+        
+        // On portrait orientation (typically phones), position toolbar on right side
+        if (isPortrait && toolbar && !toolbar.classList.contains('user-positioned')) {
+            // Apply right side positioning for portrait mode
+            toolbar.classList.add('vertical');
+            toolbar.style.right = '20px';
+            toolbar.style.left = 'auto';
+            toolbar.style.top = '50%';
+            toolbar.style.bottom = 'auto';
+            toolbar.style.transform = 'translateY(-50%)';
+        } else if (!isPortrait && toolbar && !toolbar.classList.contains('user-positioned')) {
+            // For landscape mode, use bottom center positioning
+            toolbar.classList.remove('vertical');
+            toolbar.style.left = '50%';
+            toolbar.style.right = 'auto';
+            toolbar.style.top = 'auto';
+            toolbar.style.bottom = '20px';
+            toolbar.style.transform = 'translateX(-50%)';
+        }
+        
         // Ensure all toolbars and panels stay within viewport after window resize
         const EDGE_SPACING = 10; // Minimum spacing from viewport edges
         const panels = [
@@ -1229,13 +1376,9 @@ class DrawingBoard {
             document.getElementById('config-area'),
             document.getElementById('time-display-area'),
             document.getElementById('feature-area'),
-            document.getElementById('toolbar'),
             document.getElementById('pagination-controls'),
             document.getElementById('timer-display')
         ];
-        
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
         
         panels.forEach(panel => {
             if (!panel) return;
@@ -1387,6 +1530,7 @@ class DrawingBoard {
             let y = clientY - this.dragOffset.y;
             
             const edgeSnapDistance = 30;
+            const edgeSnapHysteresis = 60; // Wider zone to prevent flicker when already snapped
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
             const isToolbar = this.draggedElement.id === 'toolbar';
@@ -1399,16 +1543,27 @@ class DrawingBoard {
             let snappedLeft = false;
             let snappedRight = false;
             
+            // Check if currently in vertical mode
+            const currentlyVertical = this.draggedElement.classList.contains('vertical');
+            
+            // Get current element dimensions (updated during drag)
+            const currentRect = this.draggedElement.getBoundingClientRect();
+            const currentWidth = currentRect.width;
+            const currentHeight = currentRect.height;
+            
             if (this.settingsManager.edgeSnapEnabled) {
+                // Use hysteresis: easier to snap than to unsnap (prevents flicker)
+                const effectiveSnapDistance = currentlyVertical ? edgeSnapHysteresis : edgeSnapDistance;
+                
                 // Check for left edge snap first
-                if (x < edgeSnapDistance) {
+                if (x < effectiveSnapDistance) {
                     x = 10;
                     snappedToEdge = true;
                     isVertical = true;
                     snappedLeft = true;
                 }
                 // Check for right edge snap
-                else if (x + this.draggedElementWidth > windowWidth - edgeSnapDistance) {
+                else if (x + currentWidth > windowWidth - effectiveSnapDistance) {
                     // When vertical, need to recalculate width
                     if (isToolbar || isConfigArea || isTimeDisplayArea || isFeatureArea) {
                         // Temporarily add vertical class to get correct dimensions
@@ -1417,7 +1572,7 @@ class DrawingBoard {
                         this.draggedElement.classList.remove('vertical');
                         x = windowWidth - tempWidth - 10;
                     } else {
-                        x = windowWidth - this.draggedElementWidth - 10;
+                        x = windowWidth - currentWidth - 10;
                     }
                     snappedToEdge = true;
                     isVertical = true;
@@ -1429,8 +1584,8 @@ class DrawingBoard {
                     snappedToEdge = true;
                 }
                 // Snap to bottom
-                if (y + this.draggedElementHeight > windowHeight - edgeSnapDistance) {
-                    y = windowHeight - this.draggedElementHeight - 10;
+                if (y + currentHeight > windowHeight - edgeSnapDistance) {
+                    y = windowHeight - currentHeight - 10;
                     snappedToEdge = true;
                 }
             }
@@ -1443,13 +1598,21 @@ class DrawingBoard {
                     const newWidth = this.draggedElement.getBoundingClientRect().width;
                     x = windowWidth - newWidth - 10;
                 }
+                // Update height after dimension change for vertical layout
+                const newRect = this.draggedElement.getBoundingClientRect();
+                this.draggedElementHeight = newRect.height;
             } else {
                 this.draggedElement.classList.remove('vertical');
+                // Update dimensions when switching back to horizontal
+                const newRect = this.draggedElement.getBoundingClientRect();
+                this.draggedElementWidth = newRect.width;
+                this.draggedElementHeight = newRect.height;
             }
             
             // Constrain to viewport boundaries (prevent overflow)
-            x = Math.max(0, Math.min(x, windowWidth - this.draggedElement.getBoundingClientRect().width));
-            y = Math.max(0, Math.min(y, windowHeight - this.draggedElement.getBoundingClientRect().height));
+            const finalRect = this.draggedElement.getBoundingClientRect();
+            x = Math.max(0, Math.min(x, windowWidth - finalRect.width));
+            y = Math.max(0, Math.min(y, windowHeight - finalRect.height));
             
             this.draggedElement.style.left = `${x}px`;
             this.draggedElement.style.top = `${y}px`;
@@ -1463,6 +1626,12 @@ class DrawingBoard {
             if (this.isDraggingPanel && this.draggedElement) {
                 this.draggedElement.classList.remove('dragging');
                 this.draggedElement.style.transition = '';
+                
+                // Mark toolbar as user-positioned to prevent auto-repositioning
+                if (this.draggedElement.id === 'toolbar') {
+                    this.draggedElement.classList.add('user-positioned');
+                }
+                
                 this.isDraggingPanel = false;
                 this.draggedElement = null;
             }
@@ -1494,202 +1663,36 @@ class DrawingBoard {
         }
     }
     
-    showShapeColorSizeModal() {
-        // Create or show a modal for shape line properties including pen type
-        let modal = document.getElementById('shape-color-size-modal');
-        
-        if (!modal) {
-            // Create modal HTML dynamically with pen type selection
-            const modalHTML = `
-                <div id="shape-color-size-modal" class="modal">
-                    <div class="modal-content line-style-modal-content">
-                        <div class="line-style-modal-header">
-                            <h2 data-i18n="tools.shape.lineProperties">Line Properties</h2>
-                            <button id="shape-color-size-modal-close" class="line-style-modal-close" title="Close">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="line-style-modal-body">
-                            <!-- Pen Type Selection -->
-                            <div class="line-style-modal-group">
-                                <label data-i18n="tools.pen.type">Pen Type</label>
-                                <div class="button-size-options pen-type-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
-                                    <button class="shape-pen-type-btn active" data-shape-pen-type="normal" data-i18n="tools.pen.normal">Normal</button>
-                                    <button class="shape-pen-type-btn" data-shape-pen-type="pencil" data-i18n="tools.pen.pencil">Pencil</button>
-                                    <button class="shape-pen-type-btn" data-shape-pen-type="ballpoint" data-i18n="tools.pen.ballpoint">Ballpoint</button>
-                                    <button class="shape-pen-type-btn" data-shape-pen-type="fountain" data-i18n="tools.pen.fountain">Fountain</button>
-                                    <button class="shape-pen-type-btn" data-shape-pen-type="brush" data-i18n="tools.pen.brush">Brush</button>
-                                </div>
-                            </div>
-                            
-                            <!-- Color Selection -->
-                            <div class="line-style-modal-group">
-                                <label data-i18n="tools.pen.color">Color</label>
-                                <div class="color-picker-row">
-                                    <div class="color-picker-main">
-                                        <button class="shape-color-btn" data-shape-color="#000000" style="background-color: #000000;" title="Black"></button>
-                                        <button class="shape-color-btn" data-shape-color="#FF0000" style="background-color: #FF0000;" title="Red"></button>
-                                        <button class="shape-color-btn" data-shape-color="#0000FF" style="background-color: #0000FF;" title="Blue"></button>
-                                        <button class="shape-color-btn" data-shape-color="#00FF00" style="background-color: #00FF00;" title="Green"></button>
-                                    </div>
-                                    <div class="color-picker-main">
-                                        <button class="shape-color-btn" data-shape-color="#FFFF00" style="background-color: #FFFF00; border: 1px solid #ccc;" title="Yellow"></button>
-                                        <button class="shape-color-btn" data-shape-color="#FF8800" style="background-color: #FF8800;" title="Orange"></button>
-                                        <button class="shape-color-btn" data-shape-color="#8800FF" style="background-color: #8800FF;" title="Purple"></button>
-                                        <button class="shape-color-btn" data-shape-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;" title="White"></button>
-                                    </div>
-                                </div>
-                                <label class="color-picker-icon-btn" for="shape-custom-color-picker" title="Color Picker" style="margin-top: 8px;">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
-                                        <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
-                                    </svg>
-                                    <input type="color" id="shape-custom-color-picker" class="custom-color-picker-input" value="#000000">
-                                </label>
-                            </div>
-                            
-                            <!-- Size Selection -->
-                            <div class="line-style-modal-group">
-                                <label><span data-i18n="tools.pen.size">Size</span>: <span id="shape-size-value">5</span>px</label>
-                                <input type="range" id="shape-size-slider" min="1" max="50" value="5" class="slider">
-                            </div>
-                        </div>
-                        <div class="line-style-modal-footer">
-                            <button id="shape-color-size-modal-apply" class="btn-primary" data-i18n="common.apply">Apply</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
-            modal = document.getElementById('shape-color-size-modal');
-            
-            // Setup event listeners for the new modal
-            this.setupShapeColorSizeModalListeners();
-        }
-        
-        // Load current values from drawingEngine
-        const currentColor = this.drawingEngine.currentColor || '#000000';
-        const currentSize = this.drawingEngine.penSize || 5;
-        const currentPenType = this.drawingEngine.penType || 'normal';
-        
-        // Update UI to reflect current settings
-        document.querySelectorAll('.shape-color-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.shapeColor === currentColor);
-        });
-        document.querySelectorAll('.shape-pen-type-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.shapePenType === currentPenType);
-        });
-        const colorPicker = document.getElementById('shape-custom-color-picker');
-        if (colorPicker) colorPicker.value = currentColor;
-        const sizeSlider = document.getElementById('shape-size-slider');
-        const sizeValue = document.getElementById('shape-size-value');
-        if (sizeSlider) sizeSlider.value = currentSize;
-        if (sizeValue) sizeValue.textContent = currentSize;
-        
-        modal.classList.add('show');
-        
-        // Apply i18n translations if available
-        if (window.i18n && window.i18n.applyTranslations) {
-            window.i18n.applyTranslations();
-        }
-    }
-    
-    setupShapeColorSizeModalListeners() {
-        const modal = document.getElementById('shape-color-size-modal');
-        
-        // Close button
-        document.getElementById('shape-color-size-modal-close').addEventListener('click', () => {
-            modal.classList.remove('show');
-        });
-        
-        // Click outside to close
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.classList.remove('show');
-            }
-        });
-        
-        // Pen type buttons
-        document.querySelectorAll('.shape-pen-type-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.shape-pen-type-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            });
-        });
-        
-        // Color buttons
-        document.querySelectorAll('.shape-color-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.shape-color-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                const colorPicker = document.getElementById('shape-custom-color-picker');
-                if (colorPicker) colorPicker.value = btn.dataset.shapeColor;
-            });
-        });
-        
-        // Custom color picker
-        const colorPicker = document.getElementById('shape-custom-color-picker');
-        if (colorPicker) {
-            colorPicker.addEventListener('input', (e) => {
-                document.querySelectorAll('.shape-color-btn').forEach(b => b.classList.remove('active'));
-            });
-        }
-        
-        // Size slider
-        const sizeSlider = document.getElementById('shape-size-slider');
-        const sizeValue = document.getElementById('shape-size-value');
-        if (sizeSlider) {
-            sizeSlider.addEventListener('input', (e) => {
-                if (sizeValue) sizeValue.textContent = e.target.value;
-            });
-        }
-        
-        // Apply button
-        document.getElementById('shape-color-size-modal-apply').addEventListener('click', () => {
-            // Get selected pen type
-            const activePenTypeBtn = document.querySelector('.shape-pen-type-btn.active');
-            const penType = activePenTypeBtn ? activePenTypeBtn.dataset.shapePenType : 'normal';
-            
-            // Get selected color
-            const activeColorBtn = document.querySelector('.shape-color-btn.active');
-            const colorPicker = document.getElementById('shape-custom-color-picker');
-            const color = activeColorBtn ? activeColorBtn.dataset.shapeColor : colorPicker.value;
-            
-            // Get size
-            const size = parseInt(document.getElementById('shape-size-slider').value);
-            
-            // Apply to drawing engine (shapes use the same properties as pen)
-            this.drawingEngine.setPenType(penType);
-            this.drawingEngine.setColor(color);
-            this.drawingEngine.setPenSize(size);
-            
-            // Also update the main pen UI to stay in sync
-            document.querySelectorAll('.pen-type-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.penType === penType);
-            });
-            document.querySelectorAll('.color-btn[data-color]').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.color === color);
-            });
-            const mainColorPicker = document.getElementById('custom-color-picker');
-            if (mainColorPicker) mainColorPicker.value = color;
-            const penSizeSlider = document.getElementById('pen-size-slider');
-            const penSizeValueEl = document.getElementById('pen-size-value');
-            if (penSizeSlider) penSizeSlider.value = size;
-            if (penSizeValueEl) penSizeValueEl.textContent = size;
-            
-            modal.classList.remove('show');
-        });
-    }
-    
     switchToPen() {
         // Helper method to switch to pen tool
         this.setTool('pen', false);
     }
     
+    positionFeatureArea() {
+        // Position feature-area above the "更多" button
+        const featureArea = document.getElementById('feature-area');
+        const moreBtn = document.getElementById('more-btn');
+        const toolbar = document.getElementById('toolbar');
+        
+        const moreBtnRect = moreBtn.getBoundingClientRect();
+        const toolbarRect = toolbar.getBoundingClientRect();
+        
+        featureArea.style.bottom = 'auto';
+        featureArea.style.left = `${moreBtnRect.left}px`;
+        featureArea.style.top = `${toolbarRect.top - 10}px`;
+        featureArea.style.transform = 'translateY(-100%)';
+    }
+    
     setTool(tool, showConfig = true) {
+        const configArea = document.getElementById('config-area');
+        const featureArea = document.getElementById('feature-area');
+        const previousTool = this.drawingEngine.currentTool;
+        
+        // Check if we're clicking the same tool button again (toggle behavior)
+        const isSameTool = (previousTool === tool);
+        const isConfigVisible = configArea.classList.contains('show');
+        
+        // Update drawing engine tool
         this.drawingEngine.setTool(tool);
         if (tool === 'eraser') {
             this.showEraserCursor();
@@ -1699,20 +1702,38 @@ class DrawingBoard {
         
         this.updateUI();
         
-        // Hide config-area by default (but don't always hide feature-area)
-        document.getElementById('config-area').classList.remove('show');
+        // Handle toggle behavior for tools with config panels
+        const toolsWithConfig = ['pen', 'eraser', 'background', 'shape'];
         
-        // Show appropriate panel based on tool
-        if (showConfig && (tool === 'pen' || tool === 'eraser' || tool === 'background' || tool === 'shape')) {
-            document.getElementById('config-area').classList.add('show');
-            // Don't close feature-area when selecting shape - allow multiple panels to be open
-            if (tool !== 'shape') {
-                document.getElementById('feature-area').classList.remove('show');
+        if (showConfig && toolsWithConfig.includes(tool)) {
+            // If clicking the same tool and config is visible, toggle it off
+            if (isSameTool && isConfigVisible) {
+                configArea.classList.remove('show');
+            } else {
+                // Show config panel
+                configArea.classList.add('show');
+                // Don't close feature-area when selecting shape - allow multiple panels to be open
+                if (tool !== 'shape') {
+                    featureArea.classList.remove('show');
+                }
             }
         } else if (tool === 'more') {
-            document.getElementById('feature-area').classList.add('show');
+            // Toggle feature-area for more button
+            const isFeatureAreaVisible = featureArea.classList.contains('show');
+            if (isFeatureAreaVisible) {
+                featureArea.classList.remove('show');
+                // Also hide config-area when closing feature-area to prevent empty panel from showing
+                // The 'more' tool has no associated config panel, so config-area should always be hidden
+                configArea.classList.remove('show');
+            } else {
+                featureArea.classList.add('show');
+                configArea.classList.remove('show');
+                this.positionFeatureArea();
+            }
         } else {
-            document.getElementById('feature-area').classList.remove('show');
+            // For other tools (like pan), just hide panels
+            configArea.classList.remove('show');
+            featureArea.classList.remove('show');
         }
     }
     
@@ -1868,21 +1889,12 @@ class DrawingBoard {
             this.canvas.style.cursor = 'default';
         } else if (tool === 'more') {
             document.getElementById('more-btn').classList.add('active');
-            // Show feature-area instead of more-config and position it above the "更多" button
+            // Don't manipulate feature-area visibility here - let setTool handle toggle
+            // Only position it if it's already visible
             const featureArea = document.getElementById('feature-area');
-            const moreBtn = document.getElementById('more-btn');
-            featureArea.classList.add('show');
-            
-            // Position feature-area above the "更多" button
-            const moreBtnRect = moreBtn.getBoundingClientRect();
-            const toolbar = document.getElementById('toolbar');
-            const toolbarRect = toolbar.getBoundingClientRect();
-            
-            // Calculate position above the toolbar
-            featureArea.style.bottom = 'auto';
-            featureArea.style.left = `${moreBtnRect.left}px`;
-            featureArea.style.top = `${toolbarRect.top - 10}px`;
-            featureArea.style.transform = 'translateY(-100%)';
+            if (featureArea.classList.contains('show')) {
+                this.positionFeatureArea();
+            }
             
             this.canvas.style.cursor = 'default';
         }

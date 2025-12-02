@@ -69,6 +69,8 @@ window.translations = {
             circle: 'Círculo',
             ellipse: 'Elipse',
             arrow: 'Flecha',
+            doubleArrow: 'Doble flecha',
+            arrowSize: 'Tamaño de flecha',
             hint: 'Presione y arrastre para dibujar, suelte para terminar',
             lineProperties: 'Propiedades de línea'
         },
@@ -98,6 +100,10 @@ window.translations = {
             double: 'Doble',
             triple: 'Triple',
             multiLine: 'Multilínea',
+            arrow: 'Flecha',
+            doubleArrow: 'Doble flecha',
+            noArrow: 'Sin flecha',
+            arrowType: 'Tipo de flecha',
             dashDensity: 'Densidad de guiones',
             waveDensity: 'Densidad de ondas',
             lineSpacing: 'Espaciado de líneas',
@@ -117,7 +123,8 @@ window.translations = {
         options: 'Opciones de visualización de hora',
         showDate: 'Mostrar fecha',
         showTime: 'Mostrar hora',
-        settings: 'Configuración'
+        settings: 'Configuración',
+        fullscreenDisplay: 'Pantalla completa'
     },
 
     // Background
@@ -487,6 +494,14 @@ Consejos de uso:
 ¡Disfruta de tu trabajo creativo!`,
         confirm: 'OK',
         noShowAgain: 'No mostrar de nuevo'
+    },
+
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: 'Confirmar borrado',
+        message: '¿Está seguro de que desea borrar el lienzo actual? Esta acción no se puede deshacer. Otros lienzos no se verán afectados.',
+        confirm: 'Confirmar',
+        cancel: 'Cancelar'
     },
 
     // Color names

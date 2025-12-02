@@ -29,6 +29,13 @@ class DrawingEngine {
         this.multiLineLastPerpX = 0;
         this.multiLineLastPerpY = 0;
         this.multiLineLastPoints = null; // Store last offset points for each line
+        this.multiLinePendingPoint = null; // Accumulate short segments
+        
+        // Multi-line drawing constants
+        this.MULTI_LINE_MIN_DISTANCE = 1.2; // Minimum distance threshold for multi-line drawing (balanced for smooth curves at slow speeds)
+        this.MULTI_LINE_BLEND_MIN = 0.7; // Minimum blend factor for perpendicular smoothing
+        this.MULTI_LINE_BLEND_MAX = 0.95; // Maximum blend factor
+        this.MULTI_LINE_BLEND_SCALE = 50; // Scale factor for blend calculation
         
         // Drawing buffer
         this.points = [];
@@ -200,6 +207,7 @@ class DrawingEngine {
         this.multiLineLastPerpX = 0;
         this.multiLineLastPerpY = 0;
         this.multiLineLastPoints = null;
+        this.multiLinePendingPoint = null;
         
         // Check for edge snapping when pen tool is active
         if (this.currentTool === 'pen' && this.edgeDrawingManager) {
@@ -338,25 +346,62 @@ class DrawingEngine {
         const dy = currPoint.y - prevPoint.y;
         const length = Math.sqrt(dx * dx + dy * dy);
         
-        // Skip drawing if points are identical (length is 0) to avoid division by zero
-        if (length === 0) return;
+        // Skip drawing if points are too close (causes unstable perpendiculars)
+        // Minimum distance threshold to prevent dots and artifacts when drawing slowly
+        if (length < this.MULTI_LINE_MIN_DISTANCE) {
+            // For very short segments, accumulate in pending point
+            if (!this.multiLinePendingPoint) {
+                this.multiLinePendingPoint = currPoint;
+            }
+            return;
+        }
+        
+        // If we had a pending point, use it as the actual previous point
+        const actualPrevPoint = this.multiLinePendingPoint || prevPoint;
+        this.multiLinePendingPoint = null;
+        
+        // Recalculate with actual previous point
+        const actualDx = currPoint.x - actualPrevPoint.x;
+        const actualDy = currPoint.y - actualPrevPoint.y;
+        const actualLength = Math.sqrt(actualDx * actualDx + actualDy * actualDy);
+        
+        if (actualLength < 0.001) return; // Use small epsilon instead of strict zero check
         
         // Perpendicular unit vector for current segment
-        let perpX = -dy / length;
-        let perpY = dx / length;
+        let currentPerpX = -actualDy / actualLength;
+        let currentPerpY = actualDx / actualLength;
         
-        // Smooth the perpendicular with the previous one to avoid sudden direction changes
+        // For the starting perpendicular, use the previous one if available
+        // This ensures smooth connections at corners
+        let startPerpX = currentPerpX;
+        let startPerpY = currentPerpY;
+        
         if (this.multiLineLastPerpX !== 0 || this.multiLineLastPerpY !== 0) {
-            // Blend current and previous perpendicular (80% current, 20% previous)
-            const blendFactor = 0.8;
-            perpX = perpX * blendFactor + this.multiLineLastPerpX * (1 - blendFactor);
-            perpY = perpY * blendFactor + this.multiLineLastPerpY * (1 - blendFactor);
+            // Use the previous perpendicular for starting points
+            startPerpX = this.multiLineLastPerpX;
+            startPerpY = this.multiLineLastPerpY;
+        }
+        
+        // For the ending perpendicular, blend with current for smooth transition
+        // Use adaptive blend factor based on segment length
+        // Longer segments = more weight on current perpendicular
+        let endPerpX = currentPerpX;
+        let endPerpY = currentPerpY;
+        
+        if (this.multiLineLastPerpX !== 0 || this.multiLineLastPerpY !== 0) {
+            // Adaptive blend factor: more blending for longer segments
+            const blendFactor = Math.min(
+                this.MULTI_LINE_BLEND_MAX,
+                this.MULTI_LINE_BLEND_MIN + actualLength / this.MULTI_LINE_BLEND_SCALE
+            );
+            endPerpX = currentPerpX * blendFactor + this.multiLineLastPerpX * (1 - blendFactor);
+            endPerpY = currentPerpY * blendFactor + this.multiLineLastPerpY * (1 - blendFactor);
             
             // Normalize after blending
-            const perpLen = Math.sqrt(perpX * perpX + perpY * perpY);
+            const perpLen = Math.sqrt(endPerpX * endPerpX + endPerpY * endPerpY);
             if (perpLen > 0) {
-                perpX /= perpLen;
-                perpY /= perpLen;
+                endPerpX /= perpLen;
+                endPerpY /= perpLen;
             }
         }
         
@@ -364,13 +409,15 @@ class DrawingEngine {
         const totalWidth = (count - 1) * spacing;
         const startOffset = -totalWidth / 2;
         
-        // Calculate current offset points
+        // Calculate current offset points using the end perpendicular
+        
+        // Calculate current offset points using the end perpendicular
         const currentPoints = [];
         for (let i = 0; i < count; i++) {
             const offset = startOffset + i * spacing;
             currentPoints.push({
-                x: currPoint.x + perpX * offset,
-                y: currPoint.y + perpY * offset
+                x: currPoint.x + endPerpX * offset,
+                y: currPoint.y + endPerpY * offset
             });
         }
         
@@ -384,8 +431,8 @@ class DrawingEngine {
                 // Connect from previous point for smooth lines
                 this.ctx.moveTo(this.multiLineLastPoints[i].x, this.multiLineLastPoints[i].y);
             } else {
-                // First segment - start from prevPoint with offset
-                this.ctx.moveTo(prevPoint.x + perpX * offset, prevPoint.y + perpY * offset);
+                // First segment - use start perpendicular for consistency
+                this.ctx.moveTo(actualPrevPoint.x + startPerpX * offset, actualPrevPoint.y + startPerpY * offset);
             }
             
             this.ctx.lineTo(currentPoints[i].x, currentPoints[i].y);
@@ -393,8 +440,9 @@ class DrawingEngine {
         }
         
         // Store current perpendicular and points for next segment
-        this.multiLineLastPerpX = perpX;
-        this.multiLineLastPerpY = perpY;
+        // Use the blended end perpendicular for smoother transitions
+        this.multiLineLastPerpX = endPerpX;
+        this.multiLineLastPerpY = endPerpY;
         this.multiLineLastPoints = currentPoints;
     }
     

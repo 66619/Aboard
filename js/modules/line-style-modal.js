@@ -15,9 +15,25 @@ class LineStyleModal {
         this.previewCanvas = null;
         this.previewCtx = null;
         
+        // Constants for preview overflow detection
+        this.PREVIEW_OVERFLOW_HEIGHT_THRESHOLD = 60;
+        
         // Create modal elements
         this.createModal();
         this.setupEventListeners();
+    }
+    
+    // Helper method to check if arrow drawing should be used
+    // Note: Arrow types are now handled as separate shape types (arrow, doubleArrow)
+    // This method is kept for backwards compatibility but always returns false
+    shouldDrawArrow() {
+        return false;
+    }
+    
+    // Helper method to get the final line style (handles arrow type conversion)
+    // Note: Arrow types are now handled as separate shape types
+    getFinalLineStyle(lineStyle) {
+        return lineStyle;
     }
     
     createModal() {
@@ -102,8 +118,13 @@ class LineStyleModal {
                         <!-- Preview Area -->
                         <div class="line-style-modal-group">
                             <label data-i18n="lineStyleModal.preview">Preview</label>
-                            <div class="line-style-preview-area">
+                            <div class="line-style-preview-area" id="line-style-preview-container">
                                 <canvas id="line-style-preview-canvas" width="320" height="80"></canvas>
+                                <button id="preview-expand-btn" class="preview-expand-btn" style="display: none;" title="Expand Preview">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -122,6 +143,9 @@ class LineStyleModal {
         this.modal = document.getElementById('line-style-modal');
         this.previewCanvas = document.getElementById('line-style-preview-canvas');
         this.previewCtx = this.previewCanvas.getContext('2d');
+        
+        // Track arrow type (for shape mode only)
+        this.arrowType = 'none';
     }
     
     setupEventListeners() {
@@ -172,6 +196,11 @@ class LineStyleModal {
         document.getElementById('modal-line-spacing-slider').addEventListener('input', (e) => {
             document.getElementById('modal-line-spacing-value').textContent = e.target.value;
             this.updatePreview();
+        });
+        
+        // Preview expand button
+        document.getElementById('preview-expand-btn').addEventListener('click', () => {
+            this.showExpandedPreview();
         });
     }
     
@@ -307,6 +336,7 @@ class LineStyleModal {
         
         // Setup context with exact pen size (1:1 with actual drawing)
         ctx.strokeStyle = '#333333';
+        ctx.fillStyle = '#333333';
         ctx.lineWidth = penSize;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
@@ -352,6 +382,37 @@ class LineStyleModal {
                 this.drawMultiLinePreview(ctx, startX, centerY, endX, centerY, lineCount, lineSpacing);
                 break;
         }
+        
+        // Check for preview overflow
+        this.checkPreviewOverflow();
+    }
+    
+    drawArrowPreview(ctx, startX, startY, endX, endY, penSize, isDouble) {
+        const arrowSize = Math.max(10, penSize * 2);
+        
+        // Draw the main line
+        ctx.beginPath();
+        ctx.moveTo(isDouble ? startX + arrowSize * 0.8 : startX, startY);
+        ctx.lineTo(endX - arrowSize * 0.8, endY);
+        ctx.stroke();
+        
+        // Draw end arrow head
+        ctx.beginPath();
+        ctx.moveTo(endX, endY);
+        ctx.lineTo(endX - arrowSize, endY - arrowSize * 0.5);
+        ctx.lineTo(endX - arrowSize, endY + arrowSize * 0.5);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Draw start arrow head if double arrow
+        if (isDouble) {
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(startX + arrowSize, startY - arrowSize * 0.5);
+            ctx.lineTo(startX + arrowSize, startY + arrowSize * 0.5);
+            ctx.closePath();
+            ctx.fill();
+        }
     }
     
     drawWavyPreview(ctx, startX, startY, endX, endY, waveDensity) {
@@ -390,7 +451,7 @@ class LineStyleModal {
     }
     
     applySettings() {
-        const lineStyle = this.getCurrentLineStyle();
+        let lineStyle = this.getCurrentLineStyle();
         const dashDensity = parseInt(document.getElementById('modal-dash-density-slider').value);
         const waveDensity = parseInt(document.getElementById('modal-wave-density-slider').value);
         const lineCount = parseInt(document.getElementById('modal-line-count-slider').value);
@@ -406,15 +467,18 @@ class LineStyleModal {
             // Update pen button style
             this.updatePenButtonStyle(lineStyle);
         } else {
+            // For shape tool, use helper to get final line style with arrow type
+            const finalLineStyle = this.getFinalLineStyle(lineStyle);
+            
             // Apply to shape tool - convert 'multi' back to internal representation
-            this.shapeDrawingManager.setLineStyle(lineStyle);
+            this.shapeDrawingManager.setLineStyle(finalLineStyle);
             this.shapeDrawingManager.setDashDensity(dashDensity);
             this.shapeDrawingManager.setWaveDensity(waveDensity);
             this.shapeDrawingManager.setMultiLineCount(lineCount);
             this.shapeDrawingManager.setMultiLineSpacing(lineSpacing);
             
             // Update shape button style
-            this.updateShapeButtonStyle(lineStyle);
+            this.updateShapeButtonStyle(finalLineStyle);
         }
     }
     
@@ -462,10 +526,151 @@ class LineStyleModal {
                 return '<path d="M2 8 Q6 4, 10 8 T18 8 T26 8 T34 8 Q38 12, 38 8" stroke="currentColor" stroke-width="2" fill="none"/>';
             case 'multi':
                 return '<line x1="2" y1="5" x2="38" y2="5" stroke="currentColor" stroke-width="1.5"/><line x1="2" y1="11" x2="38" y2="11" stroke="currentColor" stroke-width="1.5"/>';
+            case 'arrow':
+                return '<line x1="2" y1="8" x2="32" y2="8" stroke="currentColor" stroke-width="2"/><polyline points="28,4 36,8 28,12" stroke="currentColor" stroke-width="2" fill="none"/>';
+            case 'doubleArrow':
+                return '<line x1="10" y1="8" x2="30" y2="8" stroke="currentColor" stroke-width="2"/><polyline points="4,8 10,4 10,12" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="30,4 36,8 30,12" stroke="currentColor" stroke-width="2" fill="none"/>';
             case 'solid':
             default:
                 return '<line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2"/>';
         }
+    }
+    
+    // Check if preview content overflows and show expand button if needed
+    checkPreviewOverflow() {
+        const lineStyle = this.getCurrentLineStyle();
+        const lineCount = parseInt(document.getElementById('modal-line-count-slider').value);
+        const lineSpacing = parseInt(document.getElementById('modal-line-spacing-slider').value);
+        const penSize = this.currentMode === 'pen' 
+            ? (this.drawingEngine.penSize || 5)
+            : (this.shapeDrawingManager.drawingEngine.penSize || 5);
+        
+        // Calculate if preview would overflow
+        let requiredHeight = 80;
+        if (lineStyle === 'multi') {
+            requiredHeight = (lineCount - 1) * lineSpacing + penSize * 2;
+        } else if (lineStyle === 'wavy') {
+            requiredHeight = penSize * 3 + 16;
+        } else {
+            requiredHeight = penSize * 2;
+        }
+        
+        const expandBtn = document.getElementById('preview-expand-btn');
+        if (expandBtn) {
+            expandBtn.style.display = requiredHeight > this.PREVIEW_OVERFLOW_HEIGHT_THRESHOLD ? 'flex' : 'none';
+        }
+    }
+    
+    // Show expanded preview modal
+    showExpandedPreview() {
+        // Create expanded preview modal if it doesn't exist
+        let expandedModal = document.getElementById('line-style-preview-expanded-modal');
+        if (!expandedModal) {
+            const modalHTML = `
+                <div id="line-style-preview-expanded-modal" class="modal">
+                    <div class="modal-content expanded-preview-modal-content">
+                        <div class="line-style-modal-header">
+                            <h2 data-i18n="lineStyleModal.preview">Preview</h2>
+                            <button id="expanded-preview-close" class="line-style-modal-close" title="Close">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="expanded-preview-body">
+                            <canvas id="expanded-preview-canvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            expandedModal = document.getElementById('line-style-preview-expanded-modal');
+            
+            document.getElementById('expanded-preview-close').addEventListener('click', () => {
+                expandedModal.classList.remove('show');
+            });
+            
+            expandedModal.addEventListener('click', (e) => {
+                if (e.target === expandedModal) {
+                    expandedModal.classList.remove('show');
+                }
+            });
+        }
+        
+        // Draw expanded preview
+        const canvas = document.getElementById('expanded-preview-canvas');
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        
+        // Set larger canvas size
+        const cssWidth = Math.min(600, window.innerWidth - 100);
+        const cssHeight = Math.min(300, window.innerHeight - 200);
+        canvas.width = cssWidth * dpr;
+        canvas.height = cssHeight * dpr;
+        canvas.style.width = cssWidth + 'px';
+        canvas.style.height = cssHeight + 'px';
+        
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, cssWidth, cssHeight);
+        
+        // Get current settings
+        const lineStyle = this.getCurrentLineStyle();
+        const dashDensity = parseInt(document.getElementById('modal-dash-density-slider').value);
+        const waveDensity = parseInt(document.getElementById('modal-wave-density-slider').value);
+        const lineCount = parseInt(document.getElementById('modal-line-count-slider').value);
+        const lineSpacing = parseInt(document.getElementById('modal-line-spacing-slider').value);
+        const penSize = this.currentMode === 'pen' 
+            ? (this.drawingEngine.penSize || 5)
+            : (this.shapeDrawingManager.drawingEngine.penSize || 5);
+        
+        ctx.strokeStyle = '#333333';
+        ctx.fillStyle = '#333333';
+        ctx.lineWidth = penSize;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        
+        const startX = 50;
+        const endX = cssWidth - 50;
+        const centerY = cssHeight / 2;
+        
+        ctx.setLineDash([]);
+        
+        switch (lineStyle) {
+            case 'solid':
+                ctx.beginPath();
+                ctx.moveTo(startX, centerY);
+                ctx.lineTo(endX, centerY);
+                ctx.stroke();
+                break;
+            case 'dashed':
+                ctx.setLineDash([dashDensity, dashDensity / 2]);
+                ctx.beginPath();
+                ctx.moveTo(startX, centerY);
+                ctx.lineTo(endX, centerY);
+                ctx.stroke();
+                break;
+            case 'dotted':
+                ctx.setLineDash([3, dashDensity / 2]);
+                ctx.beginPath();
+                ctx.moveTo(startX, centerY);
+                ctx.lineTo(endX, centerY);
+                ctx.stroke();
+                break;
+            case 'wavy':
+                this.drawWavyPreview(ctx, startX, centerY, endX, centerY, waveDensity);
+                break;
+            case 'multi':
+                this.drawMultiLinePreview(ctx, startX, centerY, endX, centerY, lineCount, lineSpacing);
+                break;
+        }
+        
+        // Apply i18n if available
+        if (window.i18n && window.i18n.applyTranslations) {
+            window.i18n.applyTranslations();
+        }
+        
+        expandedModal.classList.add('show');
     }
 }
 

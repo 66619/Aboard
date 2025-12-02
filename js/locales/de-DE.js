@@ -72,6 +72,8 @@ window.translations = {
             circle: 'Kreis',
             ellipse: 'Ellipse',
             arrow: 'Pfeil',
+            doubleArrow: 'Doppelpfeil',
+            arrowSize: 'Pfeilgröße',
             hint: 'Drücken und ziehen zum Zeichnen, loslassen zum Beenden',
             lineProperties: 'Linieneigenschaften'
         },
@@ -103,6 +105,10 @@ window.translations = {
             double: 'Doppelt',
             triple: 'Dreifach',
             multiLine: 'Mehrfachlinien',
+            arrow: 'Pfeil',
+            doubleArrow: 'Doppelpfeil',
+            noArrow: 'Kein Pfeil',
+            arrowType: 'Pfeiltyp',
             dashDensity: 'Strichdichte',
             waveDensity: 'Wellendichte',
             lineSpacing: 'Linienabstand',
@@ -122,7 +128,8 @@ window.translations = {
         options: 'Zeitanzeigeoptionen',
         showDate: 'Datum anzeigen',
         showTime: 'Uhrzeit anzeigen',
-        settings: 'Einstellungen'
+        settings: 'Einstellungen',
+        fullscreenDisplay: 'Vollbildanzeige'
     },
 
     // Background
@@ -551,6 +558,14 @@ Verwendungstipps:
 Viel Spaß bei Ihrer kreativen Arbeit!`,
         confirm: 'OK',
         noShowAgain: 'Nicht mehr anzeigen'
+    },
+
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: 'Löschen bestätigen',
+        message: 'Sind Sie sicher, dass Sie die aktuelle Leinwand löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden. Andere Leinwände sind nicht betroffen.',
+        confirm: 'Bestätigen',
+        cancel: 'Abbrechen'
     },
 
     // Color names

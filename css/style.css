@@ -161,7 +161,7 @@ body {
     bottom: 100px; /* Position above toolbar (toolbar is at bottom: 20px + estimated height ~60px + gap 20px) */
     transform: translateX(-50%);
     z-index: 999;
-    padding: 16px 24px;
+    padding: 12px 16px;
     background-color: #ffffff;
     border-radius: 16px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
@@ -299,7 +299,7 @@ body {
     justify-content: center;
     width: 40px;
     height: 40px;
-    border: 2px solid #ddd;
+    border: 3px solid transparent;
     border-radius: 8px;
     background-color: #f8f8f8;
     cursor: pointer;
@@ -311,8 +311,14 @@ body {
 
 .color-picker-icon-btn:hover {
     background-color: #e8e8e8;
-    border-color: var(--theme-color);
+    border-color: #ddd;
     transform: scale(1.05);
+}
+
+.color-picker-icon-btn.active {
+    border-color: var(--theme-color);
+    transform: scale(1.15);
+    background-color: #e8f4ff;
 }
 
 .color-picker-icon-btn svg {
@@ -336,7 +342,7 @@ body {
 .color-btn {
     width: 36px;
     height: 36px;
-    border: 3px solid transparent;
+    border: 2px solid transparent;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -351,6 +357,8 @@ body {
 .color-btn.active {
     border-color: var(--theme-color);
     transform: scale(1.15);
+    /* Use box-shadow to create visible border for light colors (yellow, white) */
+    box-shadow: 0 0 0 2px var(--theme-color), 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Sliders */
@@ -584,6 +592,8 @@ body {
     width: 180px;
     border-right: 2px solid #f0f0f0;
     padding-right: 20px;
+    overflow-y: auto;
+    max-height: 75vh;
 }
 
 .settings-tab-icon {
@@ -812,7 +822,7 @@ body {
 .eraser-shape-btn {
     flex: 1;
     padding: 8px 12px;
-    border: 2px solid #ddd;
+    border: 3px solid #ddd;
     border-radius: 8px;
     background-color: #ffffff;
     cursor: pointer;
@@ -854,7 +864,7 @@ body {
 .size-option-btn {
     flex: 1;
     padding: 12px 16px;
-    border: 2px solid #ddd;
+    border: 3px solid #ddd;
     border-radius: 8px;
     background-color: #ffffff;
     cursor: pointer;
@@ -879,7 +889,7 @@ body {
 .display-option-btn {
     flex: 1;
     padding: 12px 16px;
-    border: 2px solid #ddd;
+    border: 3px solid #ddd;
     border-radius: 8px;
     background-color: #ffffff;
     cursor: pointer;
@@ -905,7 +915,7 @@ body {
 .pattern-option-btn {
     flex: 1;
     padding: 8px 12px;
-    border: 2px solid #ddd;
+    border: 3px solid #ddd;
     border-radius: 8px;
     background-color: #ffffff;
     cursor: pointer;
@@ -930,7 +940,7 @@ body {
 .pen-type-btn {
     flex: 1;
     padding: 8px 10px;
-    border: 2px solid #ddd;
+    border: 3px solid #ddd;
     border-radius: 8px;
     background-color: #ffffff;
     cursor: pointer;
@@ -1233,6 +1243,11 @@ body {
     .tool-btn span {
         font-size: 11px;
     }
+    
+    /* Hide the Move (pan) button on mobile devices - pan is done via pinch gestures */
+    #pan-btn {
+        display: none;
+    }
 
     #history-controls {
         top: 10px;
@@ -1477,7 +1492,7 @@ body {
 
 .canvas-mode-btn {
     padding: 12px 16px;
-    border: 2px solid #ddd;
+    border: 3px solid #ddd;
     border-radius: 8px;
     background-color: #ffffff;
     cursor: pointer;
@@ -1508,7 +1523,7 @@ body {
 
 .canvas-preset-btn {
     padding: 10px 12px;
-    border: 2px solid #ddd;
+    border: 3px solid #ddd;
     border-radius: 8px;
     background-color: #ffffff;
     cursor: pointer;
@@ -1939,7 +1954,7 @@ body {
 
 .export-format-btn {
     background: white;
-    border: 2px solid #e0e0e0;
+    border: 3px solid #e0e0e0;
     border-radius: 8px;
     padding: 12px;
     font-size: 14px;

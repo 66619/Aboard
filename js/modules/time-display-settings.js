@@ -67,6 +67,11 @@ class TimeDisplaySettingsModal {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.color-btn[data-td-time-color]').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
+                // Deactivate custom time color picker
+                const customTimeColorPickerBtn = document.querySelector('label[for="td-custom-time-color-picker"]');
+                if (customTimeColorPickerBtn) {
+                    customTimeColorPickerBtn.classList.remove('active');
+                }
                 this.applySettings(); // Instant apply
             });
         });
@@ -75,6 +80,11 @@ class TimeDisplaySettingsModal {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.color-btn[data-td-time-bg-color]').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
+                // Deactivate custom color picker
+                const customBgColorPickerBtn = document.querySelector('label[for="td-custom-bg-color-picker"]');
+                if (customBgColorPickerBtn) {
+                    customBgColorPickerBtn.classList.remove('active');
+                }
                 this.applySettings(); // Instant apply
             });
         });
@@ -82,22 +92,32 @@ class TimeDisplaySettingsModal {
         // Custom color pickers - instant apply
         const customTimeColorPicker = document.getElementById('td-custom-time-color-picker');
         if (customTimeColorPicker) {
+            const customTimeColorPickerBtn = document.querySelector('label[for="td-custom-time-color-picker"]');
             customTimeColorPicker.addEventListener('change', (e) => {
                 // Deactivate all preset color buttons
                 document.querySelectorAll('.color-btn[data-td-time-color]').forEach(b => b.classList.remove('active'));
                 // Store custom color as data attribute for later use
                 customTimeColorPicker.dataset.selectedColor = e.target.value;
+                // Mark color picker button as active
+                if (customTimeColorPickerBtn) {
+                    customTimeColorPickerBtn.classList.add('active');
+                }
                 this.applySettings(); // Instant apply
             });
         }
         
         const customBgColorPicker = document.getElementById('td-custom-bg-color-picker');
         if (customBgColorPicker) {
+            const customBgColorPickerBtn = document.querySelector('label[for="td-custom-bg-color-picker"]');
             customBgColorPicker.addEventListener('change', (e) => {
-                // Deactivate all preset background color buttons
+                // Deactivate all preset color buttons
                 document.querySelectorAll('.color-btn[data-td-time-bg-color]').forEach(b => b.classList.remove('active'));
                 // Store custom color as data attribute for later use
                 customBgColorPicker.dataset.selectedColor = e.target.value;
+                // Mark color picker button as active
+                if (customBgColorPickerBtn) {
+                    customBgColorPickerBtn.classList.add('active');
+                }
                 this.applySettings(); // Instant apply
             });
         }
@@ -270,6 +290,7 @@ class TimeDisplaySettingsModal {
         // Get colors
         const activeColorBtn = document.querySelector('.color-btn[data-td-time-color].active');
         const customTimeColorPicker = document.getElementById('td-custom-time-color-picker');
+        const customTimeColorPickerBtn = document.querySelector('label[for="td-custom-time-color-picker"]');
         
         if (activeColorBtn) {
             this.timeDisplayManager.timeColor = activeColorBtn.dataset.tdTimeColor;
@@ -278,14 +299,15 @@ class TimeDisplaySettingsModal {
             this.timeDisplayManager.timeColor = customTimeColorPicker.dataset.selectedColor;
         }
         
+        // For background color, check preset buttons first, then fallback to custom picker
         const activeBgColorBtn = document.querySelector('.color-btn[data-td-time-bg-color].active');
         const customBgColorPicker = document.getElementById('td-custom-bg-color-picker');
         
         if (activeBgColorBtn) {
             this.timeDisplayManager.bgColor = activeBgColorBtn.dataset.tdTimeBgColor;
-        } else if (customBgColorPicker && customBgColorPicker.dataset.selectedColor) {
-            // Use custom background color if no preset is active
-            this.timeDisplayManager.bgColor = customBgColorPicker.dataset.selectedColor;
+        } else if (customBgColorPicker) {
+            // Use dataset.selectedColor if available, otherwise use the picker's value
+            this.timeDisplayManager.bgColor = customBgColorPicker.dataset.selectedColor || customBgColorPicker.value || '#ffffff';
         }
         
         // Get font size
