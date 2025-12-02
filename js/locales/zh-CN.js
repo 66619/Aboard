@@ -32,6 +32,7 @@ window.translations = {
         undo: '撤销',
         redo: '重做',
         pen: '笔',
+        shape: '形状',
         move: '移动',
         eraser: '橡皮',
         clear: '清空',
@@ -56,11 +57,25 @@ window.translations = {
             ballpoint: '圆珠笔',
             fountain: '钢笔',
             brush: '毛笔',
+            color: '颜色',
             colorAndSize: '颜色与粗细',
             colorPicker: '取色器',
             size: '粗细',
             sizeLabel: '粗细：当前',
             sizePx: 'px'
+        },
+        shape: {
+            title: '形状',
+            type: '形状类型',
+            line: '直线',
+            rectangle: '矩形',
+            circle: '圆形',
+            ellipse: '椭圆',
+            arrow: '箭头',
+            doubleArrow: '双箭头',
+            arrowSize: '箭头大小',
+            hint: '按住拖动绘制形状，松开完成',
+            lineProperties: '线条属性'
         },
         eraser: {
             title: '橡皮',
@@ -80,7 +95,40 @@ window.translations = {
         },
         refresh: {
             warning: '刷新后画布内容将清空且无法恢复，确定要刷新吗？'
+        },
+        lineStyle: {
+            title: '线条样式',
+            solid: '实线',
+            dashed: '虚线',
+            dotted: '点线',
+            wavy: '波浪线',
+            double: '双线',
+            triple: '三线',
+            multiLine: '多线',
+            arrow: '箭头',
+            doubleArrow: '双箭头',
+            noArrow: '无箭头',
+            arrowType: '箭头类型',
+            dashDensity: '虚线密度',
+            waveDensity: '波浪密度',
+            lineSpacing: '线条间距',
+            lineCount: '线条数量'
         }
+    },
+
+    // Line Style Modal
+    lineStyleModal: {
+        title: '线条样式设置',
+        openSettings: '更多设置',
+        preview: '预览'
+    },
+
+    // Time Display
+    timeDisplay: {
+        options: '时间显示选项',
+        showDate: '显示日期',
+        showTime: '显示时间',
+        settings: '设置'
     },
 
     // Background
@@ -97,6 +145,7 @@ window.translations = {
         english4line: '英语四线格',
         musicStaff: '五线谱',
         coordinate: '坐标系',
+        coordinateOriginHint: '在移动模式下双击选中坐标系中心可拖动移动',
         image: '上传图片',
         density: '密度',
         densityLabel: '密度：当前',
@@ -376,6 +425,7 @@ window.translations = {
         showDate: '显示日期',
         showTime: '显示时间',
         settings: '设置',
+        fullscreenDisplay: '全屏显示',
         displayOptions: '显示选项',
         dateAndTime: '日期和时间',
         dateOnly: '仅日期',
@@ -498,6 +548,14 @@ window.translations = {
 祝您使用愉快！`,
         confirm: '确定',
         noShowAgain: '不再弹出'
+    },
+
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: '确认清空',
+        message: '确定要清空当前画布吗？此操作无法撤销，其他画布不受影响。',
+        confirm: '确定',
+        cancel: '取消'
     },
 
     // Color names

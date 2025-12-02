@@ -31,6 +31,18 @@ class DrawingBoard {
         this.exportManager = new ExportManager(this.canvas, this.bgCanvas, this);
         this.teachingToolsManager = new TeachingToolsManager(this.canvas, this.ctx, this.historyManager);
         
+        // Set callback for teaching tools insertion to auto-switch to pen
+        this.teachingToolsManager.onToolsInserted = () => {
+            this.closeFeaturePanel();
+            this.switchToPen();
+        };
+        
+        // Initialize shape drawing manager
+        this.shapeDrawingManager = new ShapeDrawingManager(this.canvas, this.ctx, this.drawingEngine, this.historyManager);
+        
+        // Initialize line style modal for both pen and shape tools
+        this.lineStyleModal = new LineStyleModal(this.drawingEngine, this.shapeDrawingManager);
+        
         // Initialize edge drawing manager for teaching tools
         this.edgeDrawingManager = new EdgeDrawingManager(this.teachingToolsManager, this.drawingEngine);
         
@@ -235,17 +247,21 @@ class DrawingBoard {
                 }
             }
             
-            // Check if clicking on coordinate origin point (in background mode)
-            if (this.drawingEngine.currentTool === 'background' && 
-                this.backgroundManager.backgroundPattern === 'coordinate') {
+            // Check if clicking on coordinate origin point (in background or pan mode)
+            // In pan mode, require double-click to select coordinate origin
+            if (this.backgroundManager.backgroundPattern === 'coordinate') {
                 const rect = this.bgCanvas.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
                 
                 if (this.backgroundManager.isPointNearCoordinateOrigin(x, y)) {
-                    this.isDraggingCoordinateOrigin = true;
-                    this.coordinateOriginDragStart = { x: e.clientX, y: e.clientY };
-                    return;
+                    if (this.drawingEngine.currentTool === 'background') {
+                        // In background mode, single click to drag
+                        this.isDraggingCoordinateOrigin = true;
+                        this.coordinateOriginDragStart = { x: e.clientX, y: e.clientY };
+                        return;
+                    }
+                    // In pan mode, we'll handle this in dblclick event
                 }
             }
             
@@ -257,6 +273,12 @@ class DrawingBoard {
             
             if (e.button === 1 || (e.button === 0 && e.shiftKey) || this.drawingEngine.currentTool === 'pan') {
                 this.drawingEngine.startPanning(e);
+            } else if (this.drawingEngine.currentTool === 'shape') {
+                // Handle shape drawing
+                if (this.teachingToolsManager && this.teachingToolsManager.isInteracting) {
+                    return;
+                }
+                this.shapeDrawingManager.startDrawing(e);
             } else if (this.drawingEngine.currentTool === 'pen' || this.drawingEngine.currentTool === 'eraser') {
                 // Don't start drawing if interacting with teaching tools
                 if (this.teachingToolsManager && this.teachingToolsManager.isInteracting) {
@@ -277,6 +299,9 @@ class DrawingBoard {
             } else if (this.drawingEngine.isPanning) {
                 this.drawingEngine.pan(e);
                 this.applyPanTransform();
+            } else if (this.shapeDrawingManager && this.shapeDrawingManager.isDrawing) {
+                // Handle shape drawing
+                this.shapeDrawingManager.draw(e);
             } else if (this.drawingEngine.isDrawing) {
                 this.drawingEngine.draw(e);
                 this.updateEraserCursor(e);
@@ -289,6 +314,24 @@ class DrawingBoard {
             this.stopDraggingCoordinateOrigin();
             this.handleDrawingComplete();
             this.drawingEngine.stopPanning();
+        });
+        
+        // Double-click handler for coordinate origin selection in pan mode
+        this.canvas.addEventListener('dblclick', (e) => {
+            // In pan mode, double-click to select coordinate origin
+            if (this.drawingEngine.currentTool === 'pan' && 
+                this.backgroundManager.backgroundPattern === 'coordinate') {
+                const rect = this.bgCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                if (this.backgroundManager.isPointNearCoordinateOrigin(x, y)) {
+                    this.isDraggingCoordinateOrigin = true;
+                    this.coordinateOriginDragStart = { x: e.clientX, y: e.clientY };
+                    // Visual feedback - change cursor
+                    this.canvas.style.cursor = 'move';
+                }
+            }
         });
         
         this.canvas.addEventListener('mouseenter', (e) => {
@@ -364,7 +407,10 @@ class DrawingBoard {
         document.getElementById('clear-btn').addEventListener('click', () => this.confirmClear());
         document.getElementById('settings-btn').addEventListener('click', () => this.openSettings());
         document.getElementById('more-btn').addEventListener('click', () => this.setTool('more'));
-        document.getElementById('teaching-tools-btn').addEventListener('click', () => this.teachingToolsManager.showModal());
+        
+        // Shape and Teaching Tools buttons in More menu
+        document.getElementById('more-shape-btn').addEventListener('click', () => this.setTool('shape'));
+        document.getElementById('more-teaching-tools-btn').addEventListener('click', () => this.teachingToolsManager.showModal());
         
         document.getElementById('config-close-btn').addEventListener('click', () => this.closeConfigPanel());
         document.getElementById('feature-close-btn').addEventListener('click', () => this.closeFeaturePanel());
@@ -455,13 +501,41 @@ class DrawingBoard {
                 this.drawingEngine.setColor(e.target.dataset.color);
                 document.querySelectorAll('.color-btn[data-color]').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
+                // Sync shape color picker value
+                const shapeColorPicker = document.getElementById('shape-custom-color-picker');
+                if (shapeColorPicker) {
+                    shapeColorPicker.value = e.target.dataset.color;
+                }
             });
         });
         
         const customColorPicker = document.getElementById('custom-color-picker');
+        const customColorPickerBtn = document.querySelector('label[for="custom-color-picker"]');
         customColorPicker.addEventListener('input', (e) => {
             this.drawingEngine.setColor(e.target.value);
             document.querySelectorAll('.color-btn[data-color]').forEach(b => b.classList.remove('active'));
+            // Mark color picker button as active
+            if (customColorPickerBtn) {
+                customColorPickerBtn.classList.add('active');
+            }
+            // Sync shape color picker
+            const shapeColorPicker = document.getElementById('shape-custom-color-picker');
+            if (shapeColorPicker) {
+                shapeColorPicker.value = e.target.value;
+            }
+        });
+        // Deactivate color picker when a preset is selected
+        document.querySelectorAll('.color-btn[data-color]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (customColorPickerBtn) {
+                    customColorPickerBtn.classList.remove('active');
+                }
+                // Also deactivate shape color picker button
+                const shapeCustomColorPickerBtn = document.querySelector('label[for="shape-custom-color-picker"]');
+                if (shapeCustomColorPickerBtn) {
+                    shapeCustomColorPickerBtn.classList.remove('active');
+                }
+            });
         });
         
         // Background color picker
@@ -478,13 +552,26 @@ class DrawingBoard {
         });
         
         const customBgColorPicker = document.getElementById('custom-bg-color-picker');
+        const customBgColorPickerBtn = document.querySelector('label[for="custom-bg-color-picker"]');
         customBgColorPicker.addEventListener('input', (e) => {
             this.backgroundManager.setBackgroundColor(e.target.value);
             document.querySelectorAll('.color-btn[data-bg-color]').forEach(b => b.classList.remove('active'));
+            // Mark color picker button as active
+            if (customBgColorPickerBtn) {
+                customBgColorPickerBtn.classList.add('active');
+            }
             // Save page background in paginated mode
             if (!this.settingsManager.infiniteCanvas) {
                 this.savePageBackground(this.currentPage);
             }
+        });
+        // Deactivate color picker when a preset is selected
+        document.querySelectorAll('.color-btn[data-bg-color]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (customBgColorPickerBtn) {
+                    customBgColorPickerBtn.classList.remove('active');
+                }
+            });
         });
         
         // Background pattern buttons
@@ -577,10 +664,66 @@ class DrawingBoard {
         // Sliders
         const penSizeSlider = document.getElementById('pen-size-slider');
         const penSizeValue = document.getElementById('pen-size-value');
+        const shapeSizeSlider = document.getElementById('shape-size-slider');
+        const shapeSizeValue = document.getElementById('shape-size-value');
+        
+        // Pen size slider - syncs with shape slider
         penSizeSlider.addEventListener('input', (e) => {
             this.drawingEngine.setPenSize(parseInt(e.target.value));
             penSizeValue.textContent = e.target.value;
+            // Sync shape slider
+            if (shapeSizeSlider) {
+                shapeSizeSlider.value = e.target.value;
+                shapeSizeValue.textContent = e.target.value;
+            }
         });
+        
+        // Shape size slider - syncs with pen slider
+        if (shapeSizeSlider) {
+            shapeSizeSlider.addEventListener('input', (e) => {
+                this.drawingEngine.setPenSize(parseInt(e.target.value));
+                shapeSizeValue.textContent = e.target.value;
+                // Sync pen slider
+                penSizeSlider.value = e.target.value;
+                penSizeValue.textContent = e.target.value;
+            });
+        }
+        
+        // Arrow size slider (independent control)
+        const arrowSizeSlider = document.getElementById('arrow-size-slider');
+        const arrowSizeValue = document.getElementById('arrow-size-value');
+        if (arrowSizeSlider && arrowSizeValue) {
+            arrowSizeSlider.addEventListener('input', (e) => {
+                this.shapeDrawingManager.setArrowSize(parseInt(e.target.value));
+                arrowSizeValue.textContent = e.target.value;
+            });
+            // Initialize from saved value
+            arrowSizeSlider.value = this.shapeDrawingManager.arrowSize;
+            arrowSizeValue.textContent = this.shapeDrawingManager.arrowSize;
+        }
+        
+        // Shape custom color picker - syncs with pen color picker
+        const shapeCustomColorPicker = document.getElementById('shape-custom-color-picker');
+        const shapeCustomColorPickerBtn = document.querySelector('label[for="shape-custom-color-picker"]');
+        if (shapeCustomColorPicker) {
+            shapeCustomColorPicker.addEventListener('input', (e) => {
+                this.drawingEngine.setColor(e.target.value);
+                document.querySelectorAll('.color-btn[data-color]').forEach(b => b.classList.remove('active'));
+                // Mark color picker button as active
+                if (shapeCustomColorPickerBtn) {
+                    shapeCustomColorPickerBtn.classList.add('active');
+                }
+                // Sync pen color picker value and active state
+                const penColorPicker = document.getElementById('custom-color-picker');
+                const penColorPickerBtn = document.querySelector('label[for="custom-color-picker"]');
+                if (penColorPicker) {
+                    penColorPicker.value = e.target.value;
+                }
+                if (penColorPickerBtn) {
+                    penColorPickerBtn.classList.add('active');
+                }
+            });
+        }
         
         // Eraser shape buttons
         document.querySelectorAll('.eraser-shape-btn').forEach(btn => {
@@ -604,6 +747,41 @@ class DrawingBoard {
             }
         });
         
+        // Shape type buttons
+        document.querySelectorAll('.shape-type-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const shapeType = e.target.closest('.shape-type-btn').dataset.shapeType;
+                this.shapeDrawingManager.setShape(shapeType);
+                document.querySelectorAll('.shape-type-btn').forEach(b => b.classList.remove('active'));
+                e.target.closest('.shape-type-btn').classList.add('active');
+                
+                // Show/hide arrow size control based on shape type
+                const arrowSizeGroup = document.getElementById('arrow-size-group');
+                if (arrowSizeGroup) {
+                    if (shapeType === 'arrow' || shapeType === 'doubleArrow') {
+                        arrowSizeGroup.style.display = '';
+                    } else {
+                        arrowSizeGroup.style.display = 'none';
+                    }
+                }
+            });
+        });
+        
+        // Line style settings buttons (open modal)
+        const penLineStyleSettingsBtn = document.getElementById('pen-line-style-settings-btn');
+        if (penLineStyleSettingsBtn) {
+            penLineStyleSettingsBtn.addEventListener('click', () => {
+                this.lineStyleModal.show('pen');
+            });
+        }
+        
+        const shapeLineStyleSettingsBtn = document.getElementById('shape-line-style-settings-btn');
+        if (shapeLineStyleSettingsBtn) {
+            shapeLineStyleSettingsBtn.addEventListener('click', () => {
+                this.lineStyleModal.show('shape');
+            });
+        }
+        
         // More config panel (time display checkboxes)
         const showDateCheckboxMore = document.getElementById('show-date-checkbox-more');
         const showTimeCheckboxMore = document.getElementById('show-time-checkbox-more');
@@ -619,6 +797,9 @@ class DrawingBoard {
                 if (isVisible) {
                     timeDisplayControls.style.display = 'none';
                     timeDisplayFeatureBtn.classList.remove('active');
+                    // Auto-switch to pen tool after closing time display settings
+                    this.closeFeaturePanel();
+                    this.switchToPen();
                 } else {
                     timeDisplayControls.style.display = 'flex';
                     timeDisplayFeatureBtn.classList.add('active');
@@ -635,6 +816,9 @@ class DrawingBoard {
         if (timerFeatureBtn) {
             timerFeatureBtn.addEventListener('click', () => {
                 this.timerManager.showSettingsModal();
+                // Auto-switch to pen tool after opening timer
+                this.closeFeaturePanel();
+                this.switchToPen();
             });
         }
         
@@ -871,9 +1055,22 @@ class DrawingBoard {
         });
         
         const customThemeColorPicker = document.getElementById('custom-theme-color-picker');
+        const customThemeColorPickerBtn = document.querySelector('label[for="custom-theme-color-picker"]');
         customThemeColorPicker.addEventListener('input', (e) => {
             this.settingsManager.setThemeColor(e.target.value);
             document.querySelectorAll('.color-btn[data-theme-color]').forEach(b => b.classList.remove('active'));
+            // Mark color picker button as active
+            if (customThemeColorPickerBtn) {
+                customThemeColorPickerBtn.classList.add('active');
+            }
+        });
+        // Deactivate color picker when a preset is selected
+        document.querySelectorAll('.color-btn[data-theme-color]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (customThemeColorPickerBtn) {
+                    customThemeColorPickerBtn.classList.remove('active');
+                }
+            });
         });
         
         // Pattern preferences
@@ -970,13 +1167,23 @@ class DrawingBoard {
                 this.timeDisplayManager.setColor(e.target.dataset.timeColor);
                 document.querySelectorAll('.color-btn[data-time-color]').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
+                // Deactivate color picker button
+                const customTimeColorPickerBtn = document.querySelector('label[for="custom-time-color-picker"]');
+                if (customTimeColorPickerBtn) {
+                    customTimeColorPickerBtn.classList.remove('active');
+                }
             });
         });
         
         const customTimeColorPicker = document.getElementById('custom-time-color-picker');
+        const customTimeColorPickerBtn = document.querySelector('label[for="custom-time-color-picker"]');
         customTimeColorPicker.addEventListener('input', (e) => {
             this.timeDisplayManager.setColor(e.target.value);
             document.querySelectorAll('.color-btn[data-time-color]').forEach(b => b.classList.remove('active'));
+            // Mark color picker button as active
+            if (customTimeColorPickerBtn) {
+                customTimeColorPickerBtn.classList.add('active');
+            }
         });
         
         // Time background color buttons
@@ -985,13 +1192,23 @@ class DrawingBoard {
                 this.timeDisplayManager.setBgColor(e.target.dataset.timeBgColor);
                 document.querySelectorAll('.color-btn[data-time-bg-color]').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
+                // Deactivate color picker button
+                const customTimeBgColorPickerBtn = document.querySelector('label[for="custom-time-bg-color-picker"]');
+                if (customTimeBgColorPickerBtn) {
+                    customTimeBgColorPickerBtn.classList.remove('active');
+                }
             });
         });
         
         const customTimeBgColorPicker = document.getElementById('custom-time-bg-color-picker');
+        const customTimeBgColorPickerBtn = document.querySelector('label[for="custom-time-bg-color-picker"]');
         customTimeBgColorPicker.addEventListener('input', (e) => {
             this.timeDisplayManager.setBgColor(e.target.value);
             document.querySelectorAll('.color-btn[data-time-bg-color]').forEach(b => b.classList.remove('active'));
+            // Mark color picker button as active
+            if (customTimeBgColorPickerBtn) {
+                customTimeBgColorPickerBtn.classList.add('active');
+            }
         });
         
         // Time fullscreen mode buttons
@@ -1127,6 +1344,31 @@ class DrawingBoard {
     }
     
     repositionToolbarsOnResize() {
+        // Dynamic toolbar positioning based on window orientation
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+        const isPortrait = windowHeight > windowWidth;
+        const toolbar = document.getElementById('toolbar');
+        
+        // On portrait orientation (typically phones), position toolbar on right side
+        if (isPortrait && toolbar && !toolbar.classList.contains('user-positioned')) {
+            // Apply right side positioning for portrait mode
+            toolbar.classList.add('vertical');
+            toolbar.style.right = '20px';
+            toolbar.style.left = 'auto';
+            toolbar.style.top = '50%';
+            toolbar.style.bottom = 'auto';
+            toolbar.style.transform = 'translateY(-50%)';
+        } else if (!isPortrait && toolbar && !toolbar.classList.contains('user-positioned')) {
+            // For landscape mode, use bottom center positioning
+            toolbar.classList.remove('vertical');
+            toolbar.style.left = '50%';
+            toolbar.style.right = 'auto';
+            toolbar.style.top = 'auto';
+            toolbar.style.bottom = '20px';
+            toolbar.style.transform = 'translateX(-50%)';
+        }
+        
         // Ensure all toolbars and panels stay within viewport after window resize
         const EDGE_SPACING = 10; // Minimum spacing from viewport edges
         const panels = [
@@ -1134,13 +1376,9 @@ class DrawingBoard {
             document.getElementById('config-area'),
             document.getElementById('time-display-area'),
             document.getElementById('feature-area'),
-            document.getElementById('toolbar'),
             document.getElementById('pagination-controls'),
             document.getElementById('timer-display')
         ];
-        
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
         
         panels.forEach(panel => {
             if (!panel) return;
@@ -1292,6 +1530,7 @@ class DrawingBoard {
             let y = clientY - this.dragOffset.y;
             
             const edgeSnapDistance = 30;
+            const edgeSnapHysteresis = 60; // Wider zone to prevent flicker when already snapped
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
             const isToolbar = this.draggedElement.id === 'toolbar';
@@ -1304,16 +1543,27 @@ class DrawingBoard {
             let snappedLeft = false;
             let snappedRight = false;
             
+            // Check if currently in vertical mode
+            const currentlyVertical = this.draggedElement.classList.contains('vertical');
+            
+            // Get current element dimensions (updated during drag)
+            const currentRect = this.draggedElement.getBoundingClientRect();
+            const currentWidth = currentRect.width;
+            const currentHeight = currentRect.height;
+            
             if (this.settingsManager.edgeSnapEnabled) {
+                // Use hysteresis: easier to snap than to unsnap (prevents flicker)
+                const effectiveSnapDistance = currentlyVertical ? edgeSnapHysteresis : edgeSnapDistance;
+                
                 // Check for left edge snap first
-                if (x < edgeSnapDistance) {
+                if (x < effectiveSnapDistance) {
                     x = 10;
                     snappedToEdge = true;
                     isVertical = true;
                     snappedLeft = true;
                 }
                 // Check for right edge snap
-                else if (x + this.draggedElementWidth > windowWidth - edgeSnapDistance) {
+                else if (x + currentWidth > windowWidth - effectiveSnapDistance) {
                     // When vertical, need to recalculate width
                     if (isToolbar || isConfigArea || isTimeDisplayArea || isFeatureArea) {
                         // Temporarily add vertical class to get correct dimensions
@@ -1322,7 +1572,7 @@ class DrawingBoard {
                         this.draggedElement.classList.remove('vertical');
                         x = windowWidth - tempWidth - 10;
                     } else {
-                        x = windowWidth - this.draggedElementWidth - 10;
+                        x = windowWidth - currentWidth - 10;
                     }
                     snappedToEdge = true;
                     isVertical = true;
@@ -1334,8 +1584,8 @@ class DrawingBoard {
                     snappedToEdge = true;
                 }
                 // Snap to bottom
-                if (y + this.draggedElementHeight > windowHeight - edgeSnapDistance) {
-                    y = windowHeight - this.draggedElementHeight - 10;
+                if (y + currentHeight > windowHeight - edgeSnapDistance) {
+                    y = windowHeight - currentHeight - 10;
                     snappedToEdge = true;
                 }
             }
@@ -1348,13 +1598,21 @@ class DrawingBoard {
                     const newWidth = this.draggedElement.getBoundingClientRect().width;
                     x = windowWidth - newWidth - 10;
                 }
+                // Update height after dimension change for vertical layout
+                const newRect = this.draggedElement.getBoundingClientRect();
+                this.draggedElementHeight = newRect.height;
             } else {
                 this.draggedElement.classList.remove('vertical');
+                // Update dimensions when switching back to horizontal
+                const newRect = this.draggedElement.getBoundingClientRect();
+                this.draggedElementWidth = newRect.width;
+                this.draggedElementHeight = newRect.height;
             }
             
             // Constrain to viewport boundaries (prevent overflow)
-            x = Math.max(0, Math.min(x, windowWidth - this.draggedElement.getBoundingClientRect().width));
-            y = Math.max(0, Math.min(y, windowHeight - this.draggedElement.getBoundingClientRect().height));
+            const finalRect = this.draggedElement.getBoundingClientRect();
+            x = Math.max(0, Math.min(x, windowWidth - finalRect.width));
+            y = Math.max(0, Math.min(y, windowHeight - finalRect.height));
             
             this.draggedElement.style.left = `${x}px`;
             this.draggedElement.style.top = `${y}px`;
@@ -1368,6 +1626,12 @@ class DrawingBoard {
             if (this.isDraggingPanel && this.draggedElement) {
                 this.draggedElement.classList.remove('dragging');
                 this.draggedElement.style.transition = '';
+                
+                // Mark toolbar as user-positioned to prevent auto-repositioning
+                if (this.draggedElement.id === 'toolbar') {
+                    this.draggedElement.classList.add('user-positioned');
+                }
+                
                 this.isDraggingPanel = false;
                 this.draggedElement = null;
             }
@@ -1381,7 +1645,54 @@ class DrawingBoard {
         document.addEventListener('touchcancel', handleDragEnd);
     }
     
+    updatePenLineStyleSettings(lineStyle) {
+        const penLineStyleSettings = document.getElementById('pen-line-style-settings');
+        const penDashDensitySetting = document.getElementById('pen-dash-density-setting');
+        
+        // Reset all settings
+        if (penLineStyleSettings) penLineStyleSettings.style.display = 'none';
+        if (penDashDensitySetting) penDashDensitySetting.style.display = 'none';
+        
+        // Show relevant settings
+        switch(lineStyle) {
+            case 'dashed':
+            case 'dotted':
+                if (penLineStyleSettings) penLineStyleSettings.style.display = 'block';
+                if (penDashDensitySetting) penDashDensitySetting.style.display = 'flex';
+                break;
+        }
+    }
+    
+    switchToPen() {
+        // Helper method to switch to pen tool
+        this.setTool('pen', false);
+    }
+    
+    positionFeatureArea() {
+        // Position feature-area above the "更多" button
+        const featureArea = document.getElementById('feature-area');
+        const moreBtn = document.getElementById('more-btn');
+        const toolbar = document.getElementById('toolbar');
+        
+        const moreBtnRect = moreBtn.getBoundingClientRect();
+        const toolbarRect = toolbar.getBoundingClientRect();
+        
+        featureArea.style.bottom = 'auto';
+        featureArea.style.left = `${moreBtnRect.left}px`;
+        featureArea.style.top = `${toolbarRect.top - 10}px`;
+        featureArea.style.transform = 'translateY(-100%)';
+    }
+    
     setTool(tool, showConfig = true) {
+        const configArea = document.getElementById('config-area');
+        const featureArea = document.getElementById('feature-area');
+        const previousTool = this.drawingEngine.currentTool;
+        
+        // Check if we're clicking the same tool button again (toggle behavior)
+        const isSameTool = (previousTool === tool);
+        const isConfigVisible = configArea.classList.contains('show');
+        
+        // Update drawing engine tool
         this.drawingEngine.setTool(tool);
         if (tool === 'eraser') {
             this.showEraserCursor();
@@ -1391,30 +1702,48 @@ class DrawingBoard {
         
         this.updateUI();
         
-        // Hide both config-area and feature-area by default
-        document.getElementById('config-area').classList.remove('show');
-        document.getElementById('feature-area').classList.remove('show');
+        // Handle toggle behavior for tools with config panels
+        const toolsWithConfig = ['pen', 'eraser', 'background', 'shape'];
         
-        // Show appropriate panel based on tool
-        if (showConfig && (tool === 'pen' || tool === 'eraser' || tool === 'background')) {
-            document.getElementById('config-area').classList.add('show');
+        if (showConfig && toolsWithConfig.includes(tool)) {
+            // If clicking the same tool and config is visible, toggle it off
+            if (isSameTool && isConfigVisible) {
+                configArea.classList.remove('show');
+            } else {
+                // Show config panel
+                configArea.classList.add('show');
+                // Don't close feature-area when selecting shape - allow multiple panels to be open
+                if (tool !== 'shape') {
+                    featureArea.classList.remove('show');
+                }
+            }
         } else if (tool === 'more') {
-            document.getElementById('feature-area').classList.add('show');
-            
-            // Update More config panel state
-            const showDateCheckboxMore = document.getElementById('show-date-checkbox-more');
-            const showTimeCheckboxMore = document.getElementById('show-time-checkbox-more');
-            
-            if (showDateCheckboxMore) {
-                showDateCheckboxMore.checked = this.timeDisplayManager.showDate;
+            // Toggle feature-area for more button
+            const isFeatureAreaVisible = featureArea.classList.contains('show');
+            if (isFeatureAreaVisible) {
+                featureArea.classList.remove('show');
+                // Also hide config-area when closing feature-area to prevent empty panel from showing
+                // The 'more' tool has no associated config panel, so config-area should always be hidden
+                configArea.classList.remove('show');
+            } else {
+                featureArea.classList.add('show');
+                configArea.classList.remove('show');
+                this.positionFeatureArea();
             }
-            if (showTimeCheckboxMore) {
-                showTimeCheckboxMore.checked = this.timeDisplayManager.showTime;
-            }
+        } else {
+            // For other tools (like pan), just hide panels
+            configArea.classList.remove('show');
+            featureArea.classList.remove('show');
         }
     }
     
     handleDrawingComplete() {
+        // Handle shape drawing completion
+        if (this.drawingEngine.currentTool === 'shape') {
+            this.shapeDrawingManager.stopDrawing();
+            return;
+        }
+        
         if (this.drawingEngine.stopDrawing()) {
             this.historyManager.saveState();
             this.closeConfigPanel();
@@ -1543,6 +1872,10 @@ class DrawingBoard {
             document.getElementById('pen-btn').classList.add('active');
             document.getElementById('pen-config').classList.add('active');
             this.canvas.style.cursor = 'crosshair';
+        } else if (tool === 'shape') {
+            document.getElementById('more-btn').classList.add('active');
+            document.getElementById('shape-config').classList.add('active');
+            this.canvas.style.cursor = 'crosshair';
         } else if (tool === 'pan') {
             document.getElementById('pan-btn').classList.add('active');
             this.canvas.style.cursor = 'grab';
@@ -1556,21 +1889,12 @@ class DrawingBoard {
             this.canvas.style.cursor = 'default';
         } else if (tool === 'more') {
             document.getElementById('more-btn').classList.add('active');
-            // Show feature-area instead of more-config and position it above the "更多" button
+            // Don't manipulate feature-area visibility here - let setTool handle toggle
+            // Only position it if it's already visible
             const featureArea = document.getElementById('feature-area');
-            const moreBtn = document.getElementById('more-btn');
-            featureArea.classList.add('show');
-            
-            // Position feature-area above the "更多" button
-            const moreBtnRect = moreBtn.getBoundingClientRect();
-            const toolbar = document.getElementById('toolbar');
-            const toolbarRect = toolbar.getBoundingClientRect();
-            
-            // Calculate position above the toolbar
-            featureArea.style.bottom = 'auto';
-            featureArea.style.left = `${moreBtnRect.left}px`;
-            featureArea.style.top = `${toolbarRect.top - 10}px`;
-            featureArea.style.transform = 'translateY(-100%)';
+            if (featureArea.classList.contains('show')) {
+                this.positionFeatureArea();
+            }
             
             this.canvas.style.cursor = 'default';
         }
@@ -2294,7 +2618,13 @@ class DrawingBoard {
     }
     
     stopDraggingCoordinateOrigin() {
-        this.isDraggingCoordinateOrigin = false;
+        if (this.isDraggingCoordinateOrigin) {
+            this.isDraggingCoordinateOrigin = false;
+            // Restore cursor based on current tool
+            if (this.drawingEngine.currentTool === 'pan') {
+                this.canvas.style.cursor = 'grab';
+            }
+        }
     }
 }
 

@@ -268,8 +268,10 @@ class BackgroundManager {
     }
     
     drawCoordinatePattern(dpr, patternColor) {
-        const centerX = (this.bgCanvas.width / 2) + (this.coordinateOriginX * dpr);
-        const centerY = (this.bgCanvas.height / 2) + (this.coordinateOriginY * dpr);
+        // Coordinate system center is always at the exact center of the canvas
+        // The origin offset is applied relative to this center
+        const centerX = this.bgCanvas.width / 2;
+        const centerY = this.bgCanvas.height / 2;
         const baseGridSize = 20 * dpr;
         const gridSize = baseGridSize / this.patternDensity;
         
@@ -438,8 +440,9 @@ class BackgroundManager {
         if (this.backgroundPattern !== 'coordinate') return false;
         
         const dpr = window.devicePixelRatio || 1;
-        const centerX = (this.bgCanvas.width / (2 * dpr)) + this.coordinateOriginX;
-        const centerY = (this.bgCanvas.height / (2 * dpr)) + this.coordinateOriginY;
+        // Center is always at exact canvas center (matching drawCoordinatePattern)
+        const centerX = this.bgCanvas.width / (2 * dpr);
+        const centerY = this.bgCanvas.height / (2 * dpr);
         
         const distance = Math.sqrt(Math.pow(canvasX - centerX, 2) + Math.pow(canvasY - centerY, 2));
         return distance < threshold;

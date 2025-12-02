@@ -32,6 +32,7 @@ window.translations = {
         undo: '실행 취소',
         redo: '다시 실행',
         pen: '펜',
+        shape: '도형',
         move: '이동',
         eraser: '지우개',
         clear: '지우기',
@@ -56,11 +57,25 @@ window.translations = {
             ballpoint: '볼펜',
             fountain: '만년필',
             brush: '붓',
+            color: '색상',
             colorAndSize: '색상 및 크기',
             colorPicker: '색상 선택기',
             size: '크기',
             sizeLabel: '크기: 현재',
             sizePx: 'px'
+        },
+        shape: {
+            title: '도형',
+            type: '도형 유형',
+            line: '직선',
+            rectangle: '사각형',
+            circle: '원',
+            ellipse: '타원',
+            arrow: '화살표',
+            doubleArrow: '양방향 화살표',
+            arrowSize: '화살표 크기',
+            hint: '눌러서 드래그하여 도형 그리기, 놓으면 완성',
+            lineProperties: '선 속성'
         },
         eraser: {
             title: '지우개',
@@ -80,7 +95,41 @@ window.translations = {
         },
         refresh: {
             warning: '새로 고침하면 캔버스 내용이 모두 지워지며 복구할 수 없습니다. 새로 고침하시겠습니까?'
+        },
+        lineStyle: {
+            title: '선 스타일',
+            solid: '실선',
+            dashed: '파선',
+            dotted: '점선',
+            wavy: '물결선',
+            double: '이중선',
+            triple: '삼중선',
+            multiLine: '다중선',
+            arrow: '화살표',
+            doubleArrow: '양방향 화살표',
+            noArrow: '화살표 없음',
+            arrowType: '화살표 유형',
+            dashDensity: '파선 밀도',
+            waveDensity: '물결 밀도',
+            lineSpacing: '선 간격',
+            lineCount: '선 개수'
         }
+    },
+
+    // Line Style Modal
+    lineStyleModal: {
+        title: '선 스타일 설정',
+        openSettings: '더 많은 설정',
+        preview: '미리보기'
+    },
+
+    // Time Display
+    timeDisplay: {
+        options: '시간 표시 옵션',
+        showDate: '날짜 표시',
+        showTime: '시간 표시',
+        settings: '설정',
+        fullscreenDisplay: '전체 화면 표시'
     },
 
     // Background
@@ -97,6 +146,7 @@ window.translations = {
         english4line: '영어 4선',
         musicStaff: '오선보',
         coordinate: '좌표계',
+        coordinateOriginHint: '이동 모드에서 더블클릭하여 좌표 원점 선택 후 드래그하여 이동',
         image: '이미지',
         density: '밀도',
         densityLabel: '밀도: 현재',
@@ -481,6 +531,14 @@ window.translations = {
 창의적인 작업을 즐기세요!`,
         confirm: '확인',
         noShowAgain: '다시 표시하지 않음'
+    },
+
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: '지우기 확인',
+        message: '현재 캔버스를 지우시겠습니까? 이 작업은 취소할 수 없습니다. 다른 캔버스는 영향을 받지 않습니다.',
+        confirm: '확인',
+        cancel: '취소'
     },
 
     // Color names

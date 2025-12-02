@@ -32,6 +32,7 @@ window.translations = {
         undo: 'Undo',
         redo: 'Redo',
         pen: 'Pen',
+        shape: 'Shape',
         move: 'Move',
         eraser: 'Eraser',
         clear: 'Clear',
@@ -56,11 +57,25 @@ window.translations = {
             ballpoint: 'Ballpoint',
             fountain: 'Fountain Pen',
             brush: 'Brush',
+            color: 'Color',
             colorAndSize: 'Color & Size',
             colorPicker: 'Color Picker',
             size: 'Size',
             sizeLabel: 'Size: Current',
             sizePx: 'px'
+        },
+        shape: {
+            title: 'Shape',
+            type: 'Shape Type',
+            line: 'Line',
+            rectangle: 'Rectangle',
+            circle: 'Circle',
+            ellipse: 'Ellipse',
+            arrow: 'Arrow',
+            doubleArrow: 'Double Arrow',
+            arrowSize: 'Arrow Size',
+            hint: 'Press and drag to draw shape, release to finish',
+            lineProperties: 'Line Properties'
         },
         eraser: {
             title: 'Eraser',
@@ -80,7 +95,40 @@ window.translations = {
         },
         refresh: {
             warning: 'Refreshing will clear all canvas content and cannot be recovered. Are you sure you want to refresh?'
+        },
+        lineStyle: {
+            title: 'Line Style',
+            solid: 'Solid',
+            dashed: 'Dashed',
+            dotted: 'Dotted',
+            wavy: 'Wavy',
+            double: 'Double',
+            triple: 'Triple',
+            multiLine: 'Multi-line',
+            arrow: 'Arrow',
+            doubleArrow: 'Double Arrow',
+            noArrow: 'None',
+            arrowType: 'Arrow Type',
+            dashDensity: 'Dash Density',
+            waveDensity: 'Wave Density',
+            lineSpacing: 'Line Spacing',
+            lineCount: 'Line Count'
         }
+    },
+
+    // Line Style Modal
+    lineStyleModal: {
+        title: 'Line Style Settings',
+        openSettings: 'More Settings',
+        preview: 'Preview'
+    },
+
+    // Time Display
+    timeDisplay: {
+        options: 'Time Display Options',
+        showDate: 'Show Date',
+        showTime: 'Show Time',
+        settings: 'Settings'
     },
 
     // Background
@@ -97,6 +145,7 @@ window.translations = {
         english4line: 'English 4-Line',
         musicStaff: 'Music Staff',
         coordinate: 'Coordinate',
+        coordinateOriginHint: 'Double-click to select the coordinate origin in Move mode, then drag to move it',
         image: 'Upload Image',
         density: 'Density',
         densityLabel: 'Density: Current',
@@ -376,6 +425,7 @@ window.translations = {
         showDate: 'Show Date',
         showTime: 'Show Time',
         settings: 'Settings',
+        fullscreenDisplay: 'Fullscreen',
         displayOptions: 'Display Options',
         dateAndTime: 'Date and Time',
         dateOnly: 'Date Only',
@@ -498,6 +548,14 @@ Usage Tips:
 Enjoy your creative work!`,
         confirm: 'OK',
         noShowAgain: 'Don\'t show again'
+    },
+
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: 'Confirm Clear',
+        message: 'Are you sure you want to clear the current canvas? This action cannot be undone. Other canvases will not be affected.',
+        confirm: 'Confirm',
+        cancel: 'Cancel'
     },
 
     // Color names

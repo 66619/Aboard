@@ -32,6 +32,7 @@ window.translations = {
         undo: 'Deshacer',
         redo: 'Rehacer',
         pen: 'Bolígrafo',
+        shape: 'Forma',
         move: 'Mover',
         eraser: 'Borrador',
         clear: 'Borrar',
@@ -56,8 +57,22 @@ window.translations = {
             ballpoint: 'Bolígrafo de bola',
             fountain: 'Pluma estilográfica',
             brush: 'Pincel',
+            color: 'Color',
             colorAndSize: 'Color y tamaño',
             colorPicker: 'Selector de color'
+        },
+        shape: {
+            title: 'Forma',
+            type: 'Tipo de forma',
+            line: 'Línea',
+            rectangle: 'Rectángulo',
+            circle: 'Círculo',
+            ellipse: 'Elipse',
+            arrow: 'Flecha',
+            doubleArrow: 'Doble flecha',
+            arrowSize: 'Tamaño de flecha',
+            hint: 'Presione y arrastre para dibujar, suelte para terminar',
+            lineProperties: 'Propiedades de línea'
         },
         eraser: {
             title: 'Borrador',
@@ -75,7 +90,41 @@ window.translations = {
         },
         refresh: {
             warning: 'Al actualizar se borrará todo el contenido del lienzo y no se podrá recuperar. ¿Está seguro de que desea actualizar?'
+        },
+        lineStyle: {
+            title: 'Estilo de línea',
+            solid: 'Sólido',
+            dashed: 'Discontinuo',
+            dotted: 'Punteado',
+            wavy: 'Ondulado',
+            double: 'Doble',
+            triple: 'Triple',
+            multiLine: 'Multilínea',
+            arrow: 'Flecha',
+            doubleArrow: 'Doble flecha',
+            noArrow: 'Sin flecha',
+            arrowType: 'Tipo de flecha',
+            dashDensity: 'Densidad de guiones',
+            waveDensity: 'Densidad de ondas',
+            lineSpacing: 'Espaciado de líneas',
+            lineCount: 'Número de líneas'
         }
+    },
+
+    // Line Style Modal
+    lineStyleModal: {
+        title: 'Configuración de estilo de línea',
+        openSettings: 'Más configuración',
+        preview: 'Vista previa'
+    },
+
+    // Time Display
+    timeDisplay: {
+        options: 'Opciones de visualización de hora',
+        showDate: 'Mostrar fecha',
+        showTime: 'Mostrar hora',
+        settings: 'Configuración',
+        fullscreenDisplay: 'Pantalla completa'
     },
 
     // Background
@@ -92,6 +141,7 @@ window.translations = {
         english4line: 'Línea inglesa 4',
         musicStaff: 'Pentagrama',
         coordinate: 'Coordenadas',
+        coordinateOriginHint: 'Doble clic para seleccionar el origen en modo Mover, luego arrastre para moverlo',
         image: 'Imagen',
         opacity: 'Opacidad del fondo',
         opacityHint: 'Ajustar la transparencia del fondo, 100% es completamente opaco',
@@ -335,6 +385,7 @@ window.translations = {
     // Feature Area
     features: {
         title: 'Características',
+        moreFeatures: 'Más características',
         time: 'Hora',
         timer: 'Temporizador'
     },
@@ -443,6 +494,14 @@ Consejos de uso:
 ¡Disfruta de tu trabajo creativo!`,
         confirm: 'OK',
         noShowAgain: 'No mostrar de nuevo'
+    },
+
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: 'Confirmar borrado',
+        message: '¿Está seguro de que desea borrar el lienzo actual? Esta acción no se puede deshacer. Otros lienzos no se verán afectados.',
+        confirm: 'Confirmar',
+        cancel: 'Cancelar'
     },
 
     // Color names
