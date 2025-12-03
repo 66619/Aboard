@@ -10,26 +10,29 @@
     <link rel="stylesheet" href="css/modules/feature-area.css">
     <link rel="stylesheet" href="css/modules/export.css">
     <link rel="stylesheet" href="css/modules/timer.css">
+    <link rel="stylesheet" href="css/modules/teaching-tools.css">
+    <link rel="stylesheet" href="css/modules/shape.css">
+    <link rel="stylesheet" href="css/modules/line-style-modal.css">
 </head>
 <body>
     <!-- Zoom controls in top right corner -->
     <div id="history-controls">
-        <button id="export-btn-top" class="history-btn" title="导出画布">
+        <button id="export-btn-top" class="history-btn">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="7 10 12 15 17 10"></polyline>
                 <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
         </button>
-        <button id="zoom-out-btn" class="history-btn" title="缩小 (-)">
+        <button id="zoom-out-btn" class="history-btn">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="8"></circle>
                 <path d="M21 21l-4.35-4.35"></path>
                 <line x1="8" y1="11" x2="14" y2="11"></line>
             </svg>
         </button>
-        <input type="text" id="zoom-input" class="zoom-input" value="100%" title="缩放比例 (输入百分比)">
-        <button id="zoom-in-btn" class="history-btn" title="放大 (+)">
+        <input type="text" id="zoom-input" class="zoom-input" value="100%">
+        <button id="zoom-in-btn" class="history-btn">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="8"></circle>
                 <path d="M21 21l-4.35-4.35"></path>
@@ -37,7 +40,7 @@
                 <line x1="8" y1="11" x2="14" y2="11"></line>
             </svg>
         </button>
-        <button id="fullscreen-btn" class="history-btn" title="全屏 (F11)">
+        <button id="fullscreen-btn" class="history-btn">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
             </svg>
@@ -56,7 +59,7 @@
     <!-- Dynamic configuration area (appears above toolbar) -->
     <div id="config-area">
         <!-- Close button for config panel -->
-        <button id="config-close-btn" class="config-close-btn" title="关闭">
+        <button id="config-close-btn" class="config-close-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -66,33 +69,40 @@
         <!-- Pen configuration -->
         <div id="pen-config" class="config-panel active">
             <div class="config-group">
-                <label>笔触类型</label>
+                <label data-i18n="tools.pen.type">Pen Type</label>
                 <div class="button-size-options pen-type-grid">
-                    <button class="pen-type-btn active" data-pen-type="normal">普通笔</button>
-                    <button class="pen-type-btn" data-pen-type="pencil">铅笔</button>
-                    <button class="pen-type-btn" data-pen-type="ballpoint">圆珠笔</button>
-                    <button class="pen-type-btn" data-pen-type="fountain">钢笔</button>
-                    <button class="pen-type-btn" data-pen-type="brush">毛笔</button>
+                    <button class="pen-type-btn active" data-pen-type="normal" data-i18n="tools.pen.normal">Normal</button>
+                    <button class="pen-type-btn" data-pen-type="pencil" data-i18n="tools.pen.pencil">Pencil</button>
+                    <button class="pen-type-btn" data-pen-type="ballpoint" data-i18n="tools.pen.ballpoint">Ballpoint</button>
+                    <button class="pen-type-btn" data-pen-type="fountain" data-i18n="tools.pen.fountain">Fountain</button>
+                    <button class="pen-type-btn" data-pen-type="brush" data-i18n="tools.pen.brush">Brush</button>
                 </div>
+                <!-- Line Style button below pen type -->
+                <button id="pen-line-style-settings-btn" class="open-line-style-btn">
+                    <svg width="40" height="16" viewBox="0 0 40 16">
+                        <line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <span data-i18n="tools.lineStyle.title">Line Style</span>
+                </button>
             </div>
             <div class="config-group">
-                <label>颜色与粗细</label>
+                <label data-i18n="tools.pen.colorAndSize">Color & Size</label>
                 <div class="color-picker-row">
                     <div class="color-picker-main">
-                        <button class="color-btn active" data-color="#000000" style="background-color: #000000;" title="黑色"></button>
-                        <button class="color-btn" data-color="#FF0000" style="background-color: #FF0000;" title="红色"></button>
-                        <button class="color-btn" data-color="#0000FF" style="background-color: #0000FF;" title="蓝色"></button>
-                        <button class="color-btn" data-color="#00FF00" style="background-color: #00FF00;" title="绿色"></button>
+                        <button class="color-btn active" data-color="#000000" style="background-color: #000000;"></button>
+                        <button class="color-btn" data-color="#FF0000" style="background-color: #FF0000;"></button>
+                        <button class="color-btn" data-color="#0000FF" style="background-color: #0000FF;"></button>
+                        <button class="color-btn" data-color="#00FF00" style="background-color: #00FF00;"></button>
                     </div>
                     <div class="color-picker-main">
-                        <button class="color-btn" data-color="#FFFF00" style="background-color: #FFFF00; border: 1px solid #ccc;" title="黄色"></button>
-                        <button class="color-btn" data-color="#FF8800" style="background-color: #FF8800;" title="橙色"></button>
-                        <button class="color-btn" data-color="#8800FF" style="background-color: #8800FF;" title="紫色"></button>
-                        <button class="color-btn" data-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;" title="白色"></button>
+                        <button class="color-btn" data-color="#FFFF00" style="background-color: #FFFF00; border: 1px solid #ccc;"></button>
+                        <button class="color-btn" data-color="#FF8800" style="background-color: #FF8800;"></button>
+                        <button class="color-btn" data-color="#8800FF" style="background-color: #8800FF;"></button>
+                        <button class="color-btn" data-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;"></button>
                     </div>
                 </div>
                 <div class="color-and-size-row">
-                    <label class="color-picker-icon-btn" for="custom-color-picker" title="取色器">
+                    <label class="color-picker-icon-btn" for="custom-color-picker">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
                             <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
@@ -100,7 +110,7 @@
                         <input type="color" id="custom-color-picker" class="custom-color-picker-input" value="#000000">
                     </label>
                     <div class="pen-size-inline">
-                        <label>粗细：当前 <span id="pen-size-value">5</span>px</label>
+                        <label><span data-i18n="tools.pen.size">Size</span>: <span id="pen-size-value">5</span>px</label>
                         <input type="range" id="pen-size-slider" min="1" max="50" value="5" class="slider slider-compact">
                     </div>
                 </div>
@@ -109,17 +119,112 @@
 
 
 
-        <!-- Eraser configuration -->
-        <div id="eraser-config" class="config-panel">
+        <!-- Shape configuration -->
+        <div id="shape-config" class="config-panel">
             <div class="config-group">
-                <label>形状</label>
-                <div class="button-size-options eraser-shape-options">
-                    <button class="eraser-shape-btn active" data-eraser-shape="circle">圆形</button>
-                    <button class="eraser-shape-btn" data-eraser-shape="rectangle">方形</button>
+                <label data-i18n="tools.shape.type">Shape Type</label>
+                <div class="button-size-options shape-type-grid">
+                    <button class="shape-type-btn active" data-shape-type="line">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="19" x2="19" y2="5"></line>
+                        </svg>
+                        <span data-i18n="tools.shape.line">Line</span>
+                    </button>
+                    <button class="shape-type-btn" data-shape-type="arrow">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="19" x2="19" y2="5"></line>
+                            <polyline points="10 5 19 5 19 14"></polyline>
+                        </svg>
+                        <span data-i18n="tools.shape.arrow">Arrow</span>
+                    </button>
+                    <button class="shape-type-btn" data-shape-type="doubleArrow">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="15 8 19 12 15 16"></polyline>
+                            <polyline points="9 8 5 12 9 16"></polyline>
+                        </svg>
+                        <span data-i18n="tools.shape.doubleArrow">Double Arrow</span>
+                    </button>
+                    <button class="shape-type-btn" data-shape-type="rectangle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        </svg>
+                        <span data-i18n="tools.shape.rectangle">Rectangle</span>
+                    </button>
+                    <button class="shape-type-btn" data-shape-type="circle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="9"></circle>
+                        </svg>
+                        <span data-i18n="tools.shape.circle">Circle</span>
+                    </button>
+                    <button class="shape-type-btn" data-shape-type="ellipse">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <ellipse cx="12" cy="12" rx="10" ry="6"></ellipse>
+                        </svg>
+                        <span data-i18n="tools.shape.ellipse">Ellipse</span>
+                    </button>
+                </div>
+                <!-- Line Style button -->
+                <button id="shape-line-style-settings-btn" class="open-line-style-btn">
+                    <svg width="40" height="16" viewBox="0 0 40 16">
+                        <line x1="2" y1="8" x2="38" y2="8" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <span data-i18n="tools.lineStyle.title">Line Style</span>
+                </button>
+            </div>
+            <div class="config-group">
+                <label data-i18n="tools.pen.colorAndSize">Color & Size</label>
+                <div class="color-picker-row">
+                    <div class="color-picker-main">
+                        <button class="color-btn" data-color="#000000" style="background-color: #000000;"></button>
+                        <button class="color-btn" data-color="#FF0000" style="background-color: #FF0000;"></button>
+                        <button class="color-btn" data-color="#0000FF" style="background-color: #0000FF;"></button>
+                        <button class="color-btn" data-color="#00FF00" style="background-color: #00FF00;"></button>
+                    </div>
+                    <div class="color-picker-main">
+                        <button class="color-btn" data-color="#FFFF00" style="background-color: #FFFF00; border: 1px solid #ccc;"></button>
+                        <button class="color-btn" data-color="#FF8800" style="background-color: #FF8800;"></button>
+                        <button class="color-btn" data-color="#8800FF" style="background-color: #8800FF;"></button>
+                        <button class="color-btn" data-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;"></button>
+                    </div>
+                </div>
+                <div class="color-and-size-row">
+                    <label class="color-picker-icon-btn" for="shape-custom-color-picker">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
+                            <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
+                        </svg>
+                        <input type="color" id="shape-custom-color-picker" class="custom-color-picker-input" value="#000000">
+                    </label>
+                    <div class="pen-size-inline">
+                        <label><span data-i18n="tools.pen.size">Size</span>: <span id="shape-size-value">5</span>px</label>
+                        <input type="range" id="shape-size-slider" min="1" max="50" value="5" class="slider slider-compact">
+                    </div>
+                </div>
+            </div>
+            <!-- Arrow size control (shown only for arrow/doubleArrow shapes) -->
+            <div id="arrow-size-group" class="config-group" style="display: none;">
+                <div class="pen-size-inline">
+                    <label><span data-i18n="tools.shape.arrowSize">Arrow Size</span>: <span id="arrow-size-value">15</span>px</label>
+                    <input type="range" id="arrow-size-slider" min="5" max="50" value="15" class="slider slider-compact">
                 </div>
             </div>
             <div class="config-group">
-                <label>橡皮擦大小：当前 <span id="eraser-size-value">20</span>px</label>
+                <p class="shape-hint" data-i18n="tools.shape.hint">Press and drag to draw shape, release to finish</p>
+            </div>
+        </div>
+
+        <!-- Eraser configuration -->
+        <div id="eraser-config" class="config-panel">
+            <div class="config-group">
+                <label data-i18n="tools.eraser.shape">形状</label>
+                <div class="button-size-options eraser-shape-options">
+                    <button class="eraser-shape-btn active" data-eraser-shape="circle" data-i18n="tools.eraser.shapeCircle">圆形</button>
+                    <button class="eraser-shape-btn" data-eraser-shape="rectangle" data-i18n="tools.eraser.shapeRectangle">方形</button>
+                </div>
+            </div>
+            <div class="config-group">
+                <label><span data-i18n="tools.eraser.sizeLabel">橡皮擦大小：当前</span> <span id="eraser-size-value">20</span>px</label>
                 <input type="range" id="eraser-size-slider" min="10" max="50" value="20" class="slider">
             </div>
         </div>
@@ -130,19 +235,19 @@
                 <label>背景颜色</label>
                 <div class="color-picker-row">
                     <div class="color-picker-main">
-                        <button class="color-btn active" data-bg-color="#ffffff" style="background-color: #ffffff; border: 1px solid #ccc;" title="白色"></button>
-                        <button class="color-btn" data-bg-color="#f5f5f5" style="background-color: #f5f5f5; border: 1px solid #ccc;" title="浅灰"></button>
-                        <button class="color-btn" data-bg-color="#fffef0" style="background-color: #fffef0; border: 1px solid #ccc;" title="米黄"></button>
-                        <button class="color-btn" data-bg-color="#000000" style="background-color: #000000;" title="黑色"></button>
+                        <button class="color-btn active" data-bg-color="#ffffff" style="background-color: #ffffff; border: 1px solid #ccc;"></button>
+                        <button class="color-btn" data-bg-color="#f5f5f5" style="background-color: #f5f5f5; border: 1px solid #ccc;"></button>
+                        <button class="color-btn" data-bg-color="#fffef0" style="background-color: #fffef0; border: 1px solid #ccc;"></button>
+                        <button class="color-btn" data-bg-color="#000000" style="background-color: #000000;"></button>
                     </div>
                     <div class="color-picker-main">
-                        <button class="color-btn" data-bg-color="#2d5016" style="background-color: #2d5016;" title="黑板绿"></button>
-                        <button class="color-btn" data-bg-color="#4a7c59" style="background-color: #4a7c59;" title="青绿色"></button>
-                        <button class="color-btn" data-bg-color="#654321" style="background-color: #654321;" title="棕色"></button>
-                        <button class="color-btn" data-bg-color="#8B4513" style="background-color: #8B4513;" title="深棕色"></button>
+                        <button class="color-btn" data-bg-color="#2d5016" style="background-color: #2d5016;"></button>
+                        <button class="color-btn" data-bg-color="#4a7c59" style="background-color: #4a7c59;"></button>
+                        <button class="color-btn" data-bg-color="#654321" style="background-color: #654321;"></button>
+                        <button class="color-btn" data-bg-color="#8B4513" style="background-color: #8B4513;"></button>
                     </div>
                 </div>
-                <label class="color-picker-icon-btn" for="custom-bg-color-picker" title="取色器" style="margin-top: 8px;">
+                <label class="color-picker-icon-btn" for="custom-bg-color-picker" style="margin-top: 8px;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
                         <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
@@ -179,7 +284,7 @@
                         <label>大小：当前 <span id="bg-image-size-value">100</span>%</label>
                         <div style="display: flex; gap: 8px; align-items: center;">
                             <input type="range" id="bg-image-size-slider" min="10" max="200" value="100" class="slider slider-compact" style="flex: 1;">
-                            <button id="adjust-bg-image-btn" class="icon-btn" title="调整图片位置和大小">
+                            <button id="adjust-bg-image-btn" class="icon-btn">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -191,19 +296,15 @@
             </div>
         </div>
 
-        <!-- More configuration -->
+        <!-- More configuration (placeholder) -->
         <div id="more-config" class="config-panel">
-            <div class="config-group">
-                <label>更多功能</label>
-                <p class="settings-hint" style="font-size: 12px; color: #666; margin-top: -4px;">其他工具和配置项</p>
-            </div>
         </div>
     </div>
 
     <!-- Time Display Area (independent, draggable, with edge snapping) -->
     <div id="time-display-area">
         <!-- Close button for time display area -->
-        <button id="time-display-area-close-btn" class="config-close-btn" title="关闭">
+        <button id="time-display-area-close-btn" class="config-close-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -211,25 +312,34 @@
         </button>
         
         <div class="config-group">
-            <label>时间显示选项</label>
+            <label data-i18n="timeDisplay.options">Time Display Options</label>
             <div class="time-display-options-row">
                 <div class="time-display-checkboxes">
                     <label class="checkbox-label">
                         <input type="checkbox" id="show-date-checkbox-area">
-                        <span>显示日期</span>
+                        <span data-i18n="timeDisplay.showDate">Show Date</span>
                     </label>
                     <label class="checkbox-label" style="margin-top: 8px;">
                         <input type="checkbox" id="show-time-checkbox-area">
-                        <span>显示时间</span>
+                        <span data-i18n="timeDisplay.showTime">Show Time</span>
                     </label>
                 </div>
-                <!-- Settings button for time display area - positioned to the right of checkboxes -->
-                <button id="time-display-area-settings-btn" class="time-display-settings-icon-btn" title="设置">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M12 1v6m0 6v6M5.6 5.6l4.2 4.2m4.2 4.2l4.2 4.2M1 12h6m6 0h6M5.6 18.4l4.2-4.2m4.2-4.2l4.2-4.2"></path>
-                    </svg>
-                </button>
+                <!-- Settings and Fullscreen buttons for time display area -->
+                <div class="time-display-action-buttons">
+                    <button id="time-display-area-settings-btn" class="time-display-settings-btn-with-text">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M12 1v6m0 6v6M5.6 5.6l4.2 4.2m4.2 4.2l4.2 4.2M1 12h6m6 0h6M5.6 18.4l4.2-4.2m4.2-4.2l4.2-4.2"></path>
+                        </svg>
+                        <span data-i18n="timeDisplay.settings">Settings</span>
+                    </button>
+                    <button id="time-display-fullscreen-btn" class="time-display-settings-btn-with-text" data-i18n-title="timeDisplay.fullscreenDisplay">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                        </svg>
+                        <span data-i18n="timeDisplay.fullscreenDisplay">Fullscreen</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -237,7 +347,7 @@
     <!-- Feature buttons area (independent, draggable, with edge snapping) -->
     <div id="feature-area" class="feature-area">
         <!-- Close button for feature panel -->
-        <button id="feature-close-btn" class="config-close-btn" title="关闭">
+        <button id="feature-close-btn" class="config-close-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -245,23 +355,41 @@
         </button>
         
         <div class="config-group">
-            <label>小功能</label>
+            <label data-i18n="features.moreFeatures">More Features</label>
             <div class="more-features-grid">
-                <button id="time-display-feature-btn" class="feature-btn" title="时间显示">
+                <button id="more-shape-btn" class="feature-btn" data-i18n-title="toolbar.shape">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="19" x2="19" y2="5"></line>
+                        <circle cx="19" cy="5" r="2"></circle>
+                        <circle cx="5" cy="19" r="2"></circle>
+                    </svg>
+                    <span data-i18n="toolbar.shape">Shape</span>
+                </button>
+                <button id="more-teaching-tools-btn" class="feature-btn" data-i18n-title="toolbar.teachingTools">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="3,21 3,3 21,21"></polygon>
+                        <line x1="6" y1="18" x2="6" y2="6"></line>
+                        <line x1="9" y1="18" x2="9" y2="9"></line>
+                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                        <line x1="15" y1="18" x2="15" y2="15"></line>
+                    </svg>
+                    <span data-i18n="toolbar.teachingTools">Tools</span>
+                </button>
+                <button id="time-display-feature-btn" class="feature-btn" data-i18n-title="features.time">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
                         <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
-                    <span>时间</span>
+                    <span data-i18n="features.time">Time</span>
                 </button>
-                <button id="timer-feature-btn" class="feature-btn" title="计时器">
+                <button id="timer-feature-btn" class="feature-btn" data-i18n-title="features.timer">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="13" r="8"></circle>
                         <path d="M12 9v4l2 2"></path>
                         <path d="M9 2h6"></path>
                         <path d="M12 2v2"></path>
                     </svg>
-                    <span>计时</span>
+                    <span data-i18n="features.timer">Timer</span>
                 </button>
             </div>
         </div>
@@ -269,14 +397,14 @@
 
     <!-- Pagination controls (below zoom, only visible when not in infinite canvas mode) -->
     <div id="pagination-controls">
-        <button id="prev-page-btn" class="page-nav-btn" title="上一页">
+        <button id="prev-page-btn" class="page-nav-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
         </button>
-        <input type="number" id="page-input" class="page-input" value="1" min="1" title="输入页码跳转">
+        <input type="number" id="page-input" class="page-input" value="1" min="1">
         <span id="page-total">/ 1</span>
-        <button id="next-or-add-page-btn" class="page-nav-btn" title="下一页">
+        <button id="next-or-add-page-btn" class="page-nav-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="9 18 15 12 9 6"></polyline>
             </svg>
@@ -288,7 +416,7 @@
         <div class="modal-content settings-modal-content">
             <div class="modal-header">
                 <h2>设置</h2>
-                <button id="settings-close-btn" class="modal-close-btn" title="关闭">
+                <button id="settings-close-btn" class="modal-close-btn">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -300,14 +428,14 @@
             <div class="settings-layout">
                 <!-- Settings sidebar with icons -->
                 <div class="settings-sidebar">
-                    <button class="settings-tab-icon active" data-tab="general" title="通用">
+                    <button class="settings-tab-icon active" data-tab="general">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="3"></circle>
                             <path d="M12 1v6m0 6v6M5.6 5.6l4.2 4.2m4.2 4.2l4.2 4.2M1 12h6m6 0h6M5.6 18.4l4.2-4.2m4.2-4.2l4.2-4.2"></path>
                         </svg>
                         <span>通用</span>
                     </button>
-                    <button class="settings-tab-icon" data-tab="display" title="显示">
+                    <button class="settings-tab-icon" data-tab="display">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
                             <line x1="8" y1="21" x2="16" y2="21"></line>
@@ -315,14 +443,14 @@
                         </svg>
                         <span>显示</span>
                     </button>
-                    <button class="settings-tab-icon" data-tab="canvas" title="画布">
+                    <button class="settings-tab-icon" data-tab="canvas">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                             <path d="M3 9h18M9 21V9"></path>
                         </svg>
                         <span>画布</span>
                     </button>
-                    <button class="settings-tab-icon" data-tab="background" title="背景">
+                    <button class="settings-tab-icon" data-tab="background">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                             <circle cx="8.5" cy="8.5" r="1.5"></circle>
@@ -330,7 +458,7 @@
                         </svg>
                         <span>背景</span>
                     </button>
-                    <button class="settings-tab-icon" data-tab="about" title="关于">
+                    <button class="settings-tab-icon" data-tab="about">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="10"></circle>
                             <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -338,14 +466,14 @@
                         </svg>
                         <span>关于</span>
                     </button>
-                    <button class="settings-tab-icon" data-tab="announcement" title="公告">
+                    <button class="settings-tab-icon" data-tab="announcement">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                             <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                         </svg>
                         <span>公告</span>
                     </button>
-                    <button class="settings-tab-icon" data-tab="more" title="更多">
+                    <button class="settings-tab-icon" data-tab="more">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="1"></circle>
                             <circle cx="12" cy="5" r="1"></circle>
@@ -447,19 +575,19 @@
                             <p class="settings-hint">工具栏被选中时的颜色</p>
                             <div class="color-picker-row">
                                 <div class="color-picker-main">
-                                    <button class="color-btn active" data-theme-color="#007AFF" style="background-color: #007AFF;" title="蓝色（默认）"></button>
-                                    <button class="color-btn" data-theme-color="#34C759" style="background-color: #34C759;" title="绿色"></button>
-                                    <button class="color-btn" data-theme-color="#FF3B30" style="background-color: #FF3B30;" title="红色"></button>
-                                    <button class="color-btn" data-theme-color="#FF9500" style="background-color: #FF9500;" title="橙色"></button>
+                                    <button class="color-btn active" data-theme-color="#007AFF" style="background-color: #007AFF;"></button>
+                                    <button class="color-btn" data-theme-color="#34C759" style="background-color: #34C759;"></button>
+                                    <button class="color-btn" data-theme-color="#FF3B30" style="background-color: #FF3B30;"></button>
+                                    <button class="color-btn" data-theme-color="#FF9500" style="background-color: #FF9500;"></button>
                                 </div>
                                 <div class="color-picker-main">
-                                    <button class="color-btn" data-theme-color="#AF52DE" style="background-color: #AF52DE;" title="紫色"></button>
-                                    <button class="color-btn" data-theme-color="#FF2D55" style="background-color: #FF2D55;" title="粉色"></button>
-                                    <button class="color-btn" data-theme-color="#5AC8FA" style="background-color: #5AC8FA;" title="青色"></button>
-                                    <button class="color-btn" data-theme-color="#FFCC00" style="background-color: #FFCC00; border: 1px solid #ccc;" title="黄色"></button>
+                                    <button class="color-btn" data-theme-color="#AF52DE" style="background-color: #AF52DE;"></button>
+                                    <button class="color-btn" data-theme-color="#FF2D55" style="background-color: #FF2D55;"></button>
+                                    <button class="color-btn" data-theme-color="#5AC8FA" style="background-color: #5AC8FA;"></button>
+                                    <button class="color-btn" data-theme-color="#FFCC00" style="background-color: #FFCC00; border: 1px solid #ccc;"></button>
                                 </div>
                             </div>
-                            <label class="color-picker-icon-btn" for="custom-theme-color-picker" title="自定义颜色" style="margin-top: 8px;">
+                            <label class="color-picker-icon-btn" for="custom-theme-color-picker" style="margin-top: 8px;">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
                                     <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
@@ -696,19 +824,19 @@
                                     <label style="font-size: 11px; color: #666; display: block; margin-bottom: 8px;">字体颜色</label>
                                     <div class="color-picker-row">
                                         <div class="color-picker-main">
-                                            <button class="color-btn active" data-time-color="#000000" style="background-color: #000000;" title="黑色"></button>
-                                            <button class="color-btn" data-time-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;" title="白色"></button>
-                                            <button class="color-btn" data-time-color="#007AFF" style="background-color: #007AFF;" title="蓝色"></button>
-                                            <button class="color-btn" data-time-color="#FF0000" style="background-color: #FF0000;" title="红色"></button>
+                                            <button class="color-btn active" data-time-color="#000000" style="background-color: #000000;"></button>
+                                            <button class="color-btn" data-time-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;"></button>
+                                            <button class="color-btn" data-time-color="#007AFF" style="background-color: #007AFF;"></button>
+                                            <button class="color-btn" data-time-color="#FF0000" style="background-color: #FF0000;"></button>
                                         </div>
                                         <div class="color-picker-main">
-                                            <button class="color-btn" data-time-color="#00FF00" style="background-color: #00FF00;" title="绿色"></button>
-                                            <button class="color-btn" data-time-color="#FFFF00" style="background-color: #FFFF00; border: 1px solid #ccc;" title="黄色"></button>
-                                            <button class="color-btn" data-time-color="#FF8800" style="background-color: #FF8800;" title="橙色"></button>
-                                            <button class="color-btn" data-time-color="#8800FF" style="background-color: #8800FF;" title="紫色"></button>
+                                            <button class="color-btn" data-time-color="#00FF00" style="background-color: #00FF00;"></button>
+                                            <button class="color-btn" data-time-color="#FFFF00" style="background-color: #FFFF00; border: 1px solid #ccc;"></button>
+                                            <button class="color-btn" data-time-color="#FF8800" style="background-color: #FF8800;"></button>
+                                            <button class="color-btn" data-time-color="#8800FF" style="background-color: #8800FF;"></button>
                                         </div>
                                     </div>
-                                    <label class="color-picker-icon-btn" for="custom-time-color-picker" title="自定义颜色" style="margin-top: 8px;">
+                                    <label class="color-picker-icon-btn" for="custom-time-color-picker" style="margin-top: 8px;">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
                                             <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
@@ -720,19 +848,19 @@
                                     <label style="font-size: 11px; color: #666; display: block; margin-bottom: 8px;">背景颜色</label>
                                     <div class="color-picker-row">
                                         <div class="color-picker-main">
-                                            <button class="color-btn" data-time-bg-color="transparent" style="background: linear-gradient(135deg, #fff 45%, #f00 45%, #f00 55%, #fff 55%); border: 1px solid #ccc;" title="透明"></button>
-                                            <button class="color-btn active" data-time-bg-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;" title="白色"></button>
-                                            <button class="color-btn" data-time-bg-color="#000000" style="background-color: #000000;" title="黑色"></button>
-                                            <button class="color-btn" data-time-bg-color="#007AFF" style="background-color: #007AFF;" title="蓝色"></button>
+                                            <button class="color-btn" data-time-bg-color="transparent" style="background: linear-gradient(135deg, #fff 45%, #f00 45%, #f00 55%, #fff 55%); border: 1px solid #ccc;"></button>
+                                            <button class="color-btn active" data-time-bg-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;"></button>
+                                            <button class="color-btn" data-time-bg-color="#000000" style="background-color: #000000;"></button>
+                                            <button class="color-btn" data-time-bg-color="#007AFF" style="background-color: #007AFF;"></button>
                                         </div>
                                         <div class="color-picker-main">
-                                            <button class="color-btn" data-time-bg-color="#FF0000" style="background-color: #FF0000;" title="红色"></button>
-                                            <button class="color-btn" data-time-bg-color="#00FF00" style="background-color: #00FF00;" title="绿色"></button>
-                                            <button class="color-btn" data-time-bg-color="#FFFF00" style="background-color: #FFFF00; border: 1px solid #ccc;" title="黄色"></button>
-                                            <button class="color-btn" data-time-bg-color="#8800FF" style="background-color: #8800FF;" title="紫色"></button>
+                                            <button class="color-btn" data-time-bg-color="#FF0000" style="background-color: #FF0000;"></button>
+                                            <button class="color-btn" data-time-bg-color="#00FF00" style="background-color: #00FF00;"></button>
+                                            <button class="color-btn" data-time-bg-color="#FFFF00" style="background-color: #FFFF00; border: 1px solid #ccc;"></button>
+                                            <button class="color-btn" data-time-bg-color="#8800FF" style="background-color: #8800FF;"></button>
                                         </div>
                                     </div>
-                                    <label class="color-picker-icon-btn" for="custom-time-bg-color-picker" title="自定义颜色" style="margin-top: 8px;">
+                                    <label class="color-picker-icon-btn" for="custom-time-bg-color-picker" style="margin-top: 8px;">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
                                             <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
@@ -785,13 +913,13 @@
     <div id="confirm-modal" class="modal">
         <div class="modal-content confirm-modal-content">
             <div class="modal-header">
-                <h2>确认清空</h2>
+                <h2 data-i18n="confirmClear.title">确认清空</h2>
             </div>
             <div class="modal-body">
-                <p class="confirm-message">确定要清空画布吗？此操作无法撤销。</p>
+                <p class="confirm-message" data-i18n="confirmClear.message">确定要清空当前画布吗？此操作无法撤销，其他画布不受影响。</p>
                 <div class="confirm-buttons">
-                    <button id="confirm-cancel-btn" class="confirm-btn cancel-btn">取消</button>
-                    <button id="confirm-ok-btn" class="confirm-btn ok-btn">确定</button>
+                    <button id="confirm-cancel-btn" class="confirm-btn cancel-btn" data-i18n="confirmClear.cancel">取消</button>
+                    <button id="confirm-ok-btn" class="confirm-btn ok-btn" data-i18n="confirmClear.confirm">确定</button>
                 </div>
             </div>
         </div>
@@ -830,61 +958,61 @@
 
     <!-- Bottom toolbar -->
     <div id="toolbar">
-        <button id="undo-btn" class="tool-btn" data-tool="undo" title="撤销 (Ctrl+Z)">
+        <button id="undo-btn" class="tool-btn" data-tool="undo">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 7v6h6"></path>
                 <path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"></path>
             </svg>
             <span>撤销</span>
         </button>
-        <button id="redo-btn" class="tool-btn" data-tool="redo" title="重做 (Ctrl+Y)">
+        <button id="redo-btn" class="tool-btn" data-tool="redo">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 7v6h-6"></path>
                 <path d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7"></path>
             </svg>
             <span>重做</span>
         </button>
-        <button id="pen-btn" class="tool-btn active" data-tool="pen" title="笔">
+        <button id="pen-btn" class="tool-btn active" data-tool="pen">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
                 <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
                 <path d="M2 2l7.586 7.586"></path>
                 <circle cx="11" cy="11" r="2"></circle>
             </svg>
-            <span>笔</span>
+            <span data-i18n="toolbar.pen">笔</span>
         </button>
-        <button id="pan-btn" class="tool-btn" data-tool="pan" title="移动画布 (Shift+拖动)">
+        <button id="pan-btn" class="tool-btn" data-tool="pan">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"></path>
                 <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"></path>
                 <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"></path>
                 <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"></path>
             </svg>
-            <span>移动</span>
+            <span data-i18n="toolbar.move">移动</span>
         </button>
-        <button id="eraser-btn" class="tool-btn" data-tool="eraser" title="橡皮擦">
+        <button id="eraser-btn" class="tool-btn" data-tool="eraser">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M20 20H7L3 16 12 7 17 12"></path>
                 <path d="M7 20l5-5"></path>
             </svg>
-            <span>橡皮</span>
+            <span data-i18n="toolbar.eraser">橡皮</span>
         </button>
-        <button id="clear-btn" class="tool-btn" data-tool="clear" title="清空画布">
+        <button id="clear-btn" class="tool-btn" data-tool="clear">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"></polyline>
                 <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
             </svg>
-            <span>清空</span>
+            <span data-i18n="toolbar.clear">清空</span>
         </button>
-        <button id="background-btn" class="tool-btn" data-tool="background" title="背景">
+        <button id="background-btn" class="tool-btn" data-tool="background">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                 <circle cx="8.5" cy="8.5" r="1.5"></circle>
                 <polyline points="21 15 16 10 5 21"></polyline>
             </svg>
-            <span>背景</span>
+            <span data-i18n="toolbar.background">背景</span>
         </button>
-        <button id="more-btn" class="tool-btn" data-tool="more" title="更多">
+        <button id="more-btn" class="tool-btn" data-tool="more">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="1"></circle>
                 <circle cx="12" cy="5" r="1"></circle>
@@ -892,7 +1020,7 @@
             </svg>
             <span>更多</span>
         </button>
-        <button id="settings-btn" class="tool-btn" data-tool="settings" title="设置">
+        <button id="settings-btn" class="tool-btn" data-tool="settings">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="3"></circle>
                 <path d="M12 1v6m0 6v6M5.6 5.6l4.2 4.2m4.2 4.2l4.2 4.2M1 12h6m6 0h6M5.6 18.4l4.2-4.2m4.2-4.2l4.2-4.2"></path>
@@ -906,7 +1034,7 @@
 
     <!-- Fullscreen Time Display Modal -->
     <div id="time-fullscreen-modal" class="time-fullscreen-modal">
-        <button id="time-fullscreen-close-btn" class="time-fullscreen-close-btn" title="关闭全屏">
+        <button id="time-fullscreen-close-btn" class="time-fullscreen-close-btn">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -921,7 +1049,7 @@
 
     <!-- Fullscreen Timer Display Modal -->
     <div id="timer-fullscreen-modal" class="timer-fullscreen-modal">
-        <button id="timer-fullscreen-close-btn" class="timer-fullscreen-close-btn" title="关闭全屏">
+        <button id="timer-fullscreen-close-btn" class="timer-fullscreen-close-btn">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -939,7 +1067,7 @@
         <div class="timer-modal-content" style="max-width: 580px; max-height: 85vh; overflow-y: auto;">
             <div class="timer-modal-header">
                 <h2>时间显示设置</h2>
-                <button id="time-display-settings-close-btn" class="modal-close-btn" title="关闭">
+                <button id="time-display-settings-close-btn" class="modal-close-btn">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -1007,19 +1135,19 @@
                             <label style="font-size: 12px; color: #666; display: block; margin-bottom: 8px;">字体颜色</label>
                             <div class="color-picker-row">
                                 <div class="color-picker-main">
-                                    <button class="color-btn active" data-td-time-color="#000000" style="background-color: #000000;" title="黑色"></button>
-                                    <button class="color-btn" data-td-time-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;" title="白色"></button>
-                                    <button class="color-btn" data-td-time-color="#007AFF" style="background-color: #007AFF;" title="蓝色"></button>
-                                    <button class="color-btn" data-td-time-color="#FF0000" style="background-color: #FF0000;" title="红色"></button>
+                                    <button class="color-btn active" data-td-time-color="#000000" style="background-color: #000000;"></button>
+                                    <button class="color-btn" data-td-time-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;"></button>
+                                    <button class="color-btn" data-td-time-color="#007AFF" style="background-color: #007AFF;"></button>
+                                    <button class="color-btn" data-td-time-color="#FF0000" style="background-color: #FF0000;"></button>
                                 </div>
                                 <div class="color-picker-main">
-                                    <button class="color-btn" data-td-time-color="#00FF00" style="background-color: #00FF00;" title="绿色"></button>
-                                    <button class="color-btn" data-td-time-color="#FFFF00" style="background-color: #FFFF00; border: 1px solid #ccc;" title="黄色"></button>
-                                    <button class="color-btn" data-td-time-color="#FF8800" style="background-color: #FF8800;" title="橙色"></button>
-                                    <button class="color-btn" data-td-time-color="#8800FF" style="background-color: #8800FF;" title="紫色"></button>
+                                    <button class="color-btn" data-td-time-color="#00FF00" style="background-color: #00FF00;"></button>
+                                    <button class="color-btn" data-td-time-color="#FFFF00" style="background-color: #FFFF00; border: 1px solid #ccc;"></button>
+                                    <button class="color-btn" data-td-time-color="#FF8800" style="background-color: #FF8800;"></button>
+                                    <button class="color-btn" data-td-time-color="#8800FF" style="background-color: #8800FF;"></button>
                                 </div>
                             </div>
-                            <label class="color-picker-icon-btn" for="td-custom-time-color-picker" title="自定义颜色" style="margin-top: 8px;">
+                            <label class="color-picker-icon-btn" for="td-custom-time-color-picker" style="margin-top: 8px;">
                                 <svg width="24" height="24" viewBox="-0.4 -5 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polygon points="18 2 22 6 12 16 8 16 8 12 18 2" style="position: relative; z-index: 2;"></polygon>
                                     <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34" style="position: relative; z-index: 2;"></path>
@@ -1031,19 +1159,19 @@
                             <label style="font-size: 12px; color: #666; display: block; margin-bottom: 8px;">背景颜色</label>
                             <div class="color-picker-row">
                                 <div class="color-picker-main">
-                                    <button class="color-btn" data-td-time-bg-color="transparent" style="background: linear-gradient(135deg, #fff 45%, #f00 45%, #f00 55%, #fff 55%); border: 1px solid #ccc;" title="透明"></button>
-                                    <button class="color-btn active" data-td-time-bg-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;" title="白色"></button>
-                                    <button class="color-btn" data-td-time-bg-color="#000000" style="background-color: #000000;" title="黑色"></button>
-                                    <button class="color-btn" data-td-time-bg-color="#007AFF" style="background-color: #007AFF;" title="蓝色"></button>
+                                    <button class="color-btn active" data-td-time-bg-color="#000000" style="background-color: #000000;"></button>
+                                    <button class="color-btn" data-td-time-bg-color="#FF0000" style="background-color: #FF0000;"></button>
+                                    <button class="color-btn" data-td-time-bg-color="#0000FF" style="background-color: #0000FF;"></button>
+                                    <button class="color-btn" data-td-time-bg-color="#00FF00" style="background-color: #00FF00;"></button>
                                 </div>
                                 <div class="color-picker-main">
-                                    <button class="color-btn" data-td-time-bg-color="#FF0000" style="background-color: #FF0000;" title="红色"></button>
-                                    <button class="color-btn" data-td-time-bg-color="#00FF00" style="background-color: #00FF00;" title="绿色"></button>
-                                    <button class="color-btn" data-td-time-bg-color="#FFFF00" style="background-color: #FFFF00; border: 1px solid #ccc;" title="黄色"></button>
-                                    <button class="color-btn" data-td-time-bg-color="#8800FF" style="background-color: #8800FF;" title="紫色"></button>
+                                    <button class="color-btn" data-td-time-bg-color="#FFFF00" style="background-color: #FFFF00; border: 1px solid #ccc;"></button>
+                                    <button class="color-btn" data-td-time-bg-color="#FF8800" style="background-color: #FF8800;"></button>
+                                    <button class="color-btn" data-td-time-bg-color="#8800FF" style="background-color: #8800FF;"></button>
+                                    <button class="color-btn" data-td-time-bg-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;"></button>
                                 </div>
                             </div>
-                            <label class="color-picker-icon-btn" for="td-custom-bg-color-picker" title="自定义颜色" style="margin-top: 8px;">
+                            <label class="color-picker-icon-btn" for="td-custom-bg-color-picker" style="margin-top: 8px;">
                                 <svg width="24" height="24" viewBox="-0.4 -5 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polygon points="18 2 22 6 12 16 8 16 8 12 18 2" style="position: relative; z-index: 2;"></polygon>
                                     <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34" style="position: relative; z-index: 2;"></path>
@@ -1102,7 +1230,7 @@
         <div class="timer-modal-content">
             <div class="timer-modal-header">
                 <h2>计时器设置</h2>
-                <button id="timer-settings-close-btn" class="modal-close-btn" title="关闭">
+                <button id="timer-settings-close-btn" class="modal-close-btn">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -1172,19 +1300,19 @@
                                 <label>字体颜色</label>
                                 <div class="color-picker-row">
                                     <div class="color-picker-main">
-                                        <button class="color-btn active" data-timer-text-color="#333333" style="background-color: #333333;" title="深灰（默认）"></button>
-                                        <button class="color-btn" data-timer-text-color="#000000" style="background-color: #000000;" title="黑色"></button>
-                                        <button class="color-btn" data-timer-text-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;" title="白色"></button>
-                                        <button class="color-btn" data-timer-text-color="#FF0000" style="background-color: #FF0000;" title="红色"></button>
+                                        <button class="color-btn active" data-timer-text-color="#333333" style="background-color: #333333;"></button>
+                                        <button class="color-btn" data-timer-text-color="#000000" style="background-color: #000000;"></button>
+                                        <button class="color-btn" data-timer-text-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;"></button>
+                                        <button class="color-btn" data-timer-text-color="#FF0000" style="background-color: #FF0000;"></button>
                                     </div>
                                     <div class="color-picker-main">
-                                        <button class="color-btn" data-timer-text-color="#0000FF" style="background-color: #0000FF;" title="蓝色"></button>
-                                        <button class="color-btn" data-timer-text-color="#00FF00" style="background-color: #00FF00;" title="绿色"></button>
-                                        <button class="color-btn" data-timer-text-color="#FFFF00" style="background-color: #FFFF00; border: 1px solid #ccc;" title="黄色"></button>
-                                        <button class="color-btn" data-timer-text-color="#FF8800" style="background-color: #FF8800;" title="橙色"></button>
+                                        <button class="color-btn" data-timer-text-color="#0000FF" style="background-color: #0000FF;"></button>
+                                        <button class="color-btn" data-timer-text-color="#00FF00" style="background-color: #00FF00;"></button>
+                                        <button class="color-btn" data-timer-text-color="#FFFF00" style="background-color: #FFFF00; border: 1px solid #ccc;"></button>
+                                        <button class="color-btn" data-timer-text-color="#FF8800" style="background-color: #FF8800;"></button>
                                     </div>
                                 </div>
-                                <label class="color-picker-icon-btn timer-color-picker-icon" for="custom-timer-text-color-picker" title="自定义颜色">
+                                <label class="color-picker-icon-btn timer-color-picker-icon" for="custom-timer-text-color-picker">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
                                         <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
@@ -1196,19 +1324,19 @@
                                 <label>背景颜色</label>
                                 <div class="color-picker-row">
                                     <div class="color-picker-main">
-                                        <button class="color-btn active" data-timer-bg-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;" title="白色（默认）"></button>
-                                        <button class="color-btn" data-timer-bg-color="#000000" style="background-color: #000000;" title="黑色"></button>
-                                        <button class="color-btn" data-timer-bg-color="#F0F0F0" style="background-color: #F0F0F0; border: 1px solid #ccc;" title="浅灰"></button>
-                                        <button class="color-btn" data-timer-bg-color="#FFE5E5" style="background-color: #FFE5E5;" title="浅红"></button>
+                                        <button class="color-btn active" data-timer-bg-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;"></button>
+                                        <button class="color-btn" data-timer-bg-color="#000000" style="background-color: #000000;"></button>
+                                        <button class="color-btn" data-timer-bg-color="#F0F0F0" style="background-color: #F0F0F0; border: 1px solid #ccc;"></button>
+                                        <button class="color-btn" data-timer-bg-color="#FFE5E5" style="background-color: #FFE5E5;"></button>
                                     </div>
                                     <div class="color-picker-main">
-                                        <button class="color-btn" data-timer-bg-color="#E5F0FF" style="background-color: #E5F0FF;" title="浅蓝"></button>
-                                        <button class="color-btn" data-timer-bg-color="#E5FFE5" style="background-color: #E5FFE5;" title="浅绿"></button>
-                                        <button class="color-btn" data-timer-bg-color="#FFFFE5" style="background-color: #FFFFE5; border: 1px solid #ccc;" title="浅黄"></button>
-                                        <button class="color-btn" data-timer-bg-color="#FFE5CC" style="background-color: #FFE5CC;" title="浅橙"></button>
+                                        <button class="color-btn" data-timer-bg-color="#E5F0FF" style="background-color: #E5F0FF;"></button>
+                                        <button class="color-btn" data-timer-bg-color="#E5FFE5" style="background-color: #E5FFE5;"></button>
+                                        <button class="color-btn" data-timer-bg-color="#FFFFE5" style="background-color: #FFFFE5; border: 1px solid #ccc;"></button>
+                                        <button class="color-btn" data-timer-bg-color="#FFE5CC" style="background-color: #FFE5CC;"></button>
                                     </div>
                                 </div>
-                                <label class="color-picker-icon-btn timer-color-picker-icon" for="custom-timer-bg-color-picker" title="自定义颜色">
+                                <label class="color-picker-icon-btn timer-color-picker-icon" for="custom-timer-bg-color-picker">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
                                         <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
@@ -1282,7 +1410,7 @@
     <div id="timer-display">
         <div class="timer-display-header">
             <div class="timer-display-mode">正计时</div>
-            <button class="timer-close-btn" id="timer-display-close-btn" title="关闭">
+            <button class="timer-close-btn" id="timer-display-close-btn">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -1320,6 +1448,10 @@
     <script src="js/modules/time-display-controls.js"></script>
     <script src="js/modules/time-display-settings.js"></script>
     <script src="js/modules/timer.js"></script>
+    <script src="js/modules/edge-drawing.js"></script>
+    <script src="js/modules/teaching-tools.js"></script>
+    <script src="js/modules/shape-drawing.js"></script>
+    <script src="js/modules/line-style-modal.js"></script>
     <script src="js/settings.js"></script>
     <script src="js/announcement.js"></script>
     <script src="js/export.js"></script>

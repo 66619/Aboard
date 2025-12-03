@@ -32,10 +32,12 @@ window.translations = {
         undo: 'Annuler',
         redo: 'Rétablir',
         pen: 'Stylo',
+        shape: 'Forme',
         move: 'Déplacer',
         eraser: 'Gomme',
         clear: 'Effacer',
         background: 'Arrière-plan',
+        teachingTools: 'Outils',
         more: 'Plus',
         settings: 'Paramètres',
         export: 'Exporter le canevas',
@@ -55,8 +57,22 @@ window.translations = {
             ballpoint: 'Stylo à bille',
             fountain: 'Stylo-plume',
             brush: 'Pinceau',
+            color: 'Couleur',
             colorAndSize: 'Couleur et taille',
             colorPicker: 'Sélecteur de couleur'
+        },
+        shape: {
+            title: 'Forme',
+            type: 'Type de forme',
+            line: 'Ligne',
+            rectangle: 'Rectangle',
+            circle: 'Cercle',
+            ellipse: 'Ellipse',
+            arrow: 'Flèche',
+            doubleArrow: 'Double flèche',
+            arrowSize: 'Taille de flèche',
+            hint: 'Appuyez et glissez pour dessiner, relâchez pour terminer',
+            lineProperties: 'Propriétés de ligne'
         },
         eraser: {
             title: 'Gomme',
@@ -74,7 +90,41 @@ window.translations = {
         },
         refresh: {
             warning: 'L\'actualisation effacera tout le contenu du canevas et ne pourra pas être récupéré. Êtes-vous sûr de vouloir actualiser ?'
+        },
+        lineStyle: {
+            title: 'Style de ligne',
+            solid: 'Plein',
+            dashed: 'Tirets',
+            dotted: 'Pointillé',
+            wavy: 'Ondulé',
+            double: 'Double',
+            triple: 'Triple',
+            multiLine: 'Multi-lignes',
+            arrow: 'Flèche',
+            doubleArrow: 'Double flèche',
+            noArrow: 'Sans flèche',
+            arrowType: 'Type de flèche',
+            dashDensity: 'Densité des tirets',
+            waveDensity: 'Densité des ondes',
+            lineSpacing: 'Espacement des lignes',
+            lineCount: 'Nombre de lignes'
         }
+    },
+
+    // Line Style Modal
+    lineStyleModal: {
+        title: 'Paramètres de style de ligne',
+        openSettings: 'Plus de paramètres',
+        preview: 'Aperçu'
+    },
+
+    // Time Display
+    timeDisplay: {
+        options: 'Options d\'affichage de l\'heure',
+        showDate: 'Afficher la date',
+        showTime: 'Afficher l\'heure',
+        settings: 'Paramètres',
+        fullscreenDisplay: 'Plein écran'
     },
 
     // Background
@@ -91,6 +141,7 @@ window.translations = {
         english4line: 'Ligne anglaise 4',
         musicStaff: 'Portée musicale',
         coordinate: 'Coordonnées',
+        coordinateOriginHint: 'Double-cliquez pour sélectionner l\'origine en mode Déplacer, puis faites glisser',
         image: 'Image',
         opacity: 'Opacité de l\'arrière-plan',
         opacityHint: 'Ajuster la transparence de l\'arrière-plan, 100% est complètement opaque',
@@ -334,8 +385,28 @@ window.translations = {
     // Feature Area
     features: {
         title: 'Fonctionnalités',
+        moreFeatures: 'Plus de fonctionnalités',
         time: 'Heure',
         timer: 'Minuteur'
+    },
+
+    // Teaching Tools
+    teachingTools: {
+        title: 'Outils pédagogiques',
+        ruler: 'Règle',
+        rulerStyle1: 'Règle 1',
+        rulerStyle2: 'Règle 2',
+        setSquare: 'Équerre',
+        setSquare60: 'Équerre 60°',
+        setSquare45: 'Équerre 45°',
+        hint: 'Astuce : Clic simple pour déplacer, double-clic pour redimensionner, pivoter ou supprimer',
+        insertHint: 'Sélectionnez le nombre d\'outils à insérer',
+        currentOnCanvas: 'Nombre actuel sur le canevas',
+        addNew: 'Ajouter nouveau',
+        rotate: 'Pivoter',
+        resize: 'Redimensionner',
+        delete: 'Supprimer',
+        drawAlongEdge: 'Tracer le long du bord'
     },
 
     // Time Display
@@ -423,6 +494,14 @@ Conseils d'utilisation :
 Profitez de votre travail créatif !`,
         confirm: 'OK',
         noShowAgain: 'Ne plus afficher'
+    },
+
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: 'Confirmer l\'effacement',
+        message: 'Êtes-vous sûr de vouloir effacer la toile actuelle ? Cette action ne peut pas être annulée. Les autres toiles ne seront pas affectées.',
+        confirm: 'Confirmer',
+        cancel: 'Annuler'
     },
 
     // Color names

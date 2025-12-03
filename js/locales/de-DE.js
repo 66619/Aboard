@@ -32,10 +32,12 @@ window.translations = {
         undo: 'Rückgängig',
         redo: 'Wiederholen',
         pen: 'Stift',
+        shape: 'Form',
         move: 'Verschieben',
         eraser: 'Radiergummi',
         clear: 'Löschen',
         background: 'Hintergrund',
+        teachingTools: 'Werkzeuge',
         more: 'Mehr',
         settings: 'Einstellungen',
         export: 'Leinwand exportieren',
@@ -55,11 +57,25 @@ window.translations = {
             ballpoint: 'Kugelschreiber',
             fountain: 'Füllfederhalter',
             brush: 'Pinsel',
+            color: 'Farbe',
             colorAndSize: 'Farbe & Größe',
             colorPicker: 'Farbwähler',
             size: 'Größe',
             sizeLabel: 'Größe: Aktuell',
             sizePx: 'px'
+        },
+        shape: {
+            title: 'Form',
+            type: 'Formtyp',
+            line: 'Linie',
+            rectangle: 'Rechteck',
+            circle: 'Kreis',
+            ellipse: 'Ellipse',
+            arrow: 'Pfeil',
+            doubleArrow: 'Doppelpfeil',
+            arrowSize: 'Pfeilgröße',
+            hint: 'Drücken und ziehen zum Zeichnen, loslassen zum Beenden',
+            lineProperties: 'Linieneigenschaften'
         },
         eraser: {
             title: 'Radiergummi',
@@ -79,7 +95,41 @@ window.translations = {
         },
         refresh: {
             warning: 'Beim Aktualisieren wird der gesamte Inhalt der Leinwand gelöscht und kann nicht wiederhergestellt werden. Möchten Sie wirklich aktualisieren?'
+        },
+        lineStyle: {
+            title: 'Linienstil',
+            solid: 'Durchgehend',
+            dashed: 'Gestrichelt',
+            dotted: 'Gepunktet',
+            wavy: 'Wellig',
+            double: 'Doppelt',
+            triple: 'Dreifach',
+            multiLine: 'Mehrfachlinien',
+            arrow: 'Pfeil',
+            doubleArrow: 'Doppelpfeil',
+            noArrow: 'Kein Pfeil',
+            arrowType: 'Pfeiltyp',
+            dashDensity: 'Strichdichte',
+            waveDensity: 'Wellendichte',
+            lineSpacing: 'Linienabstand',
+            lineCount: 'Linienanzahl'
         }
+    },
+
+    // Line Style Modal
+    lineStyleModal: {
+        title: 'Linienstil-Einstellungen',
+        openSettings: 'Weitere Einstellungen',
+        preview: 'Vorschau'
+    },
+
+    // Time Display
+    timeDisplay: {
+        options: 'Zeitanzeigeoptionen',
+        showDate: 'Datum anzeigen',
+        showTime: 'Uhrzeit anzeigen',
+        settings: 'Einstellungen',
+        fullscreenDisplay: 'Vollbildanzeige'
     },
 
     // Background
@@ -96,6 +146,7 @@ window.translations = {
         english4line: 'Englisch 4-Linien',
         musicStaff: 'Notensystem',
         coordinate: 'Koordinaten',
+        coordinateOriginHint: 'Doppelklicken Sie im Verschiebemodus, um den Koordinatenursprung auszuwählen und zu verschieben',
         image: 'Bild',
         opacity: 'Hintergrund-Deckkraft',
         opacityHint: 'Hintergrundtransparenz anpassen, 100% ist vollständig undurchsichtig',
@@ -374,6 +425,25 @@ window.translations = {
         timer: 'Timer'
     },
 
+    // Teaching Tools
+    teachingTools: {
+        title: 'Lehrmittel',
+        ruler: 'Lineal',
+        rulerStyle1: 'Lineal 1',
+        rulerStyle2: 'Lineal 2',
+        setSquare: 'Geodreieck',
+        setSquare60: 'Geodreieck 60°',
+        setSquare45: 'Geodreieck 45°',
+        hint: 'Hinweis: Einfacher Klick zum Verschieben, Doppelklick zum Größe ändern, Drehen oder Löschen',
+        insertHint: 'Wählen Sie die Anzahl der einzufügenden Werkzeuge',
+        currentOnCanvas: 'Aktuelle Anzahl auf der Leinwand',
+        addNew: 'Neu hinzufügen',
+        rotate: 'Drehen',
+        resize: 'Größe ändern',
+        delete: 'Löschen',
+        drawAlongEdge: 'Entlang der Kante zeichnen'
+    },
+
     // Time Display
     timeDisplay: {
         title: 'Zeitanzeige',
@@ -488,6 +558,14 @@ Verwendungstipps:
 Viel Spaß bei Ihrer kreativen Arbeit!`,
         confirm: 'OK',
         noShowAgain: 'Nicht mehr anzeigen'
+    },
+
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: 'Löschen bestätigen',
+        message: 'Sind Sie sicher, dass Sie die aktuelle Leinwand löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden. Andere Leinwände sind nicht betroffen.',
+        confirm: 'Bestätigen',
+        cancel: 'Abbrechen'
     },
 
     // Color names

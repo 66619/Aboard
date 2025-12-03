@@ -1,0 +1,473 @@
+/* Teaching Tools Module Styles */
+
+/* Teaching Tools Modal */
+#teaching-tools-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+#teaching-tools-modal.show {
+    display: flex;
+}
+
+.teaching-tools-modal-content {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    max-width: 800px;
+    width: 95%;
+    max-height: 90vh;
+    overflow: hidden;
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.teaching-tools-modal-content .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid #eee;
+}
+
+.teaching-tools-modal-content .modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Teaching Tools Body */
+.teaching-tools-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Section labels */
+.teaching-tools-section-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+/* Current count section */
+.teaching-tools-current-count-section {
+    padding: 12px 16px;
+    background: #e8f4fd;
+    border-radius: 8px;
+}
+
+.teaching-tools-current-row {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* 2x2 grid layout for current count display (2 rows) */
+.teaching-tools-current-row.teaching-tools-current-row-4 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px 24px;
+    justify-items: center;
+}
+
+.teaching-tool-current-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 180px;
+    justify-content: flex-start;
+}
+
+.teaching-tool-current-item span {
+    font-size: 14px;
+    color: #1976d2;
+    font-weight: 500;
+    white-space: nowrap;
+    min-width: 90px;
+    text-align: right;
+}
+
+/* New section */
+.teaching-tools-new-section {
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+/* Tools Row - side by side layout */
+.teaching-tools-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* 4-column layout for new tool variants */
+.teaching-tools-row.teaching-tools-row-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+/* Teaching Tool Item */
+.teaching-tool-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    background: #f8f9fa;
+    transition: all 0.2s ease;
+    flex: 1;
+    min-width: 130px;
+    max-width: 200px;
+}
+
+.teaching-tool-item:hover {
+    border-color: var(--theme-color, #007AFF);
+    background: #f0f7ff;
+}
+
+/* Tool Preview */
+.teaching-tool-preview {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 6px;
+}
+
+.teaching-tool-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.teaching-tool-image.set-square-image {
+    max-height: 70px;
+}
+
+/* Tool Label */
+.teaching-tool-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Counter Controls */
+.teaching-tool-counter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.counter-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    background: var(--theme-color, #007AFF);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.counter-btn:hover:not(.disabled) {
+    opacity: 0.9;
+    transform: scale(1.05);
+}
+
+.counter-btn:active:not(.disabled) {
+    transform: scale(0.95);
+}
+
+.counter-btn.disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.counter-btn.disabled:hover {
+    transform: none;
+}
+
+.counter-btn svg {
+    stroke: white;
+}
+
+.counter-input {
+    width: 50px;
+    height: 32px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.counter-input:focus {
+    border-color: var(--theme-color, #007AFF);
+}
+
+.counter-input::-webkit-inner-spin-button,
+.counter-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.counter-input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Hint text */
+.teaching-tools-hint {
+    text-align: center;
+    padding: 12px;
+    background: #f0f7ff;
+    border-radius: 8px;
+    color: #666;
+    font-size: 13px;
+}
+
+/* Footer */
+.teaching-tools-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.teaching-tools-confirm-btn {
+    padding: 10px 24px;
+    background: var(--theme-color, #007AFF);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.teaching-tools-confirm-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.teaching-tools-confirm-btn:active {
+    transform: translateY(0);
+}
+
+/* Teaching Tool Overlay (on canvas) */
+.teaching-tool-overlay {
+    position: fixed;
+    cursor: move;
+    z-index: 100;
+    pointer-events: auto;
+    touch-action: none;
+}
+
+.teaching-tool-overlay .teaching-tool-image-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.teaching-tool-overlay .teaching-tool-img {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Selection border - tight to image */
+.teaching-tool-overlay.selected {
+    outline: 2px solid var(--theme-color, #007AFF);
+    outline-offset: 0;
+}
+
+/* Word-style resize handles */
+.teaching-tool-resize-handle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border: 2px solid var(--theme-color, #007AFF);
+    border-radius: 2px;
+    display: none;
+    z-index: 10;
+}
+
+.teaching-tool-overlay.selected .teaching-tool-resize-handle {
+    display: block;
+}
+
+/* Handle positions */
+.handle-nw { top: -5px; left: -5px; cursor: nw-resize; }
+.handle-n { top: -5px; left: 50%; transform: translateX(-50%); cursor: n-resize; }
+.handle-ne { top: -5px; right: -5px; cursor: ne-resize; }
+.handle-e { top: 50%; right: -5px; transform: translateY(-50%); cursor: e-resize; }
+.handle-se { bottom: -5px; right: -5px; cursor: se-resize; }
+.handle-s { bottom: -5px; left: 50%; transform: translateX(-50%); cursor: s-resize; }
+.handle-sw { bottom: -5px; left: -5px; cursor: sw-resize; }
+.handle-w { top: 50%; left: -5px; transform: translateY(-50%); cursor: w-resize; }
+
+/* Rotate handle */
+.teaching-tool-rotate-handle {
+    position: absolute;
+    top: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 24px;
+    background: #fff;
+    border: 2px solid var(--theme-color, #007AFF);
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    z-index: 10;
+}
+
+.teaching-tool-rotate-handle:active {
+    cursor: grabbing;
+}
+
+.teaching-tool-rotate-handle svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--theme-color, #007AFF);
+}
+
+.teaching-tool-overlay.selected .teaching-tool-rotate-handle {
+    display: flex;
+}
+
+/* Delete button */
+.teaching-tool-delete-btn {
+    position: absolute;
+    top: -35px;
+    right: -10px;
+    width: 24px;
+    height: 24px;
+    background: #ff3b30;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s ease;
+}
+
+.teaching-tool-delete-btn:hover {
+    transform: scale(1.1);
+    background: #e0352b;
+}
+
+.teaching-tool-delete-btn svg {
+    stroke: white;
+}
+
+.teaching-tool-overlay.selected .teaching-tool-delete-btn {
+    display: flex;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .teaching-tools-modal-content {
+        max-width: 95%;
+    }
+    
+    .teaching-tools-row.teaching-tools-row-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .teaching-tools-current-row.teaching-tools-current-row-4 {
+        grid-template-columns: repeat(2, auto);
+    }
+    
+    .teaching-tool-item {
+        min-width: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .teaching-tools-modal-content {
+        width: 95%;
+        max-height: 85vh;
+    }
+    
+    .teaching-tools-body {
+        padding: 16px;
+    }
+    
+    .teaching-tools-row {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .teaching-tools-row.teaching-tools-row-4 {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    
+    .teaching-tools-current-row.teaching-tools-current-row-4 {
+        grid-template-columns: repeat(2, auto);
+        gap: 12px;
+    }
+    
+    .teaching-tool-item {
+        max-width: 100%;
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .teaching-tool-preview {
+        height: 50px;
+    }
+    
+    .teaching-tool-label {
+        font-size: 12px;
+    }
+}

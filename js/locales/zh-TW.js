@@ -32,10 +32,12 @@ window.translations = {
         undo: '撤銷',
         redo: '重做',
         pen: '筆',
+        shape: '形狀',
         move: '移動',
         eraser: '橡皮',
         clear: '清空',
         background: '背景',
+        teachingTools: '教具',
         more: '更多',
         settings: '設置',
         export: '匯出畫布',
@@ -55,11 +57,25 @@ window.translations = {
             ballpoint: '圓珠筆',
             fountain: '鋼筆',
             brush: '毛筆',
+            color: '顏色',
             colorAndSize: '顏色与粗细',
             colorPicker: '取色器',
             size: '粗细',
             sizeLabel: '粗细：目前',
             sizePx: 'px'
+        },
+        shape: {
+            title: '形狀',
+            type: '形狀類型',
+            line: '直線',
+            rectangle: '矩形',
+            circle: '圓形',
+            ellipse: '橢圓',
+            arrow: '箭頭',
+            doubleArrow: '雙箭頭',
+            arrowSize: '箭頭大小',
+            hint: '按住拖動繪製形狀，鬆開完成',
+            lineProperties: '線條屬性'
         },
         eraser: {
             title: '橡皮',
@@ -79,7 +95,41 @@ window.translations = {
         },
         refresh: {
             warning: '刷新後畫布內容將清空且無法恢復，確定要刷新嗎？'
+        },
+        lineStyle: {
+            title: '線條樣式',
+            solid: '實線',
+            dashed: '虛線',
+            dotted: '點線',
+            wavy: '波浪線',
+            double: '雙線',
+            triple: '三線',
+            multiLine: '多線',
+            arrow: '箭頭',
+            doubleArrow: '雙箭頭',
+            noArrow: '無箭頭',
+            arrowType: '箭頭類型',
+            dashDensity: '虛線密度',
+            waveDensity: '波浪密度',
+            lineSpacing: '線條間距',
+            lineCount: '線條數量'
         }
+    },
+
+    // Line Style Modal
+    lineStyleModal: {
+        title: '線條樣式設定',
+        openSettings: '更多設定',
+        preview: '預覽'
+    },
+
+    // Time Display
+    timeDisplay: {
+        options: '時間顯示選項',
+        showDate: '顯示日期',
+        showTime: '顯示時間',
+        settings: '設定',
+        fullscreenDisplay: '全螢幕顯示'
     },
 
     // Background
@@ -96,6 +146,7 @@ window.translations = {
         english4line: '英语四线格',
         musicStaff: '五线谱',
         coordinate: '坐標系',
+        coordinateOriginHint: '在移動模式下雙擊選中坐標系中心可拖動移動',
         image: '上传圖片',
         density: '密度',
         densityLabel: '密度：目前',
@@ -348,6 +399,25 @@ window.translations = {
         timer: '計時'
     },
 
+    // Teaching Tools
+    teachingTools: {
+        title: '教具',
+        ruler: '直尺',
+        rulerStyle1: '直尺 1',
+        rulerStyle2: '直尺 2',
+        setSquare: '三角板',
+        setSquare60: '三角板 60°',
+        setSquare45: '三角板 45°',
+        hint: '提示：單擊移動，雙擊調整大小、旋轉和刪除',
+        insertHint: '選擇要插入的教具數量',
+        currentOnCanvas: '畫布上當前數量',
+        addNew: '新增',
+        rotate: '旋轉',
+        resize: '調整大小',
+        delete: '刪除',
+        drawAlongEdge: '沿邊緣畫線'
+    },
+
     // Time Display
     timeDisplay: {
         title: '時間顯示',
@@ -478,6 +548,14 @@ window.translations = {
 祝您使用愉快！`,
         confirm: '确定',
         noShowAgain: '不再弹出'
+    },
+
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: '確認清空',
+        message: '確定要清空當前畫布嗎？此操作無法撤銷，其他畫布不受影響。',
+        confirm: '確定',
+        cancel: '取消'
     },
 
     // Color names

@@ -32,10 +32,12 @@ window.translations = {
         undo: '元に戻す',
         redo: 'やり直す',
         pen: 'ペン',
+        shape: '図形',
         move: '移動',
         eraser: '消しゴム',
         clear: 'クリア',
         background: '背景',
+        teachingTools: '教具',
         more: 'もっと',
         settings: '設定',
         export: 'キャンバスをエクスポート',
@@ -55,11 +57,25 @@ window.translations = {
             ballpoint: 'ボールペン',
             fountain: '万年筆',
             brush: 'ブラシ',
+            color: '色',
             colorAndSize: '色とサイズ',
             colorPicker: 'カラーピッカー',
             size: 'サイズ',
             sizeLabel: 'サイズ：現在',
             sizePx: 'px'
+        },
+        shape: {
+            title: '図形',
+            type: '図形の種類',
+            line: '直線',
+            rectangle: '四角形',
+            circle: '円',
+            ellipse: '楕円',
+            arrow: '矢印',
+            doubleArrow: '双方向矢印',
+            arrowSize: '矢印のサイズ',
+            hint: 'ドラッグして図形を描画、離して完成',
+            lineProperties: '線の属性'
         },
         eraser: {
             title: '消しゴム',
@@ -79,7 +95,41 @@ window.translations = {
         },
         refresh: {
             warning: '更新するとキャンバスの内容がすべてクリアされ、復元できません。更新してもよろしいですか？'
+        },
+        lineStyle: {
+            title: '線種',
+            solid: '実線',
+            dashed: '破線',
+            dotted: '点線',
+            wavy: '波線',
+            double: '二重線',
+            triple: '三重線',
+            multiLine: '多重線',
+            arrow: '矢印',
+            doubleArrow: '双方向矢印',
+            noArrow: '矢印なし',
+            arrowType: '矢印の種類',
+            dashDensity: '破線の密度',
+            waveDensity: '波の密度',
+            lineSpacing: '線の間隔',
+            lineCount: '線の数'
         }
+    },
+
+    // Line Style Modal
+    lineStyleModal: {
+        title: '線種設定',
+        openSettings: '詳細設定',
+        preview: 'プレビュー'
+    },
+
+    // Time Display
+    timeDisplay: {
+        options: '時刻表示オプション',
+        showDate: '日付を表示',
+        showTime: '時刻を表示',
+        settings: '設定',
+        fullscreenDisplay: 'フルスクリーン表示'
     },
 
     // Background
@@ -96,6 +146,7 @@ window.translations = {
         english4line: '英語4線',
         musicStaff: '五線譜',
         coordinate: '座標系',
+        coordinateOriginHint: '移動モードでダブルクリックして座標原点を選択し、ドラッグして移動',
         image: '画像',
         density: '密度',
         densityLabel: '密度：現在',
@@ -333,6 +384,25 @@ window.translations = {
         timer: 'タイマー'
     },
 
+    // Teaching Tools
+    teachingTools: {
+        title: '教具',
+        ruler: '定規',
+        rulerStyle1: '定規 1',
+        rulerStyle2: '定規 2',
+        setSquare: '三角定規',
+        setSquare60: '三角定規 60°',
+        setSquare45: '三角定規 45°',
+        hint: 'ヒント：シングルクリックで移動、ダブルクリックでサイズ変更、回転、削除',
+        insertHint: '挿入する教具の数を選択',
+        currentOnCanvas: 'キャンバス上の現在の数',
+        addNew: '新規追加',
+        rotate: '回転',
+        resize: 'サイズ変更',
+        delete: '削除',
+        drawAlongEdge: 'エッジに沿って描画'
+    },
+
     // Time Display
     timeDisplay: {
         title: '時刻表示',
@@ -461,6 +531,14 @@ window.translations = {
 クリエイティブな作業をお楽しみください！`,
         confirm: 'OK',
         noShowAgain: '再度表示しない'
+    },
+
+    // Confirm Clear Dialog
+    confirmClear: {
+        title: 'クリアの確認',
+        message: '現在のキャンバスをクリアしてもよろしいですか？この操作は元に戻せません。他のキャンバスには影響しません。',
+        confirm: '確認',
+        cancel: 'キャンセル'
     },
 
     // Color names

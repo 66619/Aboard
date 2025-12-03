@@ -42,6 +42,14 @@ class TimeDisplayControls {
                 this.hideTimeDisplayArea();
             });
         }
+        
+        // Fullscreen display button
+        const fullscreenBtn = document.getElementById('time-display-fullscreen-btn');
+        if (fullscreenBtn) {
+            fullscreenBtn.addEventListener('click', () => {
+                this.timeDisplayManager.showFullscreen();
+            });
+        }
     }
     
     toggleTimeDisplayArea() {
